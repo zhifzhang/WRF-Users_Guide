@@ -42,13 +42,13 @@ WRF V4.0版本主要更新点如下：
 
 # 目录
 
-1 [概述](users_guide_chap1.md)
+1. [概述](users_guide_chap1.md)
 
 	1.1 [简介](users_guide_chap1.md#Introduction)
 
 	1.2 [WRF模型系统的构成](users_guide_chap1.md#WRF_Modeling_System)
 
-2 Software Installation
+2. Software Installation
 
 	2.1 Introduction
 
