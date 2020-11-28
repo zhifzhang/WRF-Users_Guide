@@ -42,24 +42,32 @@ WRF V4.0版本主要更新点如下：
 
 # 目录
 
-1. Overview
+1. 概述
 
-1.1 Introduction
+1.1 简介
 
-1.2 The WRF Modeling System Program Components
+1.2 WRF模型系统的构成
 
 2. Software Installation
 
 2.1 Introduction
-2.2 Required Compilers and Scripting Languages	2-2
-2.3 Required/Optional Libraries to Download	2-3
-2.4 Post-Processing Utilities	2-4
-2.5 UNIX Environment Settings	2-4
-2.6 Building the WRF Code	2-5
-2.7 Building the WPS Code	2-6
 
-3. The WRF Preprocessing System (WPS) 
-	Introduction	3-1
+2.2 Required Compilers and Scripting Languages
+
+2.3 Required/Optional Libraries to Download
+
+2.4 Post-Processing Utilities
+
+2.5 UNIX Environment Settings
+
+2.6 Building the WRF Code
+
+2.7 Building the WPS Code
+
+3. WRF预处理系统（WRF Preprocessing System，WPS）
+
+3.1 介绍
+
 	Function of Each WPS Program	3-2
 	Installing the WPS	3-5
 	Running the WPS	3-8
