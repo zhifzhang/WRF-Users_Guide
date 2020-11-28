@@ -39,3 +39,140 @@ WRF V4.0版本主要更新点如下：
 		亨利定律常数表，用于在不同的化学参数化中使用相同的常数，例如干/湿沉积方案（M.Barth等人，NCAR）
 
 有关本文档的最新版本，请访问[ARW用户网站]( http://www2.mmm.ucar.edu/wrf/users/ )。
+
+# 目录
+
+1. Overview
+
+1.1 Introduction
+
+1.2 The WRF Modeling System Program Components
+
+2. Software Installation
+
+2.1 Introduction
+2.2 Required Compilers and Scripting Languages	2-2
+2.3 Required/Optional Libraries to Download	2-3
+2.4 Post-Processing Utilities	2-4
+2.5 UNIX Environment Settings	2-4
+2.6 Building the WRF Code	2-5
+2.7 Building the WPS Code	2-6
+
+3. The WRF Preprocessing System (WPS) 
+	Introduction	3-1
+	Function of Each WPS Program	3-2
+	Installing the WPS	3-5
+	Running the WPS	3-8
+	Creating Nested Domains with the WPS	3-20
+	Selecting Between USGS and MODIS-based 
+Land Use Data	3-22
+	Selecting Static Data for the Gravity Wave Drag Scheme	3-23
+	Using Multiple Meteorological Data Sources	3-23
+	Using Non-isobaric Meteorological Datasets .............................3-26
+	Alternative Initialization of Lake SSTs…………………………… 3-27
+	Parallelism in the WPS	3-28
+	Checking WPS Output	3-29
+	WPS Utility Programs	3-30
+	Writing Meteorological Data to the Intermediate Format	3-34
+	Required Meteorological Fields for Running WRF.....................3-36
+	Using MPAS Output for WRF Initial and Boundary Conditions..3-37
+	Creating and Editing Vtables	3-39
+	Writing Static Data to the Geogrid Binary Format	3-41
+	Creating an Urban Fraction Field from NLCD Data .................. 3-44
+	Description of Namelist Variables	3-46
+	Description of GEOGRID.TBL Options	3-52
+	Description of index Options	3-55
+	Description of METGRID.TBL Options	3-58
+	Available Interpolation Options in Geogrid and Metgrid	3-61
+	Land Use and Soil Categories in the Static Data	3-64
+	WPS Output Fields	3-66
+
+
+4. WRF Initialization
+	Introduction	4-1
+	Initialization for Ideal Cases	4-3
+	Initialization for Real Data Cases	4-6
+
+5. WRF Model
+	Introduction 	5-2
+	Installing WRF 	5-2
+	Running WRF 	5-8
+	Examples of namelists for various applications	5-38
+	Check Output 	5-40
+	Trouble Shooting	5-41
+	Physics and Dynamics Options	5-42
+	Summary of PBL Physics Options……………………………….  5-58
+	Summary of Microphysics Options………………………………. 5-59
+	Summary of Cumulus Parameterization Options………………. 5-62
+	Summary of Radiation Physics Options.................................... 5-63
+	Description of Namelist Variables	5-66
+	WRF Output Fields	5-122
+	Special WRF Output Variables.................................................5-130
+
+6. WRF Data Assimilation
+	Introduction	6-2
+	Installing WRFDA for 3DVAR Run….	6-4
+	Installing WRFPLUS and WRFDA for 4DVAR Run	6-9
+	Running Observation Preprocessor (OBSPROC) 	6-10
+	Running WRFDA	6-14
+	Radiance Data Assimilations in WRFDA	6-23
+	Radar Data Assimilation in WRFDA...........................................6-34
+	Precipitation Data Assimilation in WRFDA 4D-Var…………….. 6-37
+	Updating WRF boundary conditions	.6-39
+	Background Error and Running GEN_BE...................................6-43
+	WRFDA Diagnostics	6-51
+	Generating Ensembles with RANDOMCV..................................6-55
+	Hybrid Data Assimilation in WRFDA	6-56
+	ETKF Data Assimilation............................................................. 6-62
+	Additional WRFDA Options	6-67
+	Description of Namelist Variables	6-70
+
+7. Objective Analysis (OBSGRID) 
+	Introduction	7-1
+	Program Flow	7-2
+	Source of Observations	7-3
+	Objective Analysis techniques in OBSGRID	7-4
+	Quality Control for Observations	7-6
+	Additional Observations	7-7
+	Surface FDDA option	7-7
+	Objective Analysis on Model Nests	7-8
+	How to run OBSGRID	7-8
+	Output Files	7-10
+	Plot Utilities	7-13
+	Observations Format	7-15
+	OBSGRID Namelist	7-19
+
+8. WRF Software
+	WRF Build Mechanism	8-1
+	Registry	8-5
+	I/O Applications Program Interface (I/O API)	8-14
+	Timekeeping	8-14
+	Software Documentation	8-15
+	Performance	8-15
+
+9. Post-Processing Programs
+	Introduction	9-1
+	NCL		9-2
+	RIP		9-20
+	ARWpost	9-29
+	UPP 		9-36
+	VAPOR	9-38
+
+10. Utilities and Tools
+	Introduction	10-1
+	read_wrf_nc	10-1
+	iowrf		10-5
+	p_interp	10-6
+	TC Bogus Scheme	10-10
+	v_interp	10-12
+	proc_oml.f	10-14
+	Tools		10-15
+
+Appendix A: WRF-Fire 
+	Introduction	A-1
+	WRF_Fire in idealized cases	A-3
+	Fire variables in namelist.input 	A-4
+	namelist.fire	A-6
+	Running WRF_Fire on real data	A-7
+	Fire state variables	A-13
+	WRF-Fire software 	A-13
