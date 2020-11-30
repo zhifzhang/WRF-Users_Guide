@@ -58,11 +58,13 @@
 
 ## 简介
 
-WRF预处理系统（WPS）是一个由三个程序组成的模块，它们的共同作用是为真实数据模拟准备输入场。每个程序执行一个准备阶段：geogrid定义/确定模式区域并将静态地形数据插值到网格中/格点；ungrib从GRIB格式的文件中提取气象要素场；metgrid将ungrib提取的气象要素场水平插值到geogrid定义的模型网格中。将气象场垂直插值到WRF eta层的工作是在real程序中进行的。
- 
+WRF预处理系统（WPS）是一个由三个程序组成的集合，它们的共同作用是为真实数据模拟准备输入文件。每个程序执行一个准备阶段：*geogrid*定义/确定模拟区域并将静态地形数据插值到网格格点；*ungrib*从GRIB格式的文件中提取气象场；*metgrid*将*ungrib*提取的气象场水平插值到*geogrid*定义的模型网格中。将气象场垂直插值到WRF eta层的工作是在*real*程序中进行的。
 
-上图给出了数据在 WPS 的三个程序之间的转换关系。每个WPS程序都从一个公共namelist文件中读取参数，如图所示。这个namelist文件对每个程序都有单独的namelist记录，还有一个共享的namelist记录，它定义了多个WPS程序使用的参数。图中未显示的是单个程序使用的其他表文件。这些表提供了对程序操作的额外控制，尽管用户通常不需要更改它们。本文稍后将解释GEOGRID.TBL、METGRID.TBL和Vtable文件，不过现在用户不必关注它们。
-WPS的构建机制与WRF模型使用的构建机制非常相似，它提供了在各种平台上编译WPS的选项。当MPI库和合适的编译器可用时，可以编译metgrid和geogrid程序以进行分布式内存执行，这样可以在更短的时间内处理大型模型域。ungrib程序执行的工作不适合并行化，因此ungrib只能在单个处理器上运行。
+![data_flow_of_WPS](images/chap3_data_flow_of_WPS.jpg)
+
+上图给出了WPS三个程序之间的数据处理流程情况。如图所示，每个WPS程序都从一个公共namelist文件中读取参数。这个namelist文件包含了用于每个WPS程序单独的namelist数据，以及多个WPS程序共用的namelist数据。图中未显示的是单个程序使用的其他表文件。这些表提供了对程序操作的额外控制，尽管用户通常不需要更改它们。本文稍后将解释[GEOGRID.TBL](#Geogrid_TBL_Options)、[METGRID.TBL](#METGRID_TBL_Options)和[Vtable](#Creating_and_Editing_Vtables)文件，不过现在用户不必关注它们。
+
+WPS的构建机制与WRF模型使用的构建机制非常相似，它提供了在各种平台上编译WPS的选项。当MPI库和合适的编译器可用时，可以将metgrid和geogrid程序编译为并行方式，这样可以在更短的时间内处理大区域的模拟工作。ungrib程序执行的工作不适合并行化，因此ungrib只能在单个处理器上运行。
 
 <a id=Function_of_Each></a>
 
