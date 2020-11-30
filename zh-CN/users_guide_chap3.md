@@ -222,37 +222,46 @@ WPS需要与构建WRF模型相同的Fortran和C编译器，因为WPS可执行文
 
 ## 运行WPS
 
-运行WRF预处理系统主要有三个步骤： 
-1.	用geogrid定义模型粗域和任何嵌套域
-2.	利用无网格的GRIB数据集提取模拟期的气象场
-3.	用metgrid将气象场水平插值到模型域
+运行WPS基本上主要有三个步骤：
+ 
+1. 用*geogrid*定义模拟的粗糙区域和任何嵌套区域
 
-当要为同一模型域运行多个仿真时，只需要执行第一步一次；此后，使用步骤2和步骤3，只需要为每个仿真处理时变数据。同样，如果使用同一气象数据源在同一时间段内运行多个模型域，则不必为每个模拟分别运行ungrib。下面，对这三个步骤中的每一个步骤进行详细说明。
+2. 用*ungrid*为模拟时段提取GRIB数据集的气象场
 
-步骤1：使用Geogrid定义模型域
-如果成功安装了WPS软件，则在WPS目录结构的根目录中，应存在指向程序geogrid.exe，ungrib.exe和metgrid.exe的符号链接。 除了这三个链接之外，还应该存在一个namelist.wps文件。 因此，WPS根目录中的清单应类似于：
-	> ls
-	drwxr-xr-x 2   4096 arch
-	-rwxr-xr-x 1   1672 clean
-	-rwxr-xr-x 1   3510 compile
-	-rw-r--r-- 1  85973 compile.output
-	-rwxr-xr-x 1   4257 configure
-	-rw-r--r-- 1   2486 configure.wps
-	drwxr-xr-x 4   4096 geogrid
-	lrwxrwxrwx 1     23 geogrid.exe -> geogrid/src/geogrid.exe
-	-rwxr-xr-x 1   1328 link_grib.csh
-	drwxr-xr-x 3   4096 metgrid
-	lrwxrwxrwx 1     23 metgrid.exe -> metgrid/src/metgrid.exe
-	-rw-r--r-- 1   1101 namelist.wps
-	-rw-r--r-- 1   1987 namelist.wps.all_options
-	-rw-r--r-- 1   1075 namelist.wps.global
-	-rw-r--r-- 1    652 namelist.wps.nmm
-	-rw-r--r-- 1   4786 README
-	drwxr-xr-x 4   4096 ungrib
-	lrwxrwxrwx 1     21 ungrib.exe -> ungrib/src/ungrib.exe
-	drwxr-xr-x 3   4096 util
+3. 用*metgrid*将气象场水平插值到模拟区域
 
-在namelist.wps文件的“ geogrid”名称列表记录中定义了模型粗糙域和任何嵌套域，此外，还需要设置“ share”名称列表记录中的参数。 下面给出了这两个名称列表记录的示例，并向用户介绍了名称列表变量的描述，以获取有关每个变量的目的和可能值的更多信息。
+当要为同一模型区域进行多次模拟时，步骤1只需要执行一次；此后，使用步骤2和步骤3为每个模拟处理随时间变化的数据。同样，如果使用同一气象数据源在同一时间段内运行多个不同的模型区域，则不必为每个模拟分别运行ungrib。下面，对这三个步骤进行详细说明。
+
+### 步骤1：使用Geogrid定义模型区域
+
+如果成功安装了WPS软件，则在WPS目录结构的根目录中，应存在指向程序geogrid.exe，ungrib.exe和metgrid.exe的符号链接。除了这三个链接之外，还应该存在一个namelist.wps文件。因此，WPS根目录中的列表应类似于：
+
+```
+> ls
+  drwxr-xr-x 2   4096 arch
+  -rwxr-xr-x 1   1672 clean
+  -rwxr-xr-x 1   3510 compile
+  -rw-r--r-- 1  85973 compile.output
+  -rwxr-xr-x 1   4257 configure
+  -rw-r--r-- 1   2486 configure.wps
+  drwxr-xr-x 4   4096 geogrid
+  lrwxrwxrwx 1     23 geogrid.exe -> geogrid/src/geogrid.exe
+  -rwxr-xr-x 1   1328 link_grib.csh
+  drwxr-xr-x 3   4096 metgrid
+  lrwxrwxrwx 1     23 metgrid.exe -> metgrid/src/metgrid.exe
+  -rw-r--r-- 1   1101 namelist.wps
+  -rw-r--r-- 1   1987 namelist.wps.all_options
+  -rw-r--r-- 1   1075 namelist.wps.global
+  -rw-r--r-- 1    652 namelist.wps.nmm
+  -rw-r--r-- 1   4786 README
+  drwxr-xr-x 4   4096 ungrib
+  lrwxrwxrwx 1     21 ungrib.exe -> ungrib/src/ungrib.exe
+  drwxr-xr-x 3   4096 util
+```
+
+在namelist.wps文件的“geogrid” namelist记录中定义了模型粗糙区域和任何嵌套域，此外，还需要设置“share” namelist记录中的参数。下面给出了这两个namelist记录的示例，用户可参看[名称列表变量说明](#Namelist_Variables)，以获取有关每个变量的目的和可能值的更多信息。
+
+```
 &share
  wrf_core = 'ARW',
  max_dom = 2,
@@ -280,6 +289,13 @@ WPS需要与构建WRF模型相同的Fortran和C编译器，因为WPS可执行文
  stand_lon = -98.,
  geog_data_path = '/mmm/users/wrfhelp/WPS_GEOG/'
 /
+```
+
+
+
+
+
+
 
 要总结与“网格”相关的“share”名称列表记录的一组典型更改，必须首先使用wrf_core选择WRF动态核心。如果正在为ARW模拟运行WPS，则应将wrf_core设置为“ ARW”，而要为NMM模拟运行，则应将其设置为“ NMM”。选择动态核心后，必须使用max_dom选择域总数（对于ARW）或嵌套级别（对于NMM）。由于geogrid仅生成与时间无关的数据，因此geogrid会忽略start_date，end_date和interval_seconds变量。作为一个可选项，可以使用opt_output_from_geogrid_path变量指示应该写入域文件的位置（如果不是默认值，则为当前工作目录），并且可以使用io_form_geogrid更改这些域文件的格式。
 
