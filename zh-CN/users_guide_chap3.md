@@ -82,103 +82,141 @@ geogrid的输出文件是以WRF I/O API格式编写的，因此，通过选择Ne
 
 ### Ungrib程序
 
-ungrib程序读取GRIB文件，然后“degribs”数据，并以一种称为中间格式的简单格式写入数据（有关格式的详细信息，请参阅将数据写入中间格式一节）。GRIB文件包含时变气象场，通常来自另一个区域或全球模型，如NCEP的NAM或GFS模型。ungrib程序可以读取GRIB Edition 1，如果使用“GRIB2”选项编译，则可以读取GRIB Edition 2文件。
-GRIB文件通常包含的字段比初始化WRF所需的字段多。GRIB格式的两个版本都使用各种代码来标识GRIB文件中的变量和级别。Ungrib使用这些代码的表（称为Vtables，用于“变量表”）来定义要从GRIB文件中提取哪些字段并写入中间格式。有关这些代码的详细信息可以在WMO GRIB文档和原始中心的文档中找到。通用GRIB模型输出文件的Vtables随ungrib软件提供。
-为NAM 104和212网格、NAM AWIP格式、GFS、NCEP/NCAR Reanalysis（NCAR存档）、RUC（压力级数据和混合坐标数据）、AFWA的AGRMET陆面模型输出、ECMWF和其他数据集提供Vtables。用户可以使用任何Vtables作为模板为其他模型输出创建自己的Vtable；有关Vtable中字段含义的更多详细信息，请参见创建和编辑Vtables一节。
-Ungrib可以用三种用户可选择的格式之一编写中间数据文件：WPS（一种包含对下游程序有用的附加信息的新格式）、SI（WRF系统以前的中间格式）和MM5格式，这包括在这里，以便ungrib可以用于向MM5建模系统提供GRIB2输入。WPS可以使用这些格式中的任何一种来初始化WRF，尽管建议使用WPS格式。
+ungrib程序读取GRIB文件，然后“degribs”数据，并以一种称为中间格式的简单格式写入数据（有关该格式的详细信息，请参阅[将气象数据写入中间格式](#Writing_Meteorological_Data)一节）。GRIB文件包含随时间变化的气象场，通常来自另一个区域或全球模型，如NCEP的NAM或GFS模型。ungrib程序默认可以读取GRIB Edition 1文件；如果使用“GRIB2”选项进行程序编译，则可以读取GRIB Edition 2文件。
 
-Metgrid程序
-metgrid程序将ungrib程序提取的中间格式气象数据水平插值到geogrid程序定义的模拟域中。插值的metgrid输出可以被WRF real程序接收。metgrid将插入的日期范围在WPS namelist文件的“share”namelist记录中定义，并且必须在每个仿真域的namelist中分别指定日期范围。由于metgrid程序的工作与ungrib程序的工作一样依赖于时间，因此每次初始化新的模拟时都会运行metgrid。
-METGRID.TBL文件提供对如何控制每个气象场的插值。METGRID.TBL文件为每个字段提供一个部分，并且在一个部分中，可以指定选项，例如用于字段的插值方法、用作屏蔽插值的掩码的字段以及字段被插值到的网格交错（例如，U，V in ARW；H，V in NMM）。
-metgrid的输出是以WRF I/O API格式编写的，因此，通过选择NetCDF I/O格式，metgrid可以将其输出写入NetCDF，以便使用外部软件包（包括新版本的RIP4）进行可视化,包含RIP4新版本。
+GRIB文件通常包含的字段比初始化WRF所需的字段多。GRIB格式的两个版本都使用各种代码来标识GRIB文件中的变量和层级。Ungrib使用这些代码的表（称为Vtables，即“variable tables，变量表”）来定义要从GRIB文件中提取哪些字段并写入中间格式。有关这些代码的详细信息可以在WMO GRIB文档和originating center的文档中找到。通用GRIB模型输出文件的Vtables随ungrib软件提供。
+
+提供的Vtables可用于NAM 104和212网格、NAM AWIP格式、GFS、NCEP/NCAR Reanalysis（NCAR存档）、RUC（压力级数据和混合坐标数据）、AFWA的AGRMET陆面模型输出、ECMWF和其他数据集。用户可以使用任何Vtables作为模板为其他模型输出文件创建自己的Vtable；有关Vtable中字段含义的更多详细信息，请参见[创建和编辑Vtables](#Creating_and_Editing_Vtables)一节。
+
+用户可选择Ungrib用以下三种格式之一来生成中间数据文件：WPS格式——一种包含对下游程序有用的附加信息的新格式；SI格式——WRF系统以前的中间格式；以及MM5格式——这里包含MM5格式以便ungrib可用于向MM5模型系统提供GRIB2输入文件。WPS可以使用以上三种格式中的任何一种来初始化WRF——建议使用WPS格式。
+
+### Metgrid程序
+
+metgrid程序将ungrib程序提取的中间格式气象数据水平插值到geogrid程序定义的模拟区域中。插值后的metgrid输出文件可以被WRF real程序接收。metgrid将要运行插值计算的日期范围在WPS namelist文件的“共用”namelist记录中定义，并且必须在每个模拟区域的namelist中分别指定日期范围。由于metgrid程序的工作与ungrib程序的工作一样与时间相关，因此每次初始化新的模拟时都需要运行metgrid。
+
+对每个气象字段如何插值是由METGRID.TBL文件控制的。METGRID.TBL文件为每个气象字段提供一节，并且在这一节中指定操作选项，例如用于该字段的插值方法、用作屏蔽插值的掩码的字段、以及被插值字段的网格交错（例如ARW中的U和V、NMM中的H和V）。
+
+metgrid的输出文件是以WRF I/O API格式编写的，因此，通过选择NetCDF I/O格式，metgrid可以采用NetCDF格式输出文件，以便使用外部软件包（包括新版本的RIP4）进行可视化。
 
 <a id=How_to_Install></a>
 
 ## 安装WPS
 
-WRF预处理系统使用与WRF模型相似的构建机制。geogrid和metgrid的外部库仅限于WRF模型所需的库，因为WPS使用WRF模型的WRF I/O API实现；因此，必须在安装WPS之前编译WRF，以便WPS程序可以使用WRF外部目录中的I/oapi库。此外，ungrib程序需要三个压缩库来支持GRIB Edition 2；但是，如果不需要支持GRIB2数据，则可以在不使用这些压缩库的情况下编译ungrib。
-需要的库
-构建WRF模型所需的唯一库是NetCDF。用户可以在UNIDATA主页（http://www.UNIDATA.ucar.edu/software/netcdf/）上找到源代码、预编译的二进制文件和文档。由于可以很简单的访问支持NetCDF数据格式的实用程序，大多数用户将为WPS选择NetCDF I/O选项，在配置WPS之前，用户应确保将环境变量NetCDF设置为NetCDF安装的路径。
-WRF在模型和通信包之间添加了一个软件层，WPS程序geogrid和metgrid直接进行MPI调用。大多数多处理器计算机都预先配置了MPI版本，因此用户不太可能需要自己安装此软件包。
-ungrib程序需要三个库来支持GRIB Edition 2压缩。鼓励用户与其系统管理员联系安装这些包，以便维护传统的库路径和包含路径。到用户安装的压缩库的路径在configure.wps文件中由compression-LIBS和compression-INC变量处理。除了手动编辑configure.wps文件中的COMPRESSION-LIBS和COMPRESSION-INC变量之外，用户还可以在配置wps之前将环境变量JASPERLIB和jaspenc设置为保存JasPer库的目录并包含文件；例如，如果JasPer库安装在/usr/local/JasPer-1.900.1中，则可以使用以下命令（在csh或tcsh中）：
-	> setenv JASPERLIB /usr/local/jasper-1.900.1/lib
-	> setenv JASPERINC /usr/local/jasper-1.900.1/include
+WPS使用与WRF模型相似的构建机制。geogrid和metgrid的外部库仅限于WRF模型所需的库，因为WPS使用WRF模型的WRF I/O API实现；因此，**必须在安装WPS之前编译WRF**，以便WPS程序可以使用WRF外部目录中的I/O API库。此外，ungrib程序需要三个压缩库来支持GRIB Edition 2；但是，如果不需要支持GRIB2数据，则可以在不使用这些压缩库的情况下编译ungrib。
 
-如果zlib和PNG库不在编译器将自动检查的标准路径中，则可以将这些库的路径添加到JasPer环境变量中；例如，如果PNG库安装在/usr/local/libpng-1.2.29中，zlib库安装在/usr/local/zlib-1.2.3中，则可以使用
-	> setenv JASPERLIB “${JASPERLIB} -L/usr/local/libpng-1.2.29/lib -L/usr/local/zlib-1.2.3/lib”
-	> setenv JASPERINC “${JASPERINC} -I/usr/local/libpng-1.2.29/include -I/usr/local/zlib-1.2.3/include”
+### 需要的库
 
-在先前设置了JASPERLIB和JASPERINC之后。 
-1） Jasper（JPEG2000有损压缩标准的实现） 
-http://www.ece.uvic.ca/~mdadams/jasper/  
+构建WRF模型所需的唯一库是NetCDF。用户可以在[UNIDATA主页]( http://www.UNIDATA.ucar.edu/software/netcdf/ )上找到源代码、预编译的二进制文件和文档。大多数用户为WPS选择NetCDF I/O选项，这样就可以使用很多支持NetCDF数据格式的实用程序。在配置WPS之前，用户应确保将环境变量NetCDF设置为NetCDF安装的路径。
+
+WRF在模型和通信包之间添加了一个软件层，这样WPS程序geogrid和metgrid可以直接进行MPI调用。大多数多处理器计算机都预先配置了一个版本的MPI，因此用户不太可能需要自己安装此软件包。
+
+ungrib程序需要三个库来支持GRIB Edition 2压缩。鼓励用户与其系统管理员联系安装这些包，以便维护传统的库文件路径和include文件路径。用户安装的压缩库的路径由`configure.wps`文件中的`COMPRESSION_LIBS`和`COMPRESSION_INC`变量来配置。除了手动编辑`configure.wps`文件中的`COMPRESSION_LIBS`和`COMPRESSION_INC`变量之外，用户还可以在配置wps之前将环境变量`JASPERLIB`和`JASPERINC`分别设置为保存JasPer库文件和inculde文件的目录；例如，如果JasPer库安装在`/usr/local/JasPer-1.900.1`中，则可以使用以下命令（在csh或tcsh中）：
+
+```
+> setenv JASPERLIB /usr/local/jasper-1.900.1/lib
+> setenv JASPERINC /usr/local/jasper-1.900.1/include
+```
+
+如果zlib和PNG库不在编译器自动检查的标准路径中，则可以将这些库的路径添加到JasPer环境变量中；例如，如果PNG库安装在`/usr/local/libpng-1.2.29`中，zlib库安装在`/usr/local/zlib-1.2.3`中，则可以使用以下命令：
+
+```
+> setenv JASPERLIB “${JASPERLIB} -L/usr/local/libpng-1.2.29/lib -L/usr/local/zlib-1.2.3/lib”
+> setenv JASPERINC “${JASPERINC} -I/usr/local/libpng-1.2.29/include -I/usr/local/zlib-1.2.3/include”
+```
+
+注意：以上命令应在先前设置了`JASPERLIB`和`JASPERINC`之后。 
+
+（1）[Jasper（JPEG2000有损压缩标准的实现）]( http://www.ece.uvic.ca/~mdadams/jasper/ )
+
 进入“Jasper软件”，其中一个“click here”部分是源代码。
-	> ./configure
-	> make
-	> make install
 
-注意：GRIB2库希望在“jasper/jasper.h”中找到include文件，因此可能需要在jasper安装创建的“include”目录中手动创建一个“jasper”子目录，并在其中手动链接头文件。
-
-（2）PNG（用于“无损”压缩的压缩库）
-http://www.libpng.org/pub/png/libpng.html 
-向下滚动到“源代码”并选择镜像站点。
-	> ./configure
-	> make check
-	> make install
-
-（3）zlib（PNG库使用的压缩库）
-http://www.zlib.net/
-转到“当前版本在此处公开提供”部分并下载。
+```
 > ./configure
-	> make
-	> make install
+> make
+> make install
+```
 
-为了解决轻便性问题（portability issues），WPS发行版中包含了NCEP GRIB库w3和g2。这些库的原始版本可从NCEP网站http://www.nco.NCEP.noaa.gov/pmb/codes/GRIB2/ 下载。要下载的特定tar文件是g2lib和w3lib。由于ungrib程序需要这些文件中的模块，因此它们不适合在构建的链接阶段与传统库选项一起使用。
+注意：GRIB2库需要在“jasper/jasper.h”中找到include文件，因此可能需要在jasper安装创建的“include”目录中手动创建一个“jasper”子目录，并在其中手动链接header文件。
 
-必需的编译器和脚本语言
-WPS需要与构建WRF模型相同的Fortran和C编译器，因为WPS可执行文件链接到WRF的I/O API库。在WPS目录中执行./configure命令后，将显示当前系统架构上支持的编译器的列表。
+（2）[PNG（用于“无损”压缩的压缩库）]( http://www.libpng.org/pub/png/libpng.html )
 
-WPS安装步骤
-	下载wps.TAR.gz文件然后解压到与WRF相同的目录级别，如下所示。
-    > ls
-	-rw-r--r--  1  563863 WPSV4.0.TAR.gz
-	drwxr-xr-x 18    4096 WRF
+向下滚动到“源代码”并选择一个镜像站点。
 
-	> gzip -d WPSV4.0.TAR.gz
+```
+> ./configure
+> make check
+> make install
+```
 
-	> tar xf WPSV4.0.TAR 
+（3）[zlib（PNG库使用的压缩库）](http://www.zlib.net/)
 
-	> ls
-	drwxr-xr-x  7     4096 WPS
-	-rw-r--r--  1  3491840 WPSV4.0.TAR
-	drwxr-xr-x 18     4096 WRF
+转到“当前版本在此处公开提供”部分并下载。
 
-	此时，当前工作目录的列表至少应包括WRF和WPS目录。首先，编译WRF（请参阅第2章中有关安装WRF的说明）。然后，在生成WRF可执行文件之后，切换到WPS目录并发出configure命令和compile命令，如下所示。
-> cd WPS
-	> ./configure
-   选择一个配置选项（configure options）
-> ./compile >& compile.output
+```
+> ./configure
+> make
+> make install
+```
 
-	发出compile指令后，当前工作目录的列表应显示指向三个WPS程序（geogrid.exe、ungrib.exe和metgrid.exe）的可执行文件的符号链接。如果这些链接中的任何一个不存在，请检查compile.output中的编译输出以查看出错的地方。
+为了解决便携性问题，WPS发行版中包含了NCEP GRIB库w3和g2。这些库的原始版本可从[NCEP网站]( http://www.nco.NCEP.noaa.gov/pmb/codes/GRIB2/ )下载。包括g2lib和w3lib的tar压缩包文件。由于ungrib程序需要这些文件中的模块，因此它们不适合在构建的链接阶段与传统库选项一起使用。
+
+### 必需的编译器和脚本语言
+
+WPS需要与构建WRF模型相同的Fortran和C编译器，因为WPS可执行文件链接到WRF的I/O API库。在WPS目录中执行`./configure`命令后，将显示当前系统架构上支持的编译器的列表。
+
+### WPS安装步骤
+1. 下载`WPS.TAR.gz`文件，然后解压到与WRF相同的目录级别，如下所示:
+
+```
 > ls
-	drwxr-xr-x 2   4096 arch
-	-rwxr-xr-x 1   1672 clean
-	-rwxr-xr-x 1   3510 compile
-	-rw-r--r-- 1  85973 compile.output
-	-rwxr-xr-x 1   4257 configure
-	-rw-r--r-- 1   2486 configure.wps
-	drwxr-xr-x 4   4096 geogrid
-	lrwxrwxrwx 1     23 geogrid.exe -> geogrid/src/geogrid.exe
-	-rwxr-xr-x 1   1328 link_grib.csh
-	drwxr-xr-x 3   4096 metgrid
-	lrwxrwxrwx 1     23 metgrid.exe -> metgrid/src/metgrid.exe
-	-rw-r--r-- 1   1101 namelist.wps
-	-rw-r--r-- 1   1987 namelist.wps.all_options
-	-rw-r--r-- 1   1075 namelist.wps.global
-	-rw-r--r-- 1    652 namelist.wps.nmm
-	-rw-r--r-- 1   4786 README
-	drwxr-xr-x 4   4096 ungrib
-	lrwxrwxrwx 1     21 ungrib.exe -> ungrib/src/ungrib.exe
-	drwxr-xr-x 3   4096 util
+  -rw-r--r--  1  563863 WPSV4.0.TAR.gz
+  drwxr-xr-x 18    4096 WRF
+
+> gzip -d WPSV4.0.TAR.gz
+
+> tar xf WPSV4.0.TAR 
+
+> ls
+  drwxr-xr-x  7     4096 WPS
+  -rw-r--r--  1  3491840 WPSV4.0.TAR
+  drwxr-xr-x 18     4096 WRF
+```
+
+2. 此时，当前工作目录的列表至少应包括WRF和WPS目录。首先，编译WRF（请参阅第2章中有关安装WRF的说明）。然后，在生成WRF可执行文件之后，切换到WPS目录并发出configure命令和compile命令，如下所示：
+
+```
+> cd WPS
+
+> ./configure
+	选择一个配置选项（configure options）
+	
+> ./compile >& compile.output
+```
+
+3. 发出compile指令后，当前工作目录的列表应显示指向三个WPS程序（geogrid.exe、ungrib.exe和metgrid.exe）的可执行文件的符号链接。如果这些链接中的任何一个不存在，请检查compile.output中的编译输出以查看出错的地方。
+
+```
+> ls
+  drwxr-xr-x 2   4096 arch
+  -rwxr-xr-x 1   1672 clean
+  -rwxr-xr-x 1   3510 compile
+  -rw-r--r-- 1  85973 compile.output
+  -rwxr-xr-x 1   4257 configure
+  -rw-r--r-- 1   2486 configure.wps
+  drwxr-xr-x 4   4096 geogrid
+  lrwxrwxrwx 1     23 geogrid.exe -> geogrid/src/geogrid.exe
+  -rwxr-xr-x 1   1328 link_grib.csh
+  drwxr-xr-x 3   4096 metgrid
+  lrwxrwxrwx 1     23 metgrid.exe -> metgrid/src/metgrid.exe
+  -rw-r--r-- 1   1101 namelist.wps
+  -rw-r--r-- 1   1987 namelist.wps.all_options
+  -rw-r--r-- 1   1075 namelist.wps.global
+  -rw-r--r-- 1    652 namelist.wps.nmm
+  -rw-r--r-- 1   4786 README
+  drwxr-xr-x 4   4096 ungrib
+  lrwxrwxrwx 1     21 ungrib.exe -> ungrib/src/ungrib.exe
+  drwxr-xr-x 3   4096 util
+```
 
 <a id=How_to_Run></a>
 
