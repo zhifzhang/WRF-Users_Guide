@@ -628,87 +628,155 @@ ungrib程序将尝试读取名为GRIBFILE.AAA，GRIBFILE.AAB，…，GRIBFILE.ZZ
 
 ## 在基于USGS和MODIS的土地利用分类之间进行选择
 
-默认情况下，geogrid程序将根据MODIS IGBP 21类别数据对土地使用类别进行插值。但是，用户可以根据USGS土地覆盖类别选择另一组土地使用类别。尽管基于MODIS的数据包含21种土地利用类别，但这些类别不是24种USGS类别的子集；对这两个数据集中的特定类别感兴趣的用户可以在关于土地利用和土壤类别的部分中找到土地利用类别的列表。
-在运行时，可以通过＆geogrid名称列表记录中的geog_data_res变量选择基于24类USGS的土地利用数据，而不是选择MODIS数据。这是通过为静态数据的每个分辨率加上字符串“ usgs_lakes +”来实现的。例如，在两个域的配置中，通常将geog_data_res变量指定为
-	geog_data_res = ‘default’, ‘default’,
-用户应改为指定：
+默认情况下，geogrid程序将根据MODIS IGBP 21种类别数据对土地使用类别进行插值。但是，用户可以根据USGS土地覆盖分类选择另一组土地使用类别。尽管基于MODIS的数据包含21种土地利用类别，但这些类别不是USGS类别中24种的子集；对这两个数据集中的特定类别感兴趣的用户可以在[静态数据中的土地利用和土壤类别](#Land_Use_and_Soil_Categories)一节中找到土地利用类别的列表。
+
+在运行时，可以通过`&geogrid` namelist记录中的`geog_data_res`变量选择基于24类USGS的土地利用数据来代替MODIS数据。这是通过为静态数据的每个分辨率加上前缀字符串`“usgs_lakes+”`来实现的。例如，在两个区域的配置文件中，通常将`geog_data_res`变量指定为
+
+```
+geog_data_res = ‘default’, ‘default’,
+```
+
+如要使用USGS数据，则用户应改为：
+
+```
 geog_data_res = ‘usgs_lakes+default’, ‘usgs_lakes+default’,
-此更改的结果是指示geogrid程序在GEOGRID.TBL文件的每个条目中查找具有以'usgs_lakes'表示的分辨率的静态数据的分辨率，如果该分辨率不可用，则改为查找由“ +”后面的字符串表示的分辨率。因此，对于LANDUSEF字段的GEOGRID.TBL条目，将使用以字符串'usgs_lakes'标识的基于USGS的土地使用数据，而不是土地使用的分辨率（或来源），而不是'default'。上例中的数据；对于所有其他字段，第一和第二个将使用“默认”分辨率。顺便说一句，当在GEOGRID.TBL条目中找不到在geog_data_res中为域指定的所有分辨率时，将使用“默认”表示的分辨率。
-从默认的21类MODIS土地使用数据更改时，用户还必须确保在WRF namelist.input文件的＆physics名称列表记录中正确设置了num_land_cat名称列表变量。对于24类USGS数据，应将num_land_cat设置为24。
+```
+
+此更改的结果是指示geogrid程序在GEOGRID.TBL文件的每个条目中查找具有以'usgs_lakes'表示的分辨率的静态数据的分辨率，如果该分辨率不可用，则改为查找由“+”后面的字符串表示的分辨率。因此，对于LANDUSEF字段的GEOGRID.TBL条目，将使用以字符串'usgs_lakes'标识的基于USGS的土地使用数据，而不是土地使用的分辨率（或来源）来替代上例中的'default'数据；对于所有其他字段，第一和第二个将使用'default'分辨率。顺便说一句，当在GEOGRID.TBL条目中找不到在`geog_data_res`中为区域指定的所有分辨率时，将使用'default'表示的分辨率。
+
+从默认的21类MODIS土地使用数据更改时，用户还必须确保在WRF namelist.input文件的`&physics` namelist记录中正确设置了`num_land_cat` namelist变量。对于24类USGS数据，应将`num_land_cat`设置为24。
 
 <a id=Selecting_Static_Data></a>
 
 ## 为重力波拖曳方案选择静态数据
 
-ARW中的重力地形按地形引力（GWDO）方案需要WPS的十个静态场。实际上，这些字段将由Geogrid程序内插，而不管模型中是否使用GWDO方案。当不使用GWDO方案时，将仅在WRF中忽略这些字段，并且用户不必担心从中插入字段的数据的分辨率。但是，建议从源数据的分辨率中插入这些字段，而源数据的分辨率比模型网格的分辨率略低（即较粗糙）；因此，如果将使用GWDO方案，则应注意选择合适的GWDO静态数据分辨率。当前，可以使用五种分辨率的GWDO静态数据：2度，1度，30分钟，20分钟和10分钟，由字符串“ 2deg”，“ 1deg”，“ 30m”，“ 20m”表示”和“ 10m”。要选择要插值的分辨率，用户应在字符串“ XXX +”前为“ geogrid”名称列表记录中为geog_data_res变量指定的分辨率加上前缀，其中XXX是GWDO静态数据的五个可用分辨率之一。例如，在网格间距为48公里的模型配置中，geog_data_res变量通常可以指定为
-	geog_data_res = ‘default’,
-但是，如果采用GWDO方案，则分辨率仍低于模型网格的GWDO静态数据的最高分辨率为30分钟数据，在这种情况下，用户应指定
-	geog_data_res = ‘30m+default’,
-如果在geog_data_res变量中未结合静态数据的其他分辨率指定“ 2deg”，“ 1deg”，“ 30m”或“ 20m”中的任何一个，则将使用“ 10m” GWDO静态数据，因为它也已指定作为GEOGRID.TBL文件中的“默认”分辨率。值得注意的是，如果要使用10分钟分辨率的GWDO数据，但是对于其他静态字段（例如，地形高度）需要不同的分辨率，则用户应该简单地将geog_data_res的值省略'10m'变量，因为指定了
+ARW中的重力波拖曳地形（GWDO）方案需要WPS的十个静态场。实际上，这些字段将由geogrid程序内插，而不管模型中是否使用GWDO方案。当不使用GWDO方案时，将在WRF中忽略这些字段，并且用户不必担心从中插入字段的数据的分辨率。但是，建议从源数据的分辨率内插这些字段，该分辨率比模型网格的分辨率略低（即较粗糙）；因此，如果将使用GWDO方案，则应注意选择合适的GWDO静态数据分辨率。当前，可以使用五种分辨率的GWDO静态数据：2度、1度、30分、20分、和10分，由字符串“2deg”、“1deg”、“30m”、“20m”和“10m”表示。要选择要插值的分辨率，用户应在“geogrid” namelist记录中为`geog_data_res`变量指定的分辨率加上前缀字符串“XXX+”，其中XXX是GWDO静态数据的五个可用分辨率之一。例如，在网格间距为48公里的模型配置中，`geog_data_res`变量通常可以指定为
+
+```
+geog_data_res = ‘default’,
+```
+
+但是，如果采用GWDO方案，则仍比模型网格分辨率低的GWDO静态数据的最高分辨率是30分数据，在这种情况下，用户应指定
+
+```
+geog_data_res = ‘30m+default’,
+```
+	
+如果在`geog_data_res`变量中未结合静态数据的其他分辨率指定“2deg”、“1deg”、“30m”或“20m”中的任何一个，则将使用“10m”GWDO静态数据，因为它也已指定作为GEOGRID.TBL文件中的“default”分辨率。值得注意的是，如果要使用10分分辨率的GWDO数据，但是对于其他静态字段（例如地形高度）需要不同的分辨率，则用户应该简单地将`geog_data_res`的值省略'10m'变量，因为例如指定了以下内容时：
+
+```
 geog_data_res = ‘10m+30s’,
-例如，对于非GWDO字段，例如，地形高度和土地使用类别以及GWDO字段，将导致Geogrid优先使用10分钟数据而不是30秒数据。
+```
+
+将导致对于非GWDO字段（如地形高度和土地使用类别），Geogrid也会与GWDO字段一样优先使用10分数据而不是30秒数据。
 
 <a id=Using_Multiple_Meteorological></a>
 
 ## 使用多种气象数据源
 
-metgrid程序能够插值时不变的字段，并且还可以从多个气象数据源插值。这些功能中的第一个使用＆metgrid名称列表记录中的constants_name变量。 可以将此变量设置为中间格式文件的文件名列表（必要时包括路径信息），该文件包含时不变字段，并应在metgrid处理的每个时间段的输出中使用。 例如，简短的模拟可能使用恒定的SST字段； 该字段仅需一次可用，并且可以通过将constants_name变量设置为SST中间文件的路径和文件名来使用。 constants_name的典型用法如下所示
+metgrid程序能够插值不随时间变化的字段，并且还可以从多个气象数据源插值。这些功能中的第一个使用`&metgrid` namelist记录中的`constants_name`变量。可以将此变量设置为中间格式文件的文件名列表（必要时包括路径信息），该文件包含不随时间变化的字段，并应在metgrid处理的每个时间段的输出中使用。例如，简短的模拟可能使用恒定的SST字段；该字段仅需使用一次，并且可以通过将`constants_name`变量设置为SST中间文件的路径和文件名来使用。`constants_name`的典型用法如下所示
+
+```
 &metgrid
  constants_name = '/data/ungribbed/constants/SST_FILE:2006-08-16_12'
 /
+```
 
 or
 
+```
 &metgrid
  constants_name = 'LANDSEA', 'SOILHGT'
 /
-第二个metgrid功能（从多个源插入数据的功能）在需要组合两个或多个互补数据集以生成real.exe所需的完整输入数据的情况下可能很有用。 要从时变的气象数据的多个源进行插值，应将＆metgrid名称列表记录中的fg_name变量设置为中间文件的前缀列表，必要时还包括路径信息。 如果给出多个路径前缀，并且来自多个源的同一气象字段可用，那么来自最后指定源的数据将优先于所有先前源。 因此，可以通过给定数据源的顺序来对数据源进行优先级排序。
-作为此功能的一个示例，如果在一个数据源中提供了表面场，而在另一数据源中提供了空中数据，则分配给fg_name变量的值可能类似于：
+```
+
+第二个metgrid功能（从多个源插入数据的功能）在需要组合两个或多个互补数据集以生成real.exe所需的完整输入数据的情况下可能很有用。要从随时间变化的气象数据的多个源进行插值，应将`&metgrid` namelist记录中的`fg_name`变量设置为中间文件的前缀列表，必要时还包括路径信息。如果给出多个路径前缀，并且来自多个源的同一气象场可用，那么来自最后指定源的数据将优先于所有先前源。因此，可以通过给定数据源的顺序来对数据源进行优先级排序。
+
+作为此功能的一个示例，如果在一个数据源中提供了地表场，而在另一数据源中提供了高空数据，则分配给`fg_name`变量的值可能类似于：
+
+```
 &metgrid
  fg_name = '/data/ungribbed/SFC', '/data/ungribbed/UPPER_AIR'
 /
-为了简化从GRIB文件提取字段的过程，可以使用＆ungrib记录中的前缀名称列表变量。 该变量使用户可以控制由ungrib创建的中间文件的名称（和路径）。 通过示例最容易说明此名称列表变量的实用程序。 假设我们希望使用北美地区再分析（NARR）数据集，该数据集被分为3维大气数据，地表数据和固定场数据的单独GRIB文件。 我们可以先使用link_grib.csh脚本链接所有“ 3D” GRIB文件，然后将NARR Vtable链接到文件名Vtable。 然后，我们可以在运行ungrib.exe之前适当地编辑＆ungrib名称列表记录，以使生成的中间文件具有适当的前缀：
+```
+
+为了简化从GRIB文件提取气象场的过程，可以使用`&ungrib`记录中的`prefix` namelist变量。该变量使用户可以控制由ungrib创建的中间文件的名称（和路径）。 通过示例最容易说明此namelist变量的实用程序。假设我们希望使用北美地区再分析（NARR）数据集，该数据集被分为三维大气数据、地表数据和固定场数据的单独GRIB文件。我们可以先使用`link_grib.csh`脚本链接所有“3D” GRIB文件，然后将NARR Vtable链接到文件名`Vtable`。然后，我们可以在运行ungrib.exe之前适当地编辑`&ungrib` namelist记录，以使生成的中间文件具有适当的前缀：
+
+```
 &ungrib
  out_format = 'WPS',
  prefix = 'NARR_3D',
 /
-运行ungrib.exe之后，以下文件应存在（用适当的替代适当的日期）：
+```
+
+运行ungrib.exe之后，以下文件应存在：
+
+```
 NARR_3D:2008-08-16_12
 NARR_3D:2008-08-16_15
 NARR_3D:2008-08-16_18
 ...
-给定3维字段的中间文件，我们可以通过链接表面GRIB文件并更改名称列表中的prefix变量来处理表面字段：
+```
+
+给定三维场的中间文件，我们可以通过链接地表GRIB文件并更改名称列表中的`prefix`变量来处理地表场：
+
+```
 &ungrib
  out_format = 'WPS',
  prefix = 'NARR_SFC',
 /
+```
+
 再次运行ungrib.exe，除了NARR_3D文件之外，还应该存在以下内容：
+
+```
 NARR_SFC:2008-08-16_12
 NARR_SFC:2008-08-16_15
 NARR_SFC:2008-08-16_18
 ...
-最后，将固定文件与link_grib.csh脚本链接，并再次设置名称列表中的prefix变量：
+```
+
+最后，将固定场文件与`link_grib.csh`脚本链接，并再次设置namelist中的`prefix`变量：
+
+```
 &ungrib
  out_format = 'WPS',
  prefix = 'NARR_FIXED',
 /
-第三次运行ungrib.exe之后，除了surface和“ 3D”字段外，固定字段应该可用：
-NARR_FIXED:1979-11-08_00
-为了清楚起见，由于文件中的字段是静态的，因此可以重命名固定文件以删除任何日期信息，例如，将其重命名为NARR_FIXED。在此示例中，我们注意到NARR固定数据仅在特定时间（1979年11月8日，0000 UTC）可用，因此，用户需要为＆share名称列表记录中的数据设置正确的开始和结束时间，然后才能在NARR固定文件上运行ungrib；当然，应该在运行metgrid之前重新设置时间。
+```
 
-给定NARR数据集的所有三个部分的中间文件，可以在设置＆metgrid名称列表记录中的constants_name和fg_name变量之后运行metgrid.exe：
+第三次运行ungrib.exe之后，除了地表和“3D”字段外，还有固定场文件：
+
+```
+NARR_FIXED:1979-11-08_00
+```
+
+为了清楚起见，由于文件中的字段是静态的，因此可以重命名固定场以删除任何日期信息，例如，将其重命名为`NARR_FIXED`。在此示例中，我们注意到NARR固定数据仅在特定时间（1979年11月8日，0000 UTC）可用，因此，用户需要为`&share` namelist记录中的数据设置正确的开始和结束时间，然后才能在NARR固定场文件上运行ungrib；当然，还应该在运行metgrid之前重新设置时间。
+
+给定NARR数据集的所有三个部分的中间文件，可以在设置`&metgrid` namelist记录中的`constants_name`和`fg_name`变量之后运行metgrid.exe：
+
+```
 &metgrid
  constants_name = 'NARR_FIXED',
  fg_name = 'NARR_3D', 'NARR_SFC'
 /
-尽管不那么常见，但另一个需要多个数据源的情况是，当区域模型中的气象数据源不足以覆盖整个模拟域时，在以下情况下必须使用较大区域模型或全局模型中的数据插值到模拟网格的其余点。
-例如，要在任何可能的地方使用NAM数据，在其他地方使用GFS数据，则可以在名称列表中分配以下值：
+```
+
+尽管不那么常见，但另一个需要多个数据源的情况是，当区域模型中的气象数据源不足以覆盖整个模拟区域时，必须使用较大区域模型或全球模型中的数据插值到模拟网格的其余点。
+
+例如，要在任何可能的地方使用NAM数据，在其他地方使用GFS数据，则可以在namelist中分配以下值：
+
+```
 &metgrid
  fg_name = '/data/ungribbed/GFS', '/data/ungribbed/NAM'
 /
-然后，生成的模型域将使用如下图所示的数据。
- 
-	 如果在多个源中没有找到任何字段，则metgrid无需应用优先级，并且将像往常一样简单地对每个字段进行插值； 当然，每个源都应覆盖整个模拟域，以避免丢失数据的区域。
+```
+
+然后，生成的模型区域将使用如下图所示的数据。
+
+![Multiple_Meteorological](images/chap3_Multiple_Meteorological.png)
+
+如果在多个源中没有找到任何字段，则metgrid无需应用优先级，并且将像往常一样简单地对每个字段进行插值；当然，每个源都应覆盖整个模拟域，以避免出现丢失数据的区域。
 
 <a id=Using_Non-isobaric_Meteorological></a>
 
