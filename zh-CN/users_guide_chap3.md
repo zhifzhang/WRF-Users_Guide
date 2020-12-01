@@ -291,26 +291,18 @@ WPS需要与构建WRF模型相同的Fortran和C编译器，因为WPS可执行文
 /
 ```
 
+“share” namelist记录中与geogrid相关的部分，一般包括如下几项：必须首先使用`wrf_core`选择WRF动态核心。如果正在为ARW模拟运行WPS，则应将`wrf_core`设置为“`ARW`”，而如果是用于NMM模拟，则应将其设置为“`NMM`”。选择动态核心后，必须使用`max_dom`选择区域的总数（对于ARW）或嵌套级别（对于NMM）。由于geogrid仅生成与时间无关的数据，因此geogrid会忽略`start_date`，`end_date`和`interval_seconds`变量。作为一个可选项，可以使用`opt_output_from_geogrid_path`变量指示拟输出区域文件的位置（默认为当前工作目录），并且可以使用`io_form_geogrid`变量更改输出区域文件的格式。
 
+在“geogrid” namelist记录中，定义了模拟区域的投影，以及所有模型网格的大小和位置。通过`map_proj`变量指定要用于模型区域的地图投影。下图中展示了ARW中四个可用的地图投影，下表中汇总了用于设置投影参数的namelist变量。
 
+![map_projections_in_ARW](images/chap3_map_projections_in_ARW.jpg)
 
-
-
-
-要总结与“网格”相关的“share”名称列表记录的一组典型更改，必须首先使用wrf_core选择WRF动态核心。如果正在为ARW模拟运行WPS，则应将wrf_core设置为“ ARW”，而要为NMM模拟运行，则应将其设置为“ NMM”。选择动态核心后，必须使用max_dom选择域总数（对于ARW）或嵌套级别（对于NMM）。由于geogrid仅生成与时间无关的数据，因此geogrid会忽略start_date，end_date和interval_seconds变量。作为一个可选项，可以使用opt_output_from_geogrid_path变量指示应该写入域文件的位置（如果不是默认值，则为当前工作目录），并且可以使用io_form_geogrid更改这些域文件的格式。
-
-在“ geogrid”名称列表记录中，定义了仿真域的投影，以及所有模型网格的大小和位置。通过map_proj变量指定要用于模型域的地图投影。下表中以图形方式显示了ARW中四个可能的地图投影中的每一个，下表中汇总了用于设置投影参数的名称列表变量。
-
-Map projection / value of map_proj	Projection parameters
-Lambert Conformal / 'lambert'	truelat1
-truelat2 (optional)
-stand_lon
-Mercator / 'mercator' 	truelat1
-Polar stereographic / 'polar' 	truelat1
-stand_lon
-Regular latitude-longitude, or cylindrical equidistant / 'lat-lon' 	pole_lat
-pole_lon
-stand_lon
+地图投影/`map_proj`取值 | 投影参数
+------|------
+兰伯特正形投影/`lambert` | truelat1<br>truelat2(optional)<br>stand_lon
+墨卡托投影/`mercator` |	truelat1
+极地立体投影/`polar` |	truelat1<br>stand_lon
+常规经纬度或圆柱等距投影/`lat-lon` | pole_lat<br>pole_lon<br>stand_lon
 
 在Lambert conformal（兰伯特共形），极地立体投影和墨卡托投影的图示中，可以看到所谓的真实纬度（或在兰伯特共形的情况下为真实纬度）是投影表面相交的纬度。或与地球表面相切。在此纬度上，地图投影中的距离没有失真，而在其他纬度上，地球表面上的距离与投影表面上的距离之间的关系取决于地图比例因子。理想情况下，应选择地图投影及其附带的参数，以最大程度地减少模型网格覆盖的区域内的最大失真，因为由地图比例因子显着不同于单位的高失真量可以进一步限制模型时间步长超过必要。作为一般准则，极地立体投影最适合于高纬度WRF域，Lambert保角投影非常适合于中纬度域，而Mercator投影则适合于低纬度域或主要是西纬域的域。向东延伸。全局ARW模拟需要圆柱等距投影，尽管在旋转方面（例如，当pole_lat，pole_lon和stand_lon从其默认值更改时），它也非常适合地球表面上任何区域的区域。
  
