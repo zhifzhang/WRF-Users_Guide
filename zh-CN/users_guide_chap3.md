@@ -322,52 +322,66 @@ WPS需要与构建WRF模型相同的Fortran和C编译器，因为WPS可执行文
 |pole_lon | 180.0 | 0.0 |
 |stand_lon | -ref_lon | 180.0 - ref_lon |
 
-对于全局WRF模拟，粗域的覆盖范围当然是全局的，因此ref_lat和ref_lon不适用，并且不应指定dx和dy，因为名义网格距离是根据网格点数自动计算的。另外，应该注意的是，纬度-经度或圆柱等距投影（map_proj ='lat-lon'）是WRF中唯一可以支持全局范围的投影。全局域内的嵌套域不得覆盖计算纬度+45以北或计算纬度-45以南的任何区域，因为极坐标过滤器是向这些纬度的极点应用的（尽管可以在WRF名称列表中更改截止纬度）。
+对于全球WRF模拟，粗区域的覆盖范围当然是全球的，因此`ref_lat`和`ref_lon`不适用，并且不应指定`dx`和`dy`，因为标称网格距离是根据网格点数自动计算的。另外，应该注意的是，经纬度或圆柱等距投影（即`map_proj`取值为`'lat-lon'`）是WRF中唯一可以支持全球范围的投影。*全球范围内的嵌套区域不得覆盖计算纬度+45以北或计算纬度-45以南的任何区域，因为极坐标过滤器是向这些纬度的极点应用的（尽管可以在WRF namelist中更改截止纬度）。*
 
-除了设置与模型域的投影，位置和覆盖范围有关的变量外，还必须使用geog_data_path变量正确指定静态地理数据集的路径。此外，用户可以使用geog_data_res变量选择要插入静态数据geogrid的分辨率，该变量的值应与GEOGRID.TBL中数据的分辨率之一匹配。
+除了设置与模型区域的投影、位置和覆盖范围有关的变量外，还必须使用`geog_data_path`变量正确地指定静态地理数据集的路径。此外，用户可以使用`geog_data_res`变量选择geogrid程序要插入静态数据的分辨率，该变量的值应与GEOGRID.TBL中数据的分辨率之一匹配。
 
-取决于wrf_core名称列表变量的值，必须将适当的GEOGRID.TBL文件与geogrid一起使用，因为WPS插值的网格错位在动态核心之间是不同的。对于ARW，应使用GEOGRID.TBL.ARW文件，对于NMM，应使用GEOGRID.TBL.NMM文件。通过将正确的文件链接到geogrid目录（如果在名称列表中设置了opt_geogrid_tbl_path指定的目录中）中的GEOGRID.TBL，可以选择适当的GEOGRID.TBL
-	> ls geogrid/GEOGRID.TBL
+取决于`wrf_core` namelist变量的值，必须将适当的GEOGRID.TBL文件与geogrid程序一起使用，因为WPS插值的网格错位在不同的动态核心之间是不同的。对于ARW，应使用GEOGRID.TBL.ARW文件，对于NMM，应使用GEOGRID.TBL.NMM文件。通过将正确的文件链接到geogrid目录（或者在namelist中`opt_geogrid_tbl_path`参数指定的目录）中的GEOGRID.TBL，可以选择适当的GEOGRID.TBL。
 
-	lrwxrwxrwx 1      15 GEOGRID.TBL -> GEOGRID.TBL.ARW
+```
+> ls geogrid/GEOGRID.TBL
+  lrwxrwxrwx 1      15 GEOGRID.TBL -> GEOGRID.TBL.ARW
+```
 
-有关每个变量的含义和可能值的更多详细信息，请参考用户对名称列表变量的描述。
+有关每个变量的含义和可取值的更多详细信息，请参考[名称列表变量说明](#Namelist_Variables)。
 
-在namelist.wps文件中适当定义了模拟粗略域和嵌套域之后，可以运行geogrid.exe可执行文件以生成域文件。 对于ARW域，域文件名为geo_em.d0N.nc，其中N是每个文件中定义的嵌套编号。 在NMM域中运行时，geogrid会为粗略域生成文件geo_nmm.d01.nc，并为每个嵌套级别N生成geo_nmm_nest.l0N.nc文件。此外，请注意，文件后缀会根据所选的io_form_geogrid而有所不同。 要运行geogrid，请发出以下命令：
-	> ./geogrid.exe
+在namelist.wps文件中合理定义了模拟粗区域和[嵌套区域](#Using_WRFSI_for_NESTED)之后，可以运行geogrid.exe可执行文件以生成区域文件。对于ARW区域，区域文件名为`geo_em.d0N.nc`，其中`N`是每个文件中定义的嵌套编号。在NMM区域中运行时，geogrid会为粗区域生成文件`geo_nmm.d01.nc`，并为每个嵌套级别`N`生成`geo_nmm_nest.l0N.nc`文件。此外，请注意，文件后缀名会根据所选的`io_form_geogrid`而有所不同。要运行geogrid，请发出以下命令：
 
-当geogrid.exe完成运行时，该消息
+```
+> ./geogrid.exe
+```
+
+当geogrid.exe完成运行时，应该会输出以下消息
+
+```
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  Successful completion of geogrid.        !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+```
 
-应该打印出来，并且WPS根目录（或opt_output_from_geogrid_path指定的目录，如果设置了此变量）的列表应显示域文件。 如果没有，则可能会查询geogrid.log文件，以确定可能的失败原因。 有关检查土工格栅输出的更多信息，请参考检查WPS输出的部分。
+并且在WPS根目录（或`opt_output_from_geogrid_path`指定的目录，如果设置了此变量）中的列表应显示区域文件。如果没有，则应查询geogrid.log文件，以确定可能的失败原因。有关检查geogrid输出文件的更多信息，请参考[检查WPS输出](#Checking_WPS_Output)一节。
+
+```
 > ls
-	drwxr-xr-x 2     4096 arch
-	-rwxr-xr-x 1     1672 clean
-	-rwxr-xr-x 1     3510 compile
-	-rw-r--r-- 1    85973 compile.output
-	-rwxr-xr-x 1     4257 configure
-	-rw-r--r-- 1     2486 configure.wps
-	-rw-r--r-- 1  1957004 geo_em.d01.nc
-	-rw-r--r-- 1  4745324 geo_em.d02.nc
-	drwxr-xr-x 4     4096 geogrid
-	lrwxrwxrwx 1       23 geogrid.exe -> geogrid/src/geogrid.exe
-	-rw-r--r-- 1    11169 geogrid.log
-	-rwxr-xr-x 1     1328 link_grib.csh
-	drwxr-xr-x 3     4096 metgrid
-	lrwxrwxrwx 1       23 metgrid.exe -> metgrid/src/metgrid.exe
-	-rw-r--r-- 1     1094 namelist.wps
-	-rw-r--r-- 1     1987 namelist.wps.all_options
-	-rw-r--r-- 1     1075 namelist.wps.global
-	-rw-r--r-- 1      652 namelist.wps.nmm
-	-rw-r--r-- 1     4786 README
-	drwxr-xr-x 4     4096 ungrib
-	lrwxrwxrwx 1       21 ungrib.exe -> ungrib/src/ungrib.exe
-	drwxr-xr-x 3     4096 util
+  drwxr-xr-x 2     4096 arch
+  -rwxr-xr-x 1     1672 clean
+  -rwxr-xr-x 1     3510 compile
+  -rw-r--r-- 1    85973 compile.output
+  -rwxr-xr-x 1     4257 configure
+  -rw-r--r-- 1     2486 configure.wps
+  -rw-r--r-- 1  1957004 geo_em.d01.nc
+  -rw-r--r-- 1  4745324 geo_em.d02.nc
+  drwxr-xr-x 4     4096 geogrid
+  lrwxrwxrwx 1       23 geogrid.exe -> geogrid/src/geogrid.exe
+  -rw-r--r-- 1    11169 geogrid.log
+  -rwxr-xr-x 1     1328 link_grib.csh
+  drwxr-xr-x 3     4096 metgrid
+  lrwxrwxrwx 1       23 metgrid.exe -> metgrid/src/metgrid.exe
+  -rw-r--r-- 1     1094 namelist.wps
+  -rw-r--r-- 1     1987 namelist.wps.all_options
+  -rw-r--r-- 1     1075 namelist.wps.global
+  -rw-r--r-- 1      652 namelist.wps.nmm
+  -rw-r--r-- 1     4786 README
+  drwxr-xr-x 4     4096 ungrib
+  lrwxrwxrwx 1       21 ungrib.exe -> ungrib/src/ungrib.exe
+  drwxr-xr-x 3     4096 util
+```
 
-步骤2：使用ungrib从GRIB文件中提取气象字段
-已经下载了GRIB格式的气象数据后，将字段提取为中间格式的第一步涉及到编辑namelist.wps文件的“共享”和“未分类”名称列表记录–编辑该文件是为了定义模拟域。 下面给出了两个名称列表记录的示例。
+### 步骤2：使用ungrib从GRIB文件中提取气象场
+
+已经下载了GRIB格式的气象数据后，将气象场提取为中间格式的第一步，需要编辑namelist.wps文件的“share”和“ungrib” namelist记录，以定义模拟区域。下面给出了两个namelist记录的示例。
+
+```
 &share
  wrf_core = 'ARW',
  max_dom = 2,
@@ -381,87 +395,110 @@ WPS需要与构建WRF模型相同的Fortran和C编译器，因为WPS可执行文
  out_format = 'WPS',
  prefix     = 'FILE'
 /
-在“共享”名称列表记录中，与ungrib相关的变量是粗略域的开始和结束时间（start_date和end_date；或者，start_year，start_month，start_day，start_hour，end_year，end_month，end_day和end_hour）。以及气象数据文件之间的间隔（interval_seconds）。在“ ungrib”名称列表记录中，变量out_format用于选择ungrib写入的中间数据的格式； metgrid程序可以读取ungrib支持的任何格式，因此可以为out_format指定“ WPS”，“ SI”和“ MM5”中的任何一种，尽管建议使用“ WPS”。同样在“ ungrib”名称列表中，用户可以使用prefix变量为中间文件指定路径和前缀。例如，如果将prefix被设置为“ ARGRMET”，则由ungrib创建的中间文件将根据AGRMET：YYYY-MM-DD_HH命名，其中YYYY-MM-DD_HH是文件中数据的有效时间。
+```
 
-适当修改namelist.wps文件后，必须提供Vtable，并且必须将GRIB文件链接（或复制）到ungrib期望的文件名。 WPS随Vtable文件一起提供了许多气象数据源，并且可以简单地将适当的Vtable符号链接到文件Vtable，该文件是ungrib期望的Vtable名称。例如，如果GRIB数据来自GFS模型，则可以使用
+在“share” namelist记录中，与ungrib相关的变量是粗区域的开始和结束时间（`start_date`和`end_date`，或者是`start_year`、`start_month`、`start_day`、`start_hour`、`end_year`、`end_month`、`end_day`和`end_hour`），以及气象数据文件之间的间隔（`interval_seconds`）。在“ungrib” namelist记录中，`out_format`变量用于选择ungrib写入的中间数据的格式；metgrid程序可以读取ungrib支持的任何格式，因此`out_format`变量可以选择`“WPS”`、`“SI”`或`“MM5”`中的任何一种，一般建议使用`“WPS”`。同样在“ungrib” namelist中，用户可以使用`prefix`变量为中间文件指定路径和前缀。例如，如果将`prefix`变量设置为`“ARGRMET”`，则由ungrib创建的中间文件将命名为AGRMET：YYYY-MM-DD_HH，其中YYYY-MM-DD_HH是文件中数据的有效时间。
+
+适当修改namelist.wps文件后，必须提供Vtable，并且必须将GRIB文件链接（或复制）到ungrib规定的文件名。WPS随Vtable文件一起提供了许多气象数据源，并且可以简单地将适当的Vtable符号链接到ungrib规定的Vtable文件名称。例如，如果GRIB数据来自GFS模型，则可以使用
+
+```
 > ln -s ungrib/Variable_Tables/Vtable.GFS Vtable
+```
 
-ungrib程序将尝试读取名为GRIBFILE.AAA，GRIBFILE.AAB，…，GRIBFILE.ZZZ的GRIB文件。 为了简化将GRIB文件链接到这些文件名的工作，提供了一个shell脚本link_grib.csh。 link_grib.csh脚本将要链接的GRIB文件的列表作为命令行参数。 例如，如果将GRIB数据下载到目录/ data / gfs，则可以将这些文件与link_grib.csh链接，如下所示：
+ungrib程序将尝试读取名为GRIBFILE.AAA，GRIBFILE.AAB，…，GRIBFILE.ZZZ的GRIB文件。为了简化将GRIB文件链接到这些文件名的工作，提供了一个shell脚本link_grib.csh。link_grib.csh脚本将要链接的GRIB文件的列表作为命令行参数。例如，如果将GRIB数据下载到`/data/gfs`目录，则可以采用link_grib.csh将这些文件进行链接，如下所示：
+
+```
 > ls /data/gfs
-	-rw-r--r-- 1  42728372 gfs_080324_12_00
-	-rw-r--r-- 1  48218303 gfs_080324_12_06
+  -rw-r--r-- 1  42728372 gfs_080324_12_00
+  -rw-r--r-- 1  48218303 gfs_080324_12_06
 > ./link_grib.csh /data/gfs/gfs*
+```
 
 链接GRIB文件和Vtable之后，WPS目录的列表应如下所示：
 
-	> ls
-	drwxr-xr-x 2     4096 arch
-	-rwxr-xr-x 1     1672 clean
-	-rwxr-xr-x 1     3510 compile
-	-rw-r--r-- 1    85973 compile.output
-	-rwxr-xr-x 1     4257 configure
-	-rw-r--r-- 1     2486 configure.wps
-	-rw-r--r-- 1  1957004 geo_em.d01.nc
-	-rw-r--r-- 1  4745324 geo_em.d02.nc
-	drwxr-xr-x 4     4096 geogrid
-	lrwxrwxrwx 1       23 geogrid.exe -> geogrid/src/geogrid.exe
-	-rw-r--r-- 1    11169 geogrid.log
-	lrwxrwxrwx 1       38 GRIBFILE.AAA -> /data/gfs/gfs_080324_12_00
-	lrwxrwxrwx 1       38 GRIBFILE.AAB -> /data/gfs/gfs_080324_12_06
-	-rwxr-xr-x 1     1328 link_grib.csh
-	drwxr-xr-x 3     4096 metgrid
-	lrwxrwxrwx 1       23 metgrid.exe -> metgrid/src/metgrid.exe
-	-rw-r--r-- 1     1094 namelist.wps
-	-rw-r--r-- 1     1987 namelist.wps.all_options
-	-rw-r--r-- 1     1075 namelist.wps.global
-	-rw-r--r-- 1      652 namelist.wps.nmm
-	-rw-r--r-- 1     4786 README
-	drwxr-xr-x 4     4096 ungrib
-	lrwxrwxrwx 1       21 ungrib.exe -> ungrib/src/ungrib.exe
-	drwxr-xr-x 3     4096 util
-	lrwxrwxrwx 1       33 Vtable -> ungrib/Variable_Tables/Vtable.GFS
-编辑namelist.wps文件并链接适当的Vtable和GRIB文件后，可以运行ungrib.exe可执行文件，以生成中间格式的气象数据文件。 只需输入以下内容即可运行Ungrib：
-> ./ungrib.exe >& ungrib.output
+```
+> ls
+  drwxr-xr-x 2     4096 arch
+  -rwxr-xr-x 1     1672 clean
+  -rwxr-xr-x 1     3510 compile
+  -rw-r--r-- 1    85973 compile.output
+  -rwxr-xr-x 1     4257 configure
+  -rw-r--r-- 1     2486 configure.wps
+  -rw-r--r-- 1  1957004 geo_em.d01.nc
+  -rw-r--r-- 1  4745324 geo_em.d02.nc
+  drwxr-xr-x 4     4096 geogrid
+  lrwxrwxrwx 1       23 geogrid.exe -> geogrid/src/geogrid.exe
+  -rw-r--r-- 1    11169 geogrid.log
+  lrwxrwxrwx 1       38 GRIBFILE.AAA -> /data/gfs/gfs_080324_12_00
+  lrwxrwxrwx 1       38 GRIBFILE.AAB -> /data/gfs/gfs_080324_12_06
+  -rwxr-xr-x 1     1328 link_grib.csh
+  drwxr-xr-x 3     4096 metgrid
+  lrwxrwxrwx 1       23 metgrid.exe -> metgrid/src/metgrid.exe
+  -rw-r--r-- 1     1094 namelist.wps
+  -rw-r--r-- 1     1987 namelist.wps.all_options
+  -rw-r--r-- 1     1075 namelist.wps.global
+  -rw-r--r-- 1      652 namelist.wps.nmm
+  -rw-r--r-- 1     4786 README
+  drwxr-xr-x 4     4096 ungrib
+  lrwxrwxrwx 1       21 ungrib.exe -> ungrib/src/ungrib.exe
+  drwxr-xr-x 3     4096 util
+  lrwxrwxrwx 1       33 Vtable -> ungrib/Variable_Tables/Vtable.GFS
+```
 
-由于ungrib程序可能会产生大量输出，因此建议像上面的命令中一样，将ungrib输出重定向到文件。 如果ungrib.exe成功运行，则消息
+编辑namelist.wps文件并链接适当的Vtable和GRIB文件后，可以运行ungrib.exe可执行文件，以生成中间格式的气象数据文件。只需输入以下内容即可运行ungrib：
+
+```
+> ./ungrib.exe >& ungrib.output
+```
+
+由于ungrib程序可能会产生大量输出信息，因此建议像上面的命令中一样，将ungrib输出信息重定向到文件中。如果ungrib.exe成功运行，则以下消息
+
+```
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  Successful completion of ungrib.         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+```
 
-将被写入ungrib.output文件的末尾，中间文件应出现在当前工作目录中。 ungrib编写的中间文件的名称格式为FILE：YYYY-MM-DD_HH（当然，除非将prefix变量设置为'FILE'以外的前缀）。
+将被写入ungrib.output文件的末尾，且中间文件应出现在当前工作目录中。ungrib编写的中间文件的名称格式为`FILE：YYYY-MM-DD_HH`（当然，除非将`prefix`变量设置为`'FILE'`以外的其他前缀）。
+
+```
 > ls
-	drwxr-xr-x 2       4096 arch
-	-rwxr-xr-x 1       1672 clean
-	-rwxr-xr-x 1       3510 compile
-	-rw-r--r-- 1      85973 compile.output
-	-rwxr-xr-x 1       4257 configure
-	-rw-r--r-- 1       2486 configure.wps
-	-rw-r--r-- 1  154946888 FILE:2008-03-24_12
-	-rw-r--r-- 1  154946888 FILE:2008-03-24_18
-	-rw-r--r-- 1    1957004 geo_em.d01.nc
-	-rw-r--r-- 1    4745324 geo_em.d02.nc
-	drwxr-xr-x 4       4096 geogrid
-	lrwxrwxrwx 1         23 geogrid.exe -> geogrid/src/geogrid.exe
-	-rw-r--r-- 1      11169 geogrid.log
-	lrwxrwxrwx 1         38 GRIBFILE.AAA -> /data/gfs/gfs_080324_12_00
-	lrwxrwxrwx 1         38 GRIBFILE.AAB -> /data/gfs/gfs_080324_12_06
-	-rwxr-xr-x 1       1328 link_grib.csh
-	drwxr-xr-x 3       4096 metgrid
-	lrwxrwxrwx 1         23 metgrid.exe -> metgrid/src/metgrid.exe
-	-rw-r--r-- 1       1094 namelist.wps
-	-rw-r--r-- 1       1987 namelist.wps.all_options
-	-rw-r--r-- 1       1075 namelist.wps.global
-	-rw-r--r-- 1        652 namelist.wps.nmm
-	-rw-r--r-- 1       4786 README
-	drwxr-xr-x 4       4096 ungrib
-	lrwxrwxrwx 1         21 ungrib.exe -> ungrib/src/ungrib.exe
-	-rw-r--r-- 1       1418 ungrib.log
-	-rw-r--r-- 1      27787 ungrib.output
-	drwxr-xr-x 3       4096 util
-	lrwxrwxrwx 1         33 Vtable -> ungrib/Variable_Tables/Vtable.GFS
+  drwxr-xr-x 2       4096 arch
+  -rwxr-xr-x 1       1672 clean
+  -rwxr-xr-x 1       3510 compile
+  -rw-r--r-- 1      85973 compile.output
+  -rwxr-xr-x 1       4257 configure
+  -rw-r--r-- 1       2486 configure.wps
+  -rw-r--r-- 1  154946888 FILE:2008-03-24_12
+  -rw-r--r-- 1  154946888 FILE:2008-03-24_18
+  -rw-r--r-- 1    1957004 geo_em.d01.nc
+  -rw-r--r-- 1    4745324 geo_em.d02.nc
+  drwxr-xr-x 4       4096 geogrid
+  lrwxrwxrwx 1         23 geogrid.exe -> geogrid/src/geogrid.exe
+  -rw-r--r-- 1      11169 geogrid.log
+  lrwxrwxrwx 1         38 GRIBFILE.AAA -> /data/gfs/gfs_080324_12_00
+  lrwxrwxrwx 1         38 GRIBFILE.AAB -> /data/gfs/gfs_080324_12_06
+  -rwxr-xr-x 1       1328 link_grib.csh
+  drwxr-xr-x 3       4096 metgrid
+  lrwxrwxrwx 1         23 metgrid.exe -> metgrid/src/metgrid.exe
+  -rw-r--r-- 1       1094 namelist.wps
+  -rw-r--r-- 1       1987 namelist.wps.all_options
+  -rw-r--r-- 1       1075 namelist.wps.global
+  -rw-r--r-- 1        652 namelist.wps.nmm
+  -rw-r--r-- 1       4786 README
+  drwxr-xr-x 4       4096 ungrib
+  lrwxrwxrwx 1         21 ungrib.exe -> ungrib/src/ungrib.exe
+  -rw-r--r-- 1       1418 ungrib.log
+  -rw-r--r-- 1      27787 ungrib.output
+  drwxr-xr-x 3       4096 util
+  lrwxrwxrwx 1         33 Vtable -> ungrib/Variable_Tables/Vtable.GFS
+```
 
-步骤3：使用metgrid水平插值气象数据
-在运行WPS的最后一步中，将由ungrib提取的气象数据水平内插到geogrid定义的模拟网格中。 为了运行metgrid，必须编辑namelist.wps文件。 特别是“共享”和“ metgrid”名称列表记录与metgrid程序相关。 这些记录的示例如下所示。
+### 步骤3：使用metgrid水平插值气象数据
+
+运行WPS的最后一步，将由ungrib提取的气象数据水平内插到geogrid定义的模拟网格中。为了运行metgrid，必须编辑namelist.wps文件。特别是“share”和“metgrid” namelist记录与metgrid程序相关。这些记录的示例如下所示。
+
+```
 &share
  wrf_core = 'ARW',
  max_dom = 2,
@@ -475,61 +512,79 @@ ungrib程序将尝试读取名为GRIBFILE.AAA，GRIBFILE.AAB，…，GRIBFILE.ZZ
  fg_name                      = 'FILE',
  io_form_metgrid              = 2, 
 /
-至此，通常无需更改“共享”名称列表记录中的任何变量，因为这些变量应该在之前的步骤中进行了适当设置。但是，如果在运行geogrid和ungrib时未编辑“共享”名称列表，则必须在“共享”中设置WRF动态核心，域数，开始和结束时间，气象数据之间的间隔以及静态域文件的路径。 ”名称列表记录，如运行geogrid和ungrib的步骤所述。
-在“ metgrid”名称列表记录中，中间气象数据文件的路径和前缀必须用fg_name给出，任何包含常量字段的中间文件的完整路径和文件名都可以用constants_name变量指定，并且输出格式为可以使用io_form_metgrid变量指定水平内插文件。 “ metgrid”名称列表记录中的其他变量，即opt_output_from_metgrid_path和opt_metgrid_tbl_path，允许用户指定metgrid应在何处插入内插数据文件以及在何处可以找到METGRID.TBL文件。
-与geogrid和GEOGRID.TBL文件一样，必须在metgrid目录（如果设置了此变量，则在opt_metgrid_tbl_path指定的目录）中链接适合WRF核心的METGRID.TBL文件。
-	> ls metgrid/METGRID.TBL
+```
 
-	lrwxrwxrwx 1      15 METGRID.TBL -> METGRID.TBL.ARW
+至此，通常无需更改“share” namelist记录中的任何变量，因为这些变量应该在之前的步骤中进行了适当设置。但是，如果在运行geogrid和ungrib时未编辑“share” namelist，则必须在“share”中设置WRF动态核心、区域数、开始和结束时间、气象数据之间的间隔、以及静态域文件的路径，如在运行geogrid和ungrib的步骤中所述。
+
+在“metgrid” namelist记录中，中间格式气象数据文件的路径和前缀必须用`fg_name`参数给出，任何包含常量场的中间文件的完整路径和文件名都可以用`constants_name`变量指定，水平内插文件的输出格式可以使用`io_form_metgrid`变量指定。“metgrid” namelist记录中的其他变量，即`opt_output_from_metgrid_path`和`opt_metgrid_tbl_path`，允许用户指定metgrid输出内插数据文件的位置以及METGRID.TBL文件的位置。
+
+与geogrid和GEOGRID.TBL文件一样，必须在metgrid目录（或者在`opt_metgrid_tbl_path`指定的目录，如果设置了此变量）中链接适合WRF核心的METGRID.TBL文件。
+
+```
+> ls metgrid/METGRID.TBL
+  lrwxrwxrwx 1      15 METGRID.TBL -> METGRID.TBL.ARW
+```
 
 在适当地编辑namelist.wps文件并验证将使用正确的METGRID.TBL之后，可以通过发出以下命令来运行metgrid
+
+```
 > ./metgrid.exe
-如果metgrid成功运行，则消息
+```
+
+如果metgrid成功运行，则会输出以下消息
+
+```
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  Successful completion of metgrid.        !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+```
 
-将被打印。 成功运行后，metgrid输出文件应出现在WPS根目录中（如果设置了此变量，则应出现在opt_output_from_metgrid_path指定的目录中）。 对于ARW域，这些文件将被命名为met_em.d0N.YYYY-MM-DD_HH：mm：ss.nc，其中N是数据驻留在文件中的嵌套编号，或met_nmm.d01.YYYY-MM -对于NMM域，为-DD_HH：mm：ss.nc。 此处，YYYY-MM-DD_HH：mm：ss表示每个文件中插值数据的日期。 如果这些文件在“共享”名称列表记录中指定的范围内每次都不存在，则可以查阅metgrid.log文件以帮助确定运行metgrid时出现的问题。
+成功运行后，metgrid输出文件应出现在WPS根目录中（或者在`opt_metgrid_tbl_path`指定的目录，如果设置了此变量）。对于ARW区域，这些文件将被命名为`met_em.d0N.YYYY-MM-DD_HH：mm：ss.nc`，其中`N`是数据驻留在文件中的嵌套编号；对于NMM区域，为`met_nmm.d01.YYYY-MM-DD_HH:mm:ss.nc`。此处，`YYYY-MM-DD_HH:mm:ss`表示每个文件中插值数据的日期。如果在“share” namelist记录中指定的时间范围内不存在这些输出文件，则可以查阅metgrid.log文件以帮助确定运行metgrid时出现的问题。
+
+```
 > ls
-	drwxr-xr-x 2       4096 arch
-	-rwxr-xr-x 1       1672 clean
-	-rwxr-xr-x 1       3510 compile
-	-rw-r--r-- 1      85973 compile.output
-	-rwxr-xr-x 1       4257 configure
-	-rw-r--r-- 1       2486 configure.wps
-	-rw-r--r-- 1  154946888 FILE:2008-03-24_12
-	-rw-r--r-- 1  154946888 FILE:2008-03-24_18
-	-rw-r--r-- 1    1957004 geo_em.d01.nc
-	-rw-r--r-- 1    4745324 geo_em.d02.nc
-	drwxr-xr-x 4       4096 geogrid
-	lrwxrwxrwx 1         23 geogrid.exe -> geogrid/src/geogrid.exe
-	-rw-r--r-- 1      11169 geogrid.log
-	lrwxrwxrwx 1         38 GRIBFILE.AAA -> /data/gfs/gfs_080324_12_00
-	lrwxrwxrwx 1         38 GRIBFILE.AAB -> /data/gfs/gfs_080324_12_06
-	-rwxr-xr-x 1       1328 link_grib.csh
-	-rw-r--r-- 1    5217648 met_em.d01.2008-03-24_12:00:00.nc
-	-rw-r--r-- 1    5217648 met_em.d01.2008-03-24_18:00:00.nc
-	-rw-r--r-- 1   12658200 met_em.d02.2008-03-24_12:00:00.nc
-	drwxr-xr-x 3       4096 metgrid
-	lrwxrwxrwx 1         23 metgrid.exe -> metgrid/src/metgrid.exe
-	-rw-r--r-- 1      65970 metgrid.log
-	-rw-r--r-- 1       1094 namelist.wps
-	-rw-r--r-- 1       1987 namelist.wps.all_options
-	-rw-r--r-- 1       1075 namelist.wps.global
-	-rw-r--r-- 1        652 namelist.wps.nmm
-	-rw-r--r-- 1       4786 README
-	drwxr-xr-x 4       4096 ungrib
-	lrwxrwxrwx 1         21 ungrib.exe -> ungrib/src/ungrib.exe
-	-rw-r--r-- 1       1418 ungrib.log
-	-rw-r--r-- 1      27787 ungrib.output
-	drwxr-xr-x 3       4096 util
-	lrwxrwxrwx 1         33 Vtable -> ungrib/Variable_Tables/Vtable.GFS
+  drwxr-xr-x 2       4096 arch
+  -rwxr-xr-x 1       1672 clean
+  -rwxr-xr-x 1       3510 compile
+  -rw-r--r-- 1      85973 compile.output
+  -rwxr-xr-x 1       4257 configure
+  -rw-r--r-- 1       2486 configure.wps
+  -rw-r--r-- 1  154946888 FILE:2008-03-24_12
+  -rw-r--r-- 1  154946888 FILE:2008-03-24_18
+  -rw-r--r-- 1    1957004 geo_em.d01.nc
+  -rw-r--r-- 1    4745324 geo_em.d02.nc
+  drwxr-xr-x 4       4096 geogrid
+  lrwxrwxrwx 1         23 geogrid.exe -> geogrid/src/geogrid.exe
+  -rw-r--r-- 1      11169 geogrid.log
+  lrwxrwxrwx 1         38 GRIBFILE.AAA -> /data/gfs/gfs_080324_12_00
+  lrwxrwxrwx 1         38 GRIBFILE.AAB -> /data/gfs/gfs_080324_12_06
+  -rwxr-xr-x 1       1328 link_grib.csh
+  -rw-r--r-- 1    5217648 met_em.d01.2008-03-24_12:00:00.nc
+  -rw-r--r-- 1    5217648 met_em.d01.2008-03-24_18:00:00.nc
+  -rw-r--r-- 1   12658200 met_em.d02.2008-03-24_12:00:00.nc
+  drwxr-xr-x 3       4096 metgrid
+  lrwxrwxrwx 1         23 metgrid.exe -> metgrid/src/metgrid.exe
+  -rw-r--r-- 1      65970 metgrid.log
+  -rw-r--r-- 1       1094 namelist.wps
+  -rw-r--r-- 1       1987 namelist.wps.all_options
+  -rw-r--r-- 1       1075 namelist.wps.global
+  -rw-r--r-- 1        652 namelist.wps.nmm
+  -rw-r--r-- 1       4786 README
+  drwxr-xr-x 4       4096 ungrib
+  lrwxrwxrwx 1         21 ungrib.exe -> ungrib/src/ungrib.exe
+  -rw-r--r-- 1       1418 ungrib.log
+  -rw-r--r-- 1      27787 ungrib.output
+  drwxr-xr-x 3       4096 util
+  lrwxrwxrwx 1         33 Vtable -> ungrib/Variable_Tables/Vtable.GFS
+```
 
 <a id=Using_WRFSI_for_NESTED></a>
 
 ## 使用WPS创建嵌套域
 
-从本质上讲，运行WPS进行嵌套域仿真并不比单域情况下运行困难。 嵌套域模拟的区别在于，geogrid和metgrid程序在运行时处理多个网格，而不是模拟一个网格。为了指定嵌套的大小和位置，必须为namelist.wps文件中的多个变量提供值列表，每个嵌套一个值。
+从本质上讲，WPS进行嵌套区域模拟并不比单一区域更困难。嵌套区域模拟的区别在于，geogrid和metgrid程序在运行时处理多个网格，而不是模拟一个网格。为了指定嵌套的大小和位置，必须为namelist.wps文件中的多个变量提供列表值，每个嵌套一个值。
+
+```
 &share
  wrf_core = 'ARW',
  max_dom = 2,
@@ -557,11 +612,17 @@ ungrib程序将尝试读取名为GRIBFILE.AAA，GRIBFILE.AAB，…，GRIBFILE.ZZ
  stand_lon = -98.
  geog_data_path = '/mmm/users/wrfhelp/WPS_GEOG/'
 /
-受嵌套影响的名称列表变量显示在上面的（部分）名称列表记录中。该示例显示了用于两个域的运行的名称列表变量（粗糙域加一个嵌套），并且对名称列表变量的影响以明显的方式普遍化为多个嵌套：N个值的列表必须指定两个值的列表，而不是指定两个值的列表指定，其中N是模型网格的总数。
-在上面的示例中，对“共享”名称列表记录的第一次更改是对max_dom变量，该变量必须设置为模拟中嵌套的总数，包括粗糙域。确定嵌套数量后，必须为所有其他受影响的名称列表变量提供N个值的列表，每个网格一个。“共享”名称列表记录的唯一其他更改是开始时间和结束时间。在此，必须为每个嵌套指定开始和结束时间，但要限制一个嵌套不能在其父域之前开始或在其父域之后结束。另外，建议给嵌套的开始和结束时间与运行WPS时期望的嵌套开始时间相同。这是因为嵌套从其父域获取其横向边界条件，因此，仅嵌套的初始时间需要由WPS处理，除非在WRF中使用了网格微调（也称为分析微调）时。重要的是要注意，在运行WRF时，必须在WRF namelist.input文件中给出所有嵌套的实际开始和结束时间。
-其余更改是对“ geogrid”名称列表记录的。在此记录中，必须使用parent_id变量指定每个嵌套的父项。每个嵌套都必须是另一个嵌套的子代，并且粗域是其自己的父代。与嵌套的父代的标识有关的是相对于其父代的嵌套精炼比率，该比率由parent_grid_ratio变量给出；该比率确定相对于其父级的网格间距的标称网格间距。
+```
+
+受嵌套影响的namelist变量显示在上面的（部分）namelist记录中。该示例显示了用于运行两个区域的namelist变量（粗糙区域加一个嵌套区域），并且对namelist变量的影响以明显的方式推广到多个嵌套：必须指定N个值的列表，而不是指定两个值的列表，其中N是模型网格的总数。
+
+在上面的示例中，对“share” namelist记录的第一次更改是对`max_dom`变量，该变量必须设置为模拟中嵌套的总数，包括粗糙区域。确定嵌套数量后，必须为所有其他受影响的名称列表变量提供N个值的列表，每个网格一个。“share” namelist记录的唯一不同是开始时间和结束时间。在此，必须为每个嵌套指定开始和结束时间，但限制一个嵌套不能在其父域之前开始或在其父域之后结束。另外，建议给嵌套的开始和结束时间与运行WPS时期望的嵌套开始时间相同。这是因为嵌套从其父域获取其横向边界条件，因此，仅嵌套的初始时间需要由WPS处理，除非在WRF中使用了网格微调（也称为分析微调）。重要的是要注意，在运行WRF时，必须在WRF namelist.input文件中给出所有嵌套的实际开始和结束时间。
+
+其余更改是对“geogrid” namelist记录的。在此记录中，必须使用`parent_id`变量指定每个嵌套的父项。每个嵌套都必须是另一个嵌套的子代，并且粗区域是其自己的父代。与嵌套的父代的标识有关的是相对于其父代的嵌套比率，该比率由`parent_grid_ratio`变量给出，用于确定相对于其父级的网格间距的标称网格间距。
+
+![nesting_setup](images/chap3_nesting_setup.png)
  
-接下来，将嵌套的左下角指定为嵌套父域中的（i，j）位置；这是通过i_parent_start和j_parent_start变量完成的，并且相对于未交错的网格给出了指定的位置。最后，使用s_we，e_we，s_sn和e_sn变量为每个嵌套提供了以网格点为单位的每个嵌套的尺寸。上图中说明了我们的示例名称列表中的嵌套设置，可以在其中看到如何确定上述每个变量。当前，必须将南北（s_sn）和西东（s_we）方向上的起始网格点值指定为1，而终止网格点值（e_sn和e_we）本质上确定嵌套的完整尺寸;为确保嵌套网格的右上角与父域中未交错的网格点重合，e_we和e_sn都必须大于嵌套比率的某个整数倍。另外，对于每个嵌套，要使用其插值的源数据的分辨率（或列表，或分辨率；请参阅名称列表变量的描述）由geog_data_res变量指定。有关这些名称列表变量的完整描述，请向用户介绍名称列表变量的描述。
+接下来，将嵌套的左下角指定为嵌套父域中的（i，j）位置；这是通过`i_parent_start`和`j_parent_start`变量完成的，并且相对于未交错的网格给出了指定的位置。最后，使用`s_we`、`e_we`、`s_sn`和`e_sn`变量为每个嵌套提供了以网格点为单位的每个嵌套的尺寸。上图中说明了我们的上述示例namelist中的嵌套设置，可以在其中看到如何确定上述每个变量。当前，必须将南北（`s_sn`）和西东（`s_we`）方向上的起始网格点值指定为1，而终止网格点值（`e_sn`和`e_we`）本质上确定了嵌套的完整尺寸；为确保嵌套网格的右上角与父域中未交错的网格点重合，`e_we`和`e_sn`都必须是嵌套比率的某个整数倍。另外，对于每个嵌套，要使用其插值的源数据的分辨率（或列表或分辨率，请参阅[名称列表变量说明](#Namelist_Variables)）由`geog_data_res`变量指定。有关这些名namelist变量的完整描述，请参阅[名称列表变量说明](#Namelist_Variables)。
 
 <a id=Selecting_Between_USGS_MODIS></a>
 
