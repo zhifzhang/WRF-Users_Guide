@@ -782,43 +782,59 @@ NARR_FIXED:1979-11-08_00
 
 ## 使用非等压气象数据集
 
-当使用非等压气象数据集初始化WRF模拟时，重要的是，将此类数据集提供给metgrid.exe程序，使其3-d压力和地势高度场的水平与其他3-d大气变量的水平相同，例如温度和湿度。 WRF real.exe预处理程序将这些字段用于WRF模型级别的垂直插值，表面压力计算以及其他目的。
-对于某些数据源，即ECMWF模型级数据和UK Met Office模型数据，可以使用一系列系数从表面压力和/或表面高度场中导出3-d压力和/或地势高度场，并且WPS提供了用于执行此推导的实用程序；有关calc_ecmwf_p.exe和height_ukmo.exe程序的更多信息，请参见WPS实用程序部分。
-其他气象数据集明确提供了3-d压力和地势高度字段，并且用户必须仅确保这些字段存在于提供给metgrid.exe程序的一组中间文件中。
+当使用非等压气象数据集初始化WRF模拟时，重要的是，将此类数据集提供给metgrid.exe程序，使其3-d压力和地势高度场的层与其他3-d大气变量相同，例如温度和湿度。WRF real.exe预处理程序将这些场用于WRF模型层的垂直插值、表面压力计算以及其他目的。
+
+对于某些数据源，即ECMWF model-level数据和UK Met Office模型数据，可以使用一系列系数从表面压力和/或表面高度场中导出3-d压力和/或地势高度场，并且WPS提供了用于执行此导出的实用程序；请参见[WPS实用程序](#WPS_Utility_Programs)一节查看有关calc_ecmwf_p.exe和height_ukmo.exe程序的更多信息。
+
+其他气象数据集明确提供了3-d压力和地势高度场，并且用户仅需确保这些场存在于提供给metgrid.exe程序的一组中间文件中。
 
 <a id=Alternative_Initialization_of_Lake></a>
 
 ## 湖SSTs的替代初始化
 
-metgrid程序中对海洋和湖泊的海面温度的默认处理方式是简单地将SST字段从中间文件插值到WRF域中的所有水位。但是，如果在GRIB数据中未解析WRF域中已解析的湖泊，特别是如果这些湖泊在地理上与解析水体相距较远，则最有可能从附近的解析水体中推断出湖上的SST场。 GRIB数据；这种情况可能导致湖泊SST值过高或过冷。
+metgrid程序中对海洋和湖泊的海面温度的默认处理方式是简单地将SST字段从中间文件插值到WRF区域中的所有水体格点。但是，如果在WRF区域中解析为湖泊，而在GRIB数据中未解析时，特别是如果这些湖泊在地理上与解析水体相距较远，则最有可能从GRIB数据的最近解析水体中推断出湖上的SST场；这种情况可能导致湖泊SST值过热或过冷，不符合实际情况。
+
 如果没有高分辨率的SST字段供metgrid使用，则外推湖泊的SST值的另一种方法是在湖泊的SST上做出“最佳猜测”。在metgrid和real程序中，这可以通过将区分湖泊和海洋的特殊土地利用数据集与用作湖上SST代理的字段结合使用来完成。由于WRF的实际预处理程序需要知道应在哪里使用人造SST字段而不是GRIB数据中插补的SST字段，因此需要一个特殊的土地使用数据集。
-以下步骤概述了初始化湖SST的替代过程：
-1.在运行geogrid之前，请确保＆geogrid名称列表记录中的geog_data_res规范指定具有内陆水体的基于USGS或基于MODIS的土地使用数据。geogrid程序中的默认行为是使用包含湖泊类别的基于MODIS的土地利用。但是，也可以使用包含湖泊类别的USGS土地利用数据集。例如，在两域配置中，设置
-			geog_data_res = 'usgs_lakes+default', 'usgs_lakes+default',
-会告诉geogrid在两个域中都使用基于USGS的土地使用数据。
-运行Geogrid会导致输出文件使用针对内陆水域的单独类别，而不是用于海洋的常规水类别。湖泊类别由土工格栅输出文件中的全局属性ISLAKE标识；此属性应设置为28（对于基于USGS的数据）或21（对于基于MODIS的数据）。参见，例如，WPS输出字段的列表，其中ISLAKE的值-1表示没有单独的湖泊类别。
 
-2.运行ungrib程序后，使用avg_tsfc.exe实用程序创建一个包含日平均地表气温场的中间文件，该真实文件仅会被真实程序替换为湖面上的SST场。有关avg_tsfc.exe实用程序的更多信息，请参阅WPS实用程序部分。
+以下步骤概述了初始化湖SSTs的替代过程：
 
-3.在运行metgrid程序之前，将上一步中创建的TAVGSFC文件添加到namelist.wps文件的＆metgrid记录中的constants_name规范中。
+1. 在运行geogrid之前，请确保`&geogrid` namelist记录中的`geog_data_res`规范指定具有内陆水体的基于USGS或基于MODIS的土地使用数据。geogrid程序中的默认行为是使用包含湖泊类别的基于MODIS的土地利用。但是，也可以使用包含湖泊类别的USGS土地利用数据集。例如，在两层嵌套区域的配置中，设置
 
-4.在namelist.input文件的＆physics记录中设置土地类别的数量（num_land_cat），使其与metgrid文件中的全局属性NUM_LAND_CAT的值匹配之后，照常运行WRF的real.exe程序。如果metgrid文件中的全局属性ISLAKE指示存在一个特殊的湖泊土地使用类别，则实际程序将仅在类别与湖泊类别匹配的那些网格点上用TAVGSFC字段替代SST字段；此外，由于LANDUSE.TBL和VEGPARM.TBL文件都没有包含湖泊类别的条目，因此实际程序会将湖泊的土地利用类别更改回一般的水类别（用于海洋的类别）。
+```
+geog_data_res = 'usgs_lakes+default', 'usgs_lakes+default',
+```
+
+会告诉geogrid在两层嵌套区域中都使用基于USGS的土地使用数据。
+
+然后运行geogrid会使输出文件使用针对内陆水域的单独类别，而不是用于海洋的常规水类别。湖泊类别由geogrid输出文件中的全局属性ISLAKE标识；此属性应设置为28（对于基于USGS的数据）或21（对于基于MODIS的数据）。参见[WPS输出字段](#WPS_Output_Fields)，其中ISLAKE的值-1表示没有单独的湖泊类别。
+
+2. 运行ungrib程序后，使用avg_tsfc.exe实用程序创建一个包含日平均地表气温场的中间文件，该文件将由real程序代替仅在湖泊上的SST字段。有关avg_tsfc.exe实用程序的更多信息，请参阅[WPS实用程序](#WPS_Utility_Programs)。
+
+3. 在运行metgrid程序之前，将上一步中创建的TAVGSFC文件添加到namelist.wps文件的`&metgrid`记录中的`constants_name`规范中。
+
+4. 在namelist.input文件的`&physics`记录中设置土地类别的数量（`num_land_cat`），使其与metgrid文件中的全局属性`NUM_LAND_CAT`的值匹配之后，照常运行WRF的real.exe程序。如果metgrid文件中的全局属性ISLAKE指示存在一个特殊的湖泊土地使用类别，则real程序将仅在类别与湖泊类别匹配的那些网格点上用TAVGSFC字段替代SST字段；此外，由于LANDUSE.TBL和VEGPARM.TBL文件都没有包含湖泊类别的条目，因此real程序会将湖泊的土地利用类别更改回一般的水类别（用于海洋的类别）。
 
 <a id=Parallelism_in_WPS></a>
 
 ## WPS的并行计算
 
-如果WPS要处理的域的尺寸太大而无法容纳在单个CPU的内存中，则可以在分布式内存配置中运行geogrid和metgrid程序。为了编译geogrid和metgrid以执行分布式内存，用户必须在目标计算机上安装MPI库，并且必须使用“ DM parallel”配置选项之一来编译WPS。成功编译后，取决于机器，可以使用mpirun或mpiexec命令或通过批处理排队系统来运行geogrid和metgrid程序。
-如前所述，ungrib程序的工作不适合并行化，此外，ungrib处理的内存要求独立于geogrid和metgrid的内存要求；因此，无论在配置期间是否选择了“ DM并行”配置选项，ungrib始终为单个处理器编译并在单个CPU上运行。
-每种标准WRF I / O API格式（NetCDF，GRIB1，二进制）都有对应的并行格式，其编号是通过将标准格式的io_form值（即io_form_geogrid和io_form_metgrid的值）加100来给出的。不必使用并行的io_form，但是使用一个并行的io_form时，每个CPU会将其输入/输出读/写到一个单独的文件中，该文件的名称只是在串行执行期间将使用的名称，但是带有四个-名称后附加数字处理器ID。例如，在io_form_geogrid = 102的四个处理器上运行geogrid将创建名为geo_em.d01.nc.0000，geo_em.d01.nc.0001，geo_em.d01.nc.0002和geo_em.d01.nc.0003的输出文件为了粗略域。
-在分布式内存执行期间，模型域被分解为矩形补丁，每个处理器工作在单个补丁上。从WRF I / O API格式读/写时，每个处理器仅读/写其补丁。因此，如果为geogrid的输出选择了并行的io_form，则必须使用与运行geogrid相同数量的处理器来运行metgrid。同样，如果为metgrid输出文件选择了并行的io_form，则实际程序必须使用相同数量的处理器运行。当然，在多个处理器上运行时仍然可以使用标准的io_form，在这种情况下，将在输入/输出时分发/收集模型域的所有数据。最后要注意的是，当在多个处理器上运行geogrid或metgrid时，每个处理器将写入自己的日志文件，日志文件名后会附加用于I / O API文件的相同四位处理器ID号。
+如果WPS要处理的区域的尺寸太大而无法容纳在单个CPU的内存中，则可以在分布式内存配置中运行geogrid和metgrid程序。为了编译geogrid和metgrid以执行分布式内存，用户必须在目标计算机上安装MPI库，并且必须使用“DM parallel”配置选项之一来编译WPS。成功编译后，取决于机器的不同，可以使用`mpirun`或`mpiexec`命令或通过批处理排队系统来运行geogrid和metgrid程序。
+
+如前所述，ungrib程序的工作不适合并行化，此外，ungrib处理的内存要求独立于geogrid和metgrid的内存要求；因此，无论在配置期间是否选择了“DM parallel”配置选项，ungrib始终为单个处理器编译并在单个CPU上运行。
+
+每种标准WRF I/O API格式（NetCDF、GRIB1、二进制）都有对应的并行格式，其编号是通过将标准格式的io_form值（即`io_form_geogrid`和`io_form_metgrid`的值）加100来给出的。使用并行的io_form不是必须的，但是如果使用一个并行的io_form时，每个CPU会将其输入/输出读/写到一个单独的文件中，该文件的名称只是在串行执行期间将使用的名称，但是名称后附加四位处理器ID数字。例如，在四个处理器上运行`io_form_geogrid=102`时，geogrid将为粗区域创建名为geo_em.d01.nc.0000，geo_em.d01.nc.0001，geo_em.d01.nc.0002和geo_em.d01.nc.0003的输出文件。
+
+在分布式内存执行期间，模型域被分解为矩形块，每个处理器工作在单个块上。从WRF I/O API格式读/写时，每个处理器仅读/写其各自的块。因此，如果为geogrid的输出选择了并行的io_form，则必须使用与运行geogrid相同数量的处理器来运行metgrid。同样，如果为metgrid输出文件选择了并行的io_form，则real程序必须使用相同数量的处理器运行。当然，在多个处理器上运行时仍然可以使用标准的io_form，在这种情况下，将在输入/输出时分发/收集模型区域的所有数据。最后要注意的是，当在多个处理器上运行geogrid或metgrid时，每个处理器将写入自己的日志文件，日志文件名后会附加用于I/O API文件的相同四位处理器ID号。
 
 <a id=Checking_WPS_Output></a>
 
 ## 检查WPS输出
 
-运行WPS时，检查程序产生的输出可能会有所帮助。 例如，当确定嵌套的位置时，查看插值的静态地理数据和纬度/经度字段可能会有所帮助。 再举一个例子，当将新的数据源（WPS）（静态数据或气象数据）导入WPS时，检查生成的插值字段通常有助于调整Geogrid或metgrid使用的插值方法。
-通过将NetCDF格式用于geogrid和metgrid I / O表单，可以使用多种读取NetCDF数据的可视化工具来检查geogrid处理的域文件或metgrid产生的水平内插气象字段。 为了将geogrid和metgrid的文件格式设置为NetCDF，用户应在WPS名称列表文件中将io_form_geogrid和io_form_metgrid指定为2（注意：这些选项的默认设置为2）：
+运行WPS时，检查程序产生的输出信息可能会有所帮助。例如，当确定嵌套的位置时，查看插值的静态地理数据和纬度/经度字段可能会有所帮助。再举一个例子，当将新的数据源（静态数据或气象数据）导入WPS时，检查生成的插值字段通常有助于调整geogrid或metgrid使用的插值方法。
+
+通过将NetCDF格式用于geogrid和metgrid I/O格式，可以使用多种读取NetCDF数据的可视化工具来检查geogrid处理的区域文件或metgrid产生的水平内插气象场。为了将geogrid和metgrid的文件格式设置为NetCDF，用户应在WPS namelist文件中将`io_form_geogrid`和`io_form_metgrid`指定为2（注意：2就是这些选项的默认设置）：
+
+```
 &share
  io_form_geogrid = 2,
 /
@@ -826,8 +842,11 @@ metgrid程序中对海洋和湖泊的海面温度的默认处理方式是简单�
 &metgrid
  io_form_metgrid = 2, 
 /
-在可用的工具中，可能会感兴趣ncdump，ncview和新的RIP4程序。 ncdump程序是随NetCDF库一起分发的紧凑实用程序，它列出了NetCDF文件中的变量和属性。这对于检查Geogrid域文件中的域参数（例如，东西向维度，南北向维度或域中心点）或在文件中列出字段尤其有用。 ncview程序提供了一种交互方式来查看NetCDF文件中的字段。同样，对于希望产生适用于出版物的田地图的用户而言，RIP4程序的新版本可能会令人感兴趣。新的RIP4能够绘制水平轮廓，地图背景并在同一图中覆盖多个字段。
-ungrib程序的输出始终以简单的二进制格式（“ WPS”，“ SI”或“ MM5”）编写，因此用于查看NetCDF文件的软件几乎毫无用处。但是，WPS源代码提供了一个基于NCAR Graphics的实用程序plotfmt。该实用程序生成在中间格式文件中找到的字段的等高线图。如果正确安装了NCAR图形库，则在构建WPS时，plotfmt程序会与其他实用程序一起自动编译。
+```
+
+在可用的工具中，可能会感兴趣包括ncdump、ncview和新的RIP4程序。ncdump程序是随NetCDF库一起分发的紧凑实用程序，它列出了NetCDF文件中的变量和属性。这对于检查geogrid区域文件中的区域参数（例如东西向维度，南北向维度或区域中心点）或在文件中列出字段尤其有用。ncview程序提供了一种交互方式来查看NetCDF文件中的字段。同样，对于希望产生适用于出版物的图件的用户而言，RIP4程序的新版本可能会令人感兴趣。新的RIP4能够绘制水平等值线图、地图背景图并在同一张图中叠加多个场。
+
+ungrib程序的输出文件始终以简单的二进制格式（“WPS”，“SI”或“MM5”）编写，因此用于查看NetCDF文件的软件几乎毫无用处。但是，WPS源代码提供了一个基于NCAR Graphics的实用程序`plotfmt`。该实用程序可以采用中间格式文件生成等值线图。如果正确安装了NCAR图形库，则在构建WPS时，plotfmt程序会与其他实用程序一起自动编译。
 
 <a id=WPS_Utility_Programs></a>
 
