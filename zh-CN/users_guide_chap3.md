@@ -682,7 +682,7 @@ metgrid程序能够插值不随时间变化的字段，并且还可以从多个�
 /
 ```
 
-or
+或者：
 
 ```
 &metgrid
@@ -852,41 +852,63 @@ ungrib程序的输出文件始终以简单的二进制格式（“WPS”，“SI
 
 ## WPS实用程序
 
-除了三个主要的WPS程序-geogrid，ungrib和metgrid-WPS附带的许多实用程序都在util目录中进行编译。这些实用程序可用于检查数据文件，可视化嵌套域的位置，计算压力场以及计算平均表面温度场。
-A.avg_tsfc.exe
-avg_tsfc.exe程序以中间格式为给定输入文件计算每日平均表面温度。根据namelist.wps文件的“共享”名称列表部分中指定的日期范围，并考虑中间文件之间的间隔，avg_tsfc.exe将在计算平均值时使用尽可能多的整天数据，从名称列表中指定的开始日期开始。如果没有一整天的可用数据，则不会写入任何输出文件，并且程序将在确定后立即停止。同样，任何无法用作完整24小时周期的日期的中间文件都将被忽略；例如，如果每隔六个小时有五个中间文件可用，则最后一个文件将被忽略。使用与输入文件相同的中间格式版本，将计算出的平均值字段写入名为TAVGSFC的新文件中。然后，通过在“ metgrid”名称列表部分中为constants_name变量指定“ TAVGSFC”，metgrid可以摄取该每日平均表面温度场。
+除了三个主要的WPS程序——geogrid、ungrib和metgrid之外，WPS还附带了许多实用程序，都在util目录中进行编译。这些实用程序可用于检查数据文件、可视化嵌套域的位置、计算压力场、以及计算地表平均温度场。
 
-B.mod_levs.exe
-mod_levs.exe程序用于从中间格式文件中删除数据级别。要保留的级别在namelist.wps文件中的新名称列表记录中指定：
+### A. avg_tsfc.exe
+
+avg_tsfc.exe程序以中间格式作为输入文件计算日平均地表温度。根据namelist.wps文件的“share”名称列表部分中指定的日期范围，并考虑中间文件之间的间隔，avg_tsfc.exe将在计算平均值时使用尽可能多的完整的日数据，从名称列表中指定的开始日期开始。如果没有一整天的可用数据，则不会写入任何输出文件，并且程序将在确定后立即停止。同样，任何无法用作完整24小时周期的日期的中间文件都将被忽略；例如，如果每隔六个小时有五个中间文件可用，则最后一个文件将被忽略。avg_tsfc.exe计算出的平均值字段会采用与输入文件相同的中间格式版本写入名为TAVGSFC的新文件中。然后，通过在“metgrid”名称列表部分中为`constants_name`变量指定“TAVGSFC”，metgrid可以提取该每日地表平均温度场。
+
+### B. mod_levs.exe
+
+mod_levs.exe程序用于从中间格式文件中删除层的数据。要保留的层可以在namelist.wps文件中的新名称列表记录中指定：
+
+```
 &mod_levs
- press_pa = 201300 , 200100 , 100000 , 
-             95000 ,  90000 , 
-             85000 ,  80000 , 
-             75000 ,  70000 , 
-             65000 ,  60000 , 
-             55000 ,  50000 , 
-             45000 ,  40000 , 
-             35000 ,  30000 , 
-             25000 ,  20000 , 
-             15000 ,  10000 , 
-              5000 ,   1000
+	press_pa = 201300 , 200100 , 100000 , 
+				95000 ,  90000 , 
+				85000 ,  80000 , 
+				75000 ,  70000 , 
+				65000 ,  60000 , 
+				55000 ,  50000 , 
+				45000 ,  40000 , 
+				35000 ,  30000 , 
+				25000 ,  20000 , 
+				15000 ,  10000 , 
+				 5000 ,   1000
 /
-在＆mod_levs名称列表记录中，变量press_pa用于指定要保留的级别列表。指定的级别应与中间格式文件中的xlvl值匹配（有关中间文件字段的更多信息，请参见WPS中间格式的讨论）。 mod_levs程序将两个命令行参数作为其输入。第一个参数是要操作的中间文件的名称，第二个参数是要写入的输出文件的名称。
+```
 
-例如，当将一个数据集用于模型初始条件而将第二个数据集用于侧向边界条件时，从气象数据集中删除除指定子集之外的所有子集特别有用。这可以通过提供将在第一个时间段内设置的初始条件数据集（由metgrid进行插值）以及所有其他时间设置的边界条件数据来完成。如果两个数据集的垂直级别数相同，则无需做任何工作；但是，当这两个数据集的级别数不同时，至少有必要删除（m – n）个级别，其中m> n且m和n是两个级别中每个级别的数量数据集，来自具有m个级别的数据集。在所有文件中具有相同数量的垂直级别的必要性是由于real.exe中的限制所致，该限制要求从中进行固定数量的垂直级别。
-mod_levs实用程序是一种临时解决方案，用于容纳两个或多个具有不同垂直级别数的数据集。如果用户选择使用mod_levs，则应注意，尽管级别的垂直位置在数据集之间不必匹配，但是所有数据集都应具有表面数据级别，并且在运行real.exe和wrf.exe时，则必须将p_top的值选择为低于数据集中的最低值。
-C.calc_ecmwf_p.exe
-在垂直内插气象场的过程中，实际程序需要与其他大气场处于同一水平的3维压力场和地势高度场。 calc_ecmwf_p.exe实用工具可用于创建这些字段以用于ECMWF sigma级别的数据集。给定一个表面压力场（或表面压力场的对数）以及系数A和B的列表，calc_ecmwf_p.exe计算网格点（i，j）处ECMWF sigma级别k的压力为Pijk = Ak + Bk * Psfcij 。压力计算中使用的系数列表可以从以下链接之一的表格中复制，该表格与数据集中的sigma级数相对应：
+在`&mod_levs`名称列表记录中，变量`press_pa`用于指定要保留的层的列表。指定的层应与中间格式文件中的`xlvl`值匹配（有关中间文件字段的更多信息，请参见[将气象数据写入中间格式](#Writing_Meteorological_Data)）。mod_levs.exe程序将两个命令行参数作为其输入信息。第一个参数是要操作的中间文件的名称，第二个参数是要写入的输出文件的名称。
+
+例如，当将一个数据集用于模型初始条件而将第二个数据集用于侧向边界条件时，从气象数据集中删除除指定的层的子集之外的所有层特别有用。这可以通过将在第一个时间段内设置的初始条件数据集（由metgrid进行插值）以及所有其他时间设置的边界条件数据来完成。如果两个数据集的垂直层数相同，则无需做任何工作；但是，当两个数据集的层数不同时，至少有必要从m个层的数据集中删除m–n个层，其中m>n，且m和n分别是两个数据集的层数。在所有文件中具有相同数量的垂直层数是real.exe中要求必须的，因为其需要固定数量的垂直层来进行插值。
+
+mod_levs.exe实用程序是一种临时解决方案，用于容纳两个或多个具有不同垂直层数的数据集。如果用户选择使用mod_levs.exe，则应注意，尽管层的垂向位置在数据集之间不必相同，但是所有数据集都应具有地表层的数据，并且在运行real.exe和wrf.exe时，则必须将参数`p_top`的值选择为低于数据集中的最低顶层值。
+
+### C. calc_ecmwf_p.exe
+
+在垂直内插气象场的过程中，real.exe程序需要与其他大气场相同层的3维压力场和地势高度场。calc_ecmwf_p.exe实用工具可用于创建这些字段以用于ECMWF sigma-层的数据集。通过给定一个表面压力场（或表面压力场的对数）以及系数A和B的列表，calc_ecmwf_p.exe可以计算网格点（i，j）处ECMWF sigma-层k的压力，Pijk=Ak+Bk×Psfcij。压力计算中使用的系数列表可以从以下链接之一的表格中复制，该表格与数据集中的sigma层数相对应：
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/16-model-levels
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/19-model-levels
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/31-model-levels
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/40-model-levels
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/50-model-levels
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/60-model-levels
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/62-model-levels
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/91-model-levels
+
 http://www.ecmwf.int/en/forecasts/documentation-and-support/137-model-levels 
-该表应以纯文本格式写入当前工作目录中的文件ecmwf_coeffs； 例如，对于16个sigma级别，文件emcwf_coeffs将包含以下内容：
+
+该表应以纯文本格式写入当前工作目录中的文件ecmwf_coeffs中；例如，对于16个sigma层，文件emcwf_coeffs将包含以下内容：
+
+```
 1.	    0         0.000000      0.000000000
 2.	    1      5000.000000      0.000000000
 3.	    2      9890.519531      0.001720764
@@ -904,18 +926,31 @@ http://www.ecmwf.int/en/forecasts/documentation-and-support/137-model-levels
 15.	   14         0.000000      0.972985268
 16.	   15         0.000000      0.992281914
 17.	   16         0.000000      1.000000000
-此外，如果有土壤高度（或土壤地势），3维温度和3维特定湿度场，则calc_ecmwf_p.exe计算3维地势高度场，这是在真实区域中获得准确的垂直插值所必需的程序。
-给定ungrib生成的一组中间文件和ecmwf_coeffs文件，calc_ecmwf_p在namelist.wps中的所有时间段内循环，并每次生成一个附加的中间文件PRES：YYYY-MM-DD_HH，其中包含压力和地势高度每个完整sigma级别的数据，以及3-d相对湿度场。通过在fg_name namelist变量的前缀列表中添加“ PRES”，应将此中间文件与ungrib生成的中间数据一起指定给metgrid。
-D. height_ukmo.exe
-实际程序需要3维压力和地势高度场来垂直内插metgrid程序的输出；但是，来自UKMO统一模型的数据集包含3-d压力场，但不包含地势高度场。因此，height_ukmo.exe程序可用于计算来自UKMO统一模型的数据集的地势高度字段。 height_ukmo.exe程序不需要命令行参数，但会读取＆metgrid名称列表记录以获取ungrib.exe创建的中间文件的前缀；＆metgrid名称列表记录的fg_name变量中的第一个前缀所指示的中间文件应包含一个SOILHGT字段，height_ukmo.exe程序将通过该字段借助辅助表计算3-d地理高度字段。计算出的高度字段将被写入带有前缀HGT的新中间文件，然后应在运行metgrid.exe之前将前缀“ HGT”添加到＆metgrid名称列表记录中的fg_name名称列表变量中。当前，包含辅助表的文件名已硬连接到height_ukmo.exe程序的源代码中，用户有责任将WPS / util / src / height_ukmo.F中的此文件名更改为与ungrib.exe处理的GRIB数据具有相同级别级别的表的名称； WPS / util目录中分别提供了38、50和70级数据的数据表，文件名分别为vertical_grid_38_20m_G3.txt，vertical_grid_50_20m_63km.txt和vertical_grid_70_20m_80km.txt。
-E.plotgrids.ncl
-plotgrids.ncl程序是一个基于NCAR Graphics的实用程序，其目的是绘制在namelist.wps文件中定义的所有嵌套的位置。该程序在namelist.wps文件上运行，因此可以在不运行三个主要WPS程序中的任何一个的情况下运行。成功完成后，plotgrids将以所选格式生成图形文件（请参见plotgrids.ncl脚本内部，以对输出格式进行更改），绘制粗略域以填充图框，并绘制带有政治边界的地图轮廓粗略区域，所有嵌套区域都绘制为矩形，勾勒出每个嵌套区域的范围。该实用程序在域的初始放置期间特别有用，这时用户可以通过编辑namelist.wps文件，运行plotgrids.ncl并确定一组对嵌套位置的调整来迭代地调整嵌套的位置。要运行该程序，只需在WPS /目录中的命令行中键入“ ncl util / plotgrids.ncl”。目前，该实用程序不适用于使用纬度-经度投影的ARW域（即，当map_proj ='lat-lon'时）。
-F.g1print.exe
-g1print.exe程序将GRIB Edition 1文件的名称作为唯一的命令行参数。该程序将打印文件中数据的字段，级别和日期的列表。
-G.g2print.exe
-与g1print.exe相似，g2print.exe程序将GRIB Edition 2文件的名称作为唯一的命令行参数。该程序将打印文件中数据的字段，级别和日期的列表。
-H.rd_intermediate.exe
-在命令行中给定了singe中间格式文件的名称后，rd_intermediate.exe程序会打印有关文件中包含的字段的信息。
+```
+
+此外，如果有土壤高度（或土壤地势）、3维温度和3维特定湿度场，则calc_ecmwf_p.exe可以计算3维地势高度场，这是在real.exe程序中获得准确的垂直插值所必需的信息。
+
+给定ungrib生成的一组中间文件和ecmwf_coeffs文件，calc_ecmwf_p在namelist.wps中的所有时间段内循环，并为每个时间生成一个附加的中间文件PRES：YYYY-MM-DD_HH，其中包含每个完整sigma层的压力和地势高度数据，以及3-d相对湿度场。通过在namelist变量`fg_name`的前缀列表中添加“PRES”，此中间文件就可以与ungrib生成的中间数据一起指定给metgrid。
+
+### D. height_ukmo.exe
+
+real.exe程序需要3维压力和地势高度场来垂直内插metgrid程序的输出数据；但是，来自UKMO统一模型的数据集包含3维压力场，但不包含地势高度场。因此，height_ukmo.exe程序可用于计算来自UKMO统一模型的数据集的地势高度字段。height_ukmo.exe程序不需要命令行参数，但会读取`&metgrid`名称列表记录以获取ungrib.exe创建的中间文件的前缀；`&metgrid`名称列表记录的`fg_name`变量中的第一个前缀所指示的中间文件应包含一个SOILHGT字段，height_ukmo.exe程序将通过该字段借助辅助表计算3维地势高度场。计算出的高度字段将被写入带有前缀HGT的新中间文件，然后应在运行metgrid.exe之前将前缀“HGT”添加到`&metgrid`名称列表记录中的`fg_name`名称列表变量中。当前，包含辅助表的文件名已硬连接到height_ukmo.exe程序的源代码中，用户需要将WPS/util/src/height_ukmo.F中的此文件名更改为与ungrib.exe处理的GRIB数据具有相同层数的表的名称； WPS/util目录中分别提供了38、50和70层数据的数据表，文件名分别为vertical_grid_38_20m_G3.txt，vertical_grid_50_20m_63km.txt和vertical_grid_70_20m_80km.txt。
+
+### E. plotgrids.ncl
+
+plotgrids.ncl程序是一个基于NCAR Graphics的实用程序，其目的是绘制在namelist.wps文件中定义的所有嵌套的位置。该程序在namelist.wps文件上运行，因此可以在不运行三个主要WPS程序中的任何一个的情况下运行。成功完成后，plotgrids将以所选格式生成图形文件（请参见plotgrids.ncl脚本内部，以对输出格式进行更改），绘制粗区域以填充图框，在粗区域上绘制具有政治边界的地图轮廓，并且将任何嵌套域绘制为概述每个嵌套范围的矩形。该实用程序在域的初始放置期间特别有用，这时用户可以通过编辑namelist.wps文件，运行plotgrids.ncl并确定一组对嵌套位置的调整来迭代地调整嵌套的位置。要运行该程序，只需在WPS目录中的命令行中键入“ncl util/plotgrids.ncl”。*目前，该实用程序不适用于使用纬度-经度投影的ARW域（即当map_proj='lat-lon'时）*。
+
+### F. g1print.exe
+
+g1print.exe程序将GRIB Edition 1文件的名称作为唯一的命令行参数。该程序将打印文件中数据的字段、层和日期的列表。
+
+### G. g2print.exe
+
+与g1print.exe相似，g2print.exe程序将GRIB Edition 2文件的名称作为唯一的命令行参数。该程序将打印文件中数据的字段、层和日期的列表。
+
+### H. rd_intermediate.exe
+
+在命令行中给定了singe中间格式文件的名称后，rd_intermediate.exe程序会打印该文件中包含的字段的信息。
 
 <a id=Writing_Meteorological_Data></a>
 
