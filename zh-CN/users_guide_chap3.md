@@ -956,39 +956,42 @@ g1print.exe程序将GRIB Edition 1文件的名称作为唯一的命令行参数�
 
 ## 将气象数据写入中间格式
 
-ungrib程序的作用是将GRIB数据集解码为metgrid可以理解的简单中间格式。如果GRIB Edition 1或GRIB Edition 2格式的气象数据不可用，则用户有责任将这些数据写入中间文件格式。幸运的是，中间格式相对简单，由一系列未格式化的Fortran写入组成。重要的是要注意，这些未格式化的写操作使用big-endian字节顺序，通常可以使用编译器标志指定该顺序。下面，我们描述WPS中间格式；对SI或MM5中间格式感兴趣的用户可以先熟悉非常相似的WPS格式，然后检查可读写所有三种中间格式（metgrid / src / read_met_module.F和metgrid / src /的Fortran子例程）。分别为write_met_module.F）。
-将数据写入WPS中间格式时，二维字段被写入为实数值的矩形数组。 3维数组必须在垂直方向上分为2个独立编写的2维数组。还应注意，对于全局数据集，必须使用高斯或圆柱等距投影，对于区域数据集，可以使用墨卡托（Mercator），兰伯特共形，极坐标或圆柱等距。用于以WPS中间格式写入单个二维数组的写入顺序如下（请注意，并非下面声明的所有变量都用于给定的数据投影）。
-integer :: version		! Format version (must =5 for WPS format)
-integer :: nx, ny		! x- and y-dimensions of 2-d array
-integer :: iproj		! Code for projection of data in array:
-				! 	0 = cylindrical equidistant
-				! 	1 = Mercator
-				! 	3 = Lambert conformal conic
-				! 	4 = Gaussian (global only!)
-				! 	5 = Polar stereographic
-real :: nlats			! Number of latitudes north of equator 
-				! 	(for Gaussian grids)
-real :: xfcst			! Forecast hour of data
-real :: xlvl			! Vertical level of data in 2-d array
-real :: startlat, startlon	! Lat/lon of point in array indicated by 
-				! 	startloc string
-real :: deltalat, deltalon	! Grid spacing, degrees
-real :: dx, dy			! Grid spacing, km
-real :: xlonc			! Standard longitude of projection
-real :: truelat1, truelat2	! True latitudes of projection
-real :: earth_radius		! Earth radius, km
-real, dimension(nx,ny) :: slab	! The 2-d array holding the data
-logical :: is_wind_grid_rel	! Flag indicating whether winds are 						
-				! 	relative to source grid (TRUE) or 
-				! 	relative to earth (FALSE)
-character (len=8)  :: startloc	! Which point in array is given by 
-				! 	startlat/startlon; set either 						
-				! 	to 'SWCORNER' or 'CENTER  '
-character (len=9)  :: field	! Name of the field
-character (len=24) :: hdate	! Valid date for data YYYY:MM:DD_HH:00:00
-character (len=25) :: units	! Units of data
-character (len=32) :: map_source  !  Source model / originating center
-character (len=46) :: desc	! Short description of data
+ungrib程序的作用是将GRIB数据集解码为metgrid可以理解的简单中间格式。如果没有提供GRIB Edition 1或GRIB Edition 2格式的气象数据，则用户需要将这些数据写入中间文件格式。幸运的是，中间格式相对简单，由一系列未格式化的Fortran写入组成。重要的是要注意，这些未格式化的写操作使用big-endian字节顺序，通常可以使用编译器标志指定该顺序。下面，我们描述WPS中间格式；对SI或MM5中间格式感兴趣的用户可以先熟悉非常相似的WPS格式，然后检查读取和写入所有三种中间格式的Fortran子例程（分别为metgrid/src/read_met_module.F和metgrid/src/write_met_module.F）。
+
+将数据写入WPS中间格式时，二维字段被写入为实数值的矩形数组。3维数组必须在垂直方向上分为2个独立编写的2维数组。还应注意，对于全球数据集，必须使用高斯或圆柱等距投影，对于区域数据集，可以使用墨卡托、兰伯特共形、极坐标或圆柱等距投影。用于以WPS中间格式写入单个二维数组的写入顺序如下（请注意，并非下面声明的所有变量都用于给定的数据投影）。
+
+```
+integer :: version					! Format version (must =5 for WPS format)
+integer :: nx, ny					! x- and y-dimensions of 2-d array
+integer :: iproj					! Code for projection of data in array:
+									! 		0 = cylindrical equidistant
+									! 		1 = Mercator
+									! 		3 = Lambert conformal conic
+									! 		4 = Gaussian (global only!)
+									! 		5 = Polar stereographic
+real :: nlats						! Number of latitudes north of equator 
+									! 		(for Gaussian grids)
+real :: xfcst						! Forecast hour of data
+real :: xlvl						! Vertical level of data in 2-d array
+real :: startlat, startlon			! Lat/lon of point in array indicated by 
+									! 		startloc string
+real :: deltalat, deltalon			! Grid spacing, degrees
+real :: dx, dy						! Grid spacing, km
+real :: xlonc						! Standard longitude of projection
+real :: truelat1, truelat2			! True latitudes of projection
+real :: earth_radius				! Earth radius, km
+real, dimension(nx,ny) :: slab		! The 2-d array holding the data
+logical :: is_wind_grid_rel			! Flag indicating whether winds are 						
+									! 		relative to source grid (TRUE) or 
+									! 		relative to earth (FALSE)
+character (len=8)  :: startloc		! Which point in array is given by 
+									! 		startlat/startlon; set either 						
+									! 		to 'SWCORNER' or 'CENTER  '
+character (len=9)  :: field			! Name of the field
+character (len=24) :: hdate			! Valid date for data YYYY:MM:DD_HH:00:00
+character (len=25) :: units			! Units of data
+character (len=32) :: map_source  	! Source model / originating center
+character (len=46) :: desc			! Short description of data
   
     
 !  1) WRITE FORMAT VERSION
@@ -1037,34 +1040,37 @@ write(unit=ounit) is_wind_grid_rel
 
 !  4) WRITE 2-D ARRAY OF DATA
 write(unit=ounit) slab
+```
 
 <a id=Required_Meteorological_Fields></a>
 
 ## 运行WRF所需的气象场
 
-为了成功初始化WRF模拟，real.exe预处理程序要求metgrid.exe程序的输出中包含最小的气象和陆地表面字段集。 因此，这些必填字段必须在metgrid.exe处理的中间文件中可用。 下表描述了必填字段集。
-Field name in intermediate file	Units	Description	Notes
-TT	K	3-d air temperature	
-RH	%	3-d relative humidity	Not needed if SPECHUMD is available
-SPECHUMD	kg kg-1	3-d specific humidity	Not needed if RH is available
-UU	m s-1	3-d wind u-component	
-VV	m s-1	3-d wind v-component	
-GHT	m	3-d geopotential height	
-PRESSURE	Pa	3-d pressure	Only needed for non-isobaric datasets
-PSFC	Pa	Surface pressure	
-PMSL	Pa	Mean sea-level pressure	
-SKINTEMP	K	Skin temperature	
-SOILHGT	m	Soil height	
-TT	K	2-meter air temperature	
-RH	%	2-meter relative humidity	Not needed if SPECHUMD is available
-SPECHUMD	kg kg-1	2-meter specific humidity	Not needed if RH is available
-UU	m s-1	10-meter wind u-component	
-VV	m s-1	10-meter wind v-component	
-LANDSEA	fraction	Land-sea mask (0=water, 1=land)	
-SMtttbbb	m3 m-3	Soil moisture	18.	'ttt' is the layer top depth in cm, and 'bbb' is the layer bottom depth in cm
-STtttbbb	K	Soil temperature	
-SOILMmmm	kg m-3	Soil moisture	19.	'mmm' is the level depth in cm, not needed if SMtttbbb available
-SOILTmmm	K	Soil temperature	
+为了成功初始化WRF模拟，real.exe预处理程序要求metgrid.exe程序的输出中包含最小的气象和陆地表面字段集。因此，这些必填字段必须在metgrid.exe处理的中间文件中可用。下表描述了必填字段集。
+
+**中间文件中的字段名称**|**单位**  |**描述**                         |**备注**
+-------------------------|----------|---------------------------------|-------------
+TT	                     | K        | 3-d air temperature             | 
+RH	                     | %        | 3-d relative humidity           | Not needed if SPECHUMD is available
+SPECHUMD	             | kg/kg    | 3-d specific humidity           | Not needed if RH is available
+UU	                     | m/s      | 3-d wind u-component            |	
+VV	                     | m/s      | 3-d wind v-component	          |
+GHT	                     | m        | 3-d geopotential height         |	
+PRESSURE	             | Pa       | 3-d pressure	                  | Only needed for non-isobaric datasets
+PSFC	                 | Pa       | Surface pressure	              |
+PMSL	                 | Pa       | Mean sea-level pressure         |	
+SKINTEMP	             | K        | Skin temperature	              |
+SOILHGT                  | m        | Soil height	                  |
+TT	                     | K        | 2-meter air temperature         |	
+RH	                     | %        | 2-meter relative humidity       | Not needed if SPECHUMD is available
+SPECHUMD	             | kg/kg    | 2-meter specific humidity       | Not needed if RH is available
+UU	                     | m/s      | 10-meter wind u-component       |	
+VV	                     | m/s      | 10-meter wind v-component       |
+LANDSEA	                 | fraction | Land-sea mask (0=water, 1=land) |	
+SMtttbbb	             | m3/m3    | Soil moisture                   | 'ttt' is the layer top depth in cm, and 'bbb' is the layer bottom depth in cm
+STtttbbb	             | K        | Soil temperature	              | 'ttt' is the layer top depth in cm, and 'bbb' is the layer bottom depth in cm
+SOILMmmm                 | kg/m3    | Soil moisture                   | 'mmm' is the level depth in cm, not needed if SMtttbbb available
+SOILTmmm	             | K        | Soil temperature	              | 'mmm' is the level depth in cm, not needed if SMtttbbb available
 
 <a id=Using_MPAS_Output></a>
 
