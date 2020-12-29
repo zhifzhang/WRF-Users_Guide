@@ -961,7 +961,7 @@ ungrib程序的作用是将GRIB数据集解码为metgrid可以理解的简单中
 将数据写入WPS中间格式时，二维字段被写入为实数值的矩形数组。3维数组必须在垂直方向上分为2个独立编写的2维数组。还应注意，对于全球数据集，必须使用高斯或圆柱等距投影，对于区域数据集，可以使用墨卡托、兰伯特共形、极坐标或圆柱等距投影。用于以WPS中间格式写入单个二维数组的写入顺序如下（请注意，并非下面声明的所有变量都用于给定的数据投影）。
 
 ```
-integer :: version					! Format version (must =5 for WPS format)
+integer :: versio					! Format version (must =5 for WPS format)
 integer :: nx, ny					! x- and y-dimensions of 2-d array
 integer :: iproj					! Code for projection of data in array:
 									! 		0 = cylindrical equidistant
@@ -990,10 +990,10 @@ character (len=8)  :: startloc		! Which point in array is given by
 character (len=9)  :: field			! Name of the field
 character (len=24) :: hdate			! Valid date for data YYYY:MM:DD_HH:00:00
 character (len=25) :: units			! Units of data
-character (len=32) :: map_source  	! Source model / originating center
+character (len=32) :: map_source	! Source model / originating center
 character (len=46) :: desc			! Short description of data
-  
-    
+
+
 !  1) WRITE FORMAT VERSION
 write(unit=ounit) version
 
@@ -1048,29 +1048,29 @@ write(unit=ounit) slab
 
 为了成功初始化WRF模拟，real.exe预处理程序要求metgrid.exe程序的输出中包含最小的气象和陆地表面字段集。因此，这些必填字段必须在metgrid.exe处理的中间文件中可用。下表描述了必填字段集。
 
-**中间文件中的字段名称**|**单位**  |**描述**                         |**备注**
--------------------------|----------|---------------------------------|-------------
-TT	                     | K        | 3-d air temperature             | 
-RH	                     | %        | 3-d relative humidity           | Not needed if SPECHUMD is available
-SPECHUMD	             | kg/kg    | 3-d specific humidity           | Not needed if RH is available
-UU	                     | m/s      | 3-d wind u-component            |	
-VV	                     | m/s      | 3-d wind v-component	          |
-GHT	                     | m        | 3-d geopotential height         |	
-PRESSURE	             | Pa       | 3-d pressure	                  | Only needed for non-isobaric datasets
-PSFC	                 | Pa       | Surface pressure	              |
-PMSL	                 | Pa       | Mean sea-level pressure         |	
-SKINTEMP	             | K        | Skin temperature	              |
-SOILHGT                  | m        | Soil height	                  |
-TT	                     | K        | 2-meter air temperature         |	
-RH	                     | %        | 2-meter relative humidity       | Not needed if SPECHUMD is available
-SPECHUMD	             | kg/kg    | 2-meter specific humidity       | Not needed if RH is available
-UU	                     | m/s      | 10-meter wind u-component       |	
-VV	                     | m/s      | 10-meter wind v-component       |
-LANDSEA	                 | fraction | Land-sea mask (0=water, 1=land) |	
-SMtttbbb	             | m3/m3    | Soil moisture                   | 'ttt' is the layer top depth in cm, and 'bbb' is the layer bottom depth in cm
-STtttbbb	             | K        | Soil temperature	              | 'ttt' is the layer top depth in cm, and 'bbb' is the layer bottom depth in cm
-SOILMmmm                 | kg/m3    | Soil moisture                   | 'mmm' is the level depth in cm, not needed if SMtttbbb available
-SOILTmmm	             | K        | Soil temperature	              | 'mmm' is the level depth in cm, not needed if SMtttbbb available
+**中间文件中的字段名称**|**单位**  |**描述**        |**备注**
+-------------------------|----------|----------------|-------------
+TT	                     | K        | 3-d气温        | 
+RH	                     | %        | 3-d相对湿度    | 有SPECHUMD时则不需要
+SPECHUMD	             | kg/kg    | 3-d比湿度      | 有RH时则不需要
+UU	                     | m/s      | 3-d风u分量     |	
+VV	                     | m/s      | 3-d风v分量	 |
+GHT	                     | m        | 3-d地势高度    |	
+PRESSURE	             | Pa       | 3-d压力	     | 对于non-isobaric数据集不需要
+PSFC	                 | Pa       | 表面压力       |
+PMSL	                 | Pa       | 平均海平面压力 |	
+SKINTEMP	             | K        | 表层温度	     |
+SOILHGT                  | m        | 土壤高度	     |
+TT	                     | K        | 2米空气温度    |	
+RH	                     | %        | 2米相对湿度    | 有SPECHUMD时则不需要
+SPECHUMD	             | kg/kg    | 2米比湿度      | 有RH时则不需要
+UU	                     | m/s      | 10米风u分量    |	
+VV	                     | m/s      | 10米风v分量    |
+LANDSEA	                 | fraction | 陆海遮罩（0=水，1=陆地） |	
+SMtttbbb	             | m3/m3    | 土壤湿度       | “ttt”是层顶深度（cm），“bbb”是层底深度（cm）
+STtttbbb	             | K        | 土壤温度	     | “ttt”是层顶深度（cm），“bbb”是层底深度（cm） 
+SOILMmmm                 | kg/m3    | 土壤湿度       | “mmm”是层的深度（cm），有SMtttbbb时则不需要
+SOILTmmm	             | K        | 土壤温度	     | “mmm”是层的深度（cm），有SMtttbbb时则不需要
 
 <a id=Using_MPAS_Output></a>
 
