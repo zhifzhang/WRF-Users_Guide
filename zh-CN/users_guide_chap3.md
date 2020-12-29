@@ -961,37 +961,37 @@ ungrib程序的作用是将GRIB数据集解码为metgrid可以理解的简单中
 将数据写入WPS中间格式时，二维字段被写入为实数值的矩形数组。3维数组必须在垂直方向上分为2个独立编写的2维数组。还应注意，对于全球数据集，必须使用高斯或圆柱等距投影，对于区域数据集，可以使用墨卡托、兰伯特共形、极坐标或圆柱等距投影。用于以WPS中间格式写入单个二维数组的写入顺序如下（请注意，并非下面声明的所有变量都用于给定的数据投影）。
 
 ```
-integer :: versio					! Format version (must =5 for WPS format)
-integer :: nx, ny					! x- and y-dimensions of 2-d array
-integer :: iproj					! Code for projection of data in array:
-									! 		0 = cylindrical equidistant
-									! 		1 = Mercator
-									! 		3 = Lambert conformal conic
-									! 		4 = Gaussian (global only!)
-									! 		5 = Polar stereographic
-real :: nlats						! Number of latitudes north of equator 
-									! 		(for Gaussian grids)
-real :: xfcst						! Forecast hour of data
-real :: xlvl						! Vertical level of data in 2-d array
-real :: startlat, startlon			! Lat/lon of point in array indicated by 
-									! 		startloc string
-real :: deltalat, deltalon			! Grid spacing, degrees
-real :: dx, dy						! Grid spacing, km
-real :: xlonc						! Standard longitude of projection
-real :: truelat1, truelat2			! True latitudes of projection
-real :: earth_radius				! Earth radius, km
-real, dimension(nx,ny) :: slab		! The 2-d array holding the data
-logical :: is_wind_grid_rel			! Flag indicating whether winds are 						
-									! 		relative to source grid (TRUE) or 
-									! 		relative to earth (FALSE)
-character (len=8)  :: startloc		! Which point in array is given by 
-									! 		startlat/startlon; set either 						
-									! 		to 'SWCORNER' or 'CENTER  '
-character (len=9)  :: field			! Name of the field
-character (len=24) :: hdate			! Valid date for data YYYY:MM:DD_HH:00:00
-character (len=25) :: units			! Units of data
-character (len=32) :: map_source	! Source model / originating center
-character (len=46) :: desc			! Short description of data
+integer :: version             ! Format version (must =5 for WPS format)
+integer :: nx, ny              ! x- and y-dimensions of 2-d array
+integer :: iproj               ! Code for projection of data in array:
+                               !       0 = cylindrical equidistant
+                               !       1 = Mercator
+                               !       3 = Lambert conformal conic
+                               !       4 = Gaussian (global only!)
+                               !       5 = Polar stereographic
+real :: nlats                  ! Number of latitudes north of equator
+                               !       (for Gaussian grids)
+real :: xfcst                  ! Forecast hour of data
+real :: xlvl                   ! Vertical level of data in 2-d array
+real :: startlat, startlon     ! Lat/lon of point in array indicated by
+                               !       startloc string
+real :: deltalat, deltalon     ! Grid spacing, degrees
+real :: dx, dy                 ! Grid spacing, km
+real :: xlonc                  ! Standard longitude of projection
+real :: truelat1, truelat2     ! True latitudes of projection
+real :: earth_radius           ! Earth radius, km
+real, dimension(nx,ny) :: slab ! The 2-d array holding the data
+logical :: is_wind_grid_rel    ! Flag indicating whether winds are                                         
+                               !       relative to source grid (TRUE) or
+                               !       relative to earth (FALSE)
+character (len=8)  :: startloc ! Which point in array is given by
+                               !       startlat/startlon; set either                                       
+                               !       to 'SWCORNER' or 'CENTER  '
+character (len=9)  :: field    ! Name of the field
+character (len=24) :: hdate    ! Valid date for data YYYY:MM:DD_HH:00:00
+character (len=25) :: units    ! Units of data
+character (len=32) :: map_source  !  Source model / originating center
+character (len=46) :: desc     ! Short description of data
 
 
 !  1) WRITE FORMAT VERSION
