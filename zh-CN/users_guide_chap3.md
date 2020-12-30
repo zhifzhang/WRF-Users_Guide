@@ -1076,8 +1076,11 @@ SOILTmmm	             | K        | 土壤温度	     | “mmm”是层的深度�
 
 ## 将MPAS输出用于WRF初始条件和横向边界条件
 
-从WPS v3.9版本开始，metgrid.exe程序能够从跨尺度预测模型（MPAS; https://mpas-dev.github.io/）读取netCDF格式的本机，非结构化网格输出。）; 然后，metgrid.exe程序可以将MPAS字段直接水平插值到geogrid.exe程序定义的任何域，以生成WRF real.exe程序可用的输出文件，其方式与从中间文件插值的metgrid输出完全相同。 这样，MPAS的输出可用于为WRF提供初始和横向边界条件。
-运行MPAS模拟时，必须将输出流设置为包含初始化WRF模拟所需的最小字段集。 以下输出流对于MPAS v5.x和更高版本的代码应该足够了。
+从WPS v3.9版本开始，metgrid.exe程序能够从跨尺度预测模型（[MPAS](https://mpas-dev.github.io/ )）读取netCDF格式的原始、非结构化的网格输出数据；然后，metgrid.exe程序可以将MPAS字段直接水平插值到geogrid.exe程序定义的任何域，以生成WRF real.exe程序可用的输出文件，其方式与从中间文件插值的metgrid输出完全相同。这样，MPAS的输出可用于为WRF提供初始和横向边界条件。
+
+运行MPAS模拟时，必须将输出数据设置为包含初始化WRF模拟所需的最小字段集。以下输出数据对于MPAS v5.x和更高版本应该足够了。
+
+```
 <stream name="wrf_ic_bc"
         type="output"
         filename_template="MPAS.$Y-$M-$D_$h.nc"
@@ -1101,23 +1104,40 @@ SOILTmmm	             | K        | 土壤温度	     | “mmm”是层的深度�
  <var name="smois"/>
 
 </stream>
-在定义了合适的输出流后运行MPAS之后，将生成一组包含本机MPAS网格上的字段的netCDF文件。 由于这些文件不包含描述MPAS网格单元的位置，几何形状和连接性的字段，因此必须使用来自MPAS模拟的“静态”文件将此信息提供给metgrid程序。 因此，有必要在＆metgrid名称列表记录中同时指定constants_name和fg_name变量，例如MPS netCDF文件（以mpas：前缀）。
+```
+
+在定义了合适的输出数据后运行MPAS，将生成一组包含原始MPAS网格上的字段的netCDF格式文件。由于这些文件不包含描述MPAS网格单元的位置、几何形状和连接性的字段，因此必须使用来自MPAS模拟的“static”文件将此信息提供给metgrid程序。因此，需要在`&metgrid`名称列表记录中将`constants_name`和`fg_name`变量都设置为MPAS netCDF文件（以“mpas：”为前缀），例如：
+
+```
 &metgrid
  constants_name = ‘mpas:static.nc’
  fg_name = ‘mpas:MPAS’
 /
-在上面的示例中，metgrid.exe程序将首先读取MPAS'static.nc'文件以读取网格信息并计算从MPAS网格到geogrid.exe程序定义的WRF域的重映射权重，然后是前缀为“ MPAS”（后缀为YYYY-MM-DD_HH.nc）的MPAS文件将被处理。然后可以正常运行real.exe程序。
-ungrib.exe程序可以将来自ungrib.exe程序创建的中间文件中的数据与MPAS数据合并。例如，在使用SST，海冰或其他来源的陆地表面时，这可能会很有用。下面显示了将MPAS数据与带有土壤数据（带有前缀“ ERAI_SOIL”）的ERA-Interim中间文件相结合的示例。
+```
+
+在上面的示例中，metgrid.exe程序将首先读取MPAS “static.nc”文件以读取网格信息并计算从MPAS网格到geogrid.exe程序定义的WRF域的重映射权重，然后将处理前缀为“MPAS”（后缀为YYYY-MM-DD_HH.nc）的全部时段的MPAS文件。最后可以正常运行real.exe程序。
+
+ungrib.exe程序可以将来自ungrib.exe程序创建的中间文件中的数据与MPAS数据合并。例如，在使用SST、海冰或其他来源的陆地表面场时，这可能会很有用。下面显示了将MPAS数据与带有土壤数据（带有前缀“ERAI_SOIL”）的ERA-Interim中间文件相结合的示例。
+
+```
 &metgrid
   constants_name = ‘mpas:static.nc’
   fg_name = ‘mpas:MPAS’, ‘ERAI_SOIL’
 /
-由于MPAS的“ zgrid”字段不会随时间变化，因此可以从MPAS定期输出流中将其省略；但是，在这种情况下，必须将“ zgrid”字段放入其自己的netCDF文件中，该文件还必须将“时间”维度定义为netCDF无限维度。然后，可以使用constants_name namelist变量将该文件（例如“ zgrid.nc”）提供给metgrid程序，例如，
+```
+
+由于MPAS的“zgrid”字段不会随时间变化，因此可以从MPAS各时段的输出文件中将其省略；但是，在这种情况下，必须将“zgrid”字段放入其自己的netCDF文件中，该文件还必须将“时间”维度定义为netCDF无限维度。然后，可以使用`constants_name` namelist变量将该文件（例如“zgrid.nc”）提供给metgrid程序，例如：
+
+```
 &metgrid
  constants_name = ‘mpas:static.nc’, ‘mpas:zgrid.nc’
  fg_name = ‘mpas:MPAS’
 /
-当长时间运行MPAS仿真时，或者以较高的时间频率写出用作WRF初始和边界条件的输出流时，将“ zgrid”字段放在其自己的文件中可以节省大量空间。下面的python脚本可以作为如何将“ zgrid”字段提取到其自己的netCDF文件的示例。
+```
+
+当运行MPAS长时间模拟时，或者以较高的时间频率写出用作WRF初始和边界条件的输出文件时，将“zgrid”字段放在其自己的文件中可以节省大量空间。下面的python脚本可以作为如何将“zgrid”字段提取到其自己的netCDF文件的示例。
+
+```
 from netCDF4 import Dataset
 
 fin = Dataset('init.nc')
@@ -1133,60 +1153,99 @@ fout.createVariable(varname='zgrid',datatype='f',dimensions=('nCells', 'nVertLev
 fout.variables['zgrid'][:] = fin.variables['zgrid'][:]
 fout.close()
 fin.close()
-值得注意的是，尚未对megrid.exe使用本机MPAS输出针对WPS的并行（即“ dmpar”）构建进行全面测试；从WPS v4.0版本开始，因此建议在处理MPAS数据集时以串行方式运行metgrid.exe。
-同样，在大型MPAS网格的情况下，可能有必要增加metgrid代码中两个常量的值，该常量用于静态分配从MPAS网格到WRF域的重映射权重的计算中使用的几个数据结构。如下所示，这两个常量位于WPS / src / metgrid / remapper.F文件中。
+```
+
+值得注意的是，尚未对megrid.exe使用本机MPAS输出针对WPS的并行（即“dmpar”）构建进行全面测试；因此建议从WPS v4.0版本开始，在处理MPAS数据集时以串行方式运行metgrid.exe。
+
+同样，在大型MPAS网格的情况下，可能有必要增加metgrid代码中两个常量的值，该常量用于静态分配从MPAS网格到WRF域的重映射权重的计算中使用的几个数据结构。如下所示，这两个常量位于WPS/src/metgrid/remapper.F文件中。
+
+```
 ! should be at least (earth circumference / minimum grid distance)
 integer, parameter :: max_queue_length    = 2700
 
 ! should be at least (nCells/32)
 integer, parameter :: max_dictionary_size = 82000   
+```
+
 更改这些常量的值后，必须重新编译metgrid。
 
 <a id=Creating_and_Editing_Vtables></a>
 
 ## 创建和编辑Vtables
 
-尽管为许多常用数据集提供了Vtables，但是对于那些ungrib文件来说，不可能以GRIB格式预测气象数据的所有可能来源。当ungrib.exe处理新的数据源时，用户可以从头开始创建新的Vtable，也可以使用现有的Vtable作为示例。无论哪种情况，对Vtable各个字段的含义和用法的基本了解都会有所帮助。
-每个Vtable分别包含七个或十一个字段，具体取决于该Vtable是用于GRIB Edition 1数据源或者用于GRIB Edition 2数据源。 Vtable的字段属于以下三类之一：描述如何在GRIB文件中标识数据的字段，描述通过ungrib和metgrid程序如何标识数据的字段以及特定于GRIB Edition 2的字段。每个变量要由ungrib.exe提取的对象，在Vtable中将包含一行或多行，其中多行用于数据，这些数据被划分为不同的级别类型，例如，表面级别和高空级别。 Vtable中必须为行或条目指定的字段取决于字段和级别的具体情况。
-第一组字段-描述如何在GRIB文件中标识数据的字段-在下面显示的Vtable的列标题下给出。
+尽管为许多常用数据集提供了Vtables，但是对于ungrib来说，不可能所有气象数据源都是GRIB格式的。当ungrib.exe处理新的数据源时，用户可以从头开始创建新的Vtable，也可以使用现有的Vtable作为示例。无论哪种情况，都需要对Vtable各个字段的含义和用法有基本了解。
+
+每个Vtable分别包含七个或十一个字段，具体取决于该Vtable是用于GRIB Edition 1数据源或者用于GRIB Edition 2数据源。Vtable的字段属于以下三类之一：描述如何在GRIB文件中标识数据的字段，描述ungrib和metgrid程序如何识别数据的字段，以及特定于GRIB Edition 2的字段。每个变量要由ungrib.exe提取的对象，在Vtable中将包含一行或多行，其中多行用于数据，这些数据被划分为不同的层类型，例如表面层和高空层。Vtable中必须为行或条目指定的字段取决于字段和层的具体情况。
+
+第一组字段——描述如何在GRIB文件中标识数据的字段——在下面显示的Vtable的列标题下给出。
+
+```
 GRIB1| Level| From |  To  |
 Param| Type |Level1|Level2|
 -----+------+------+------+
- “ GRIB1参数”字段为气象字段指定GRIB代码，这是数据集中该字段唯一的数字。但是，不同的数据集可能对同一字段使用不同的GRIB代码-例如，高空温度在GFS数据中具有GRIB代码11，而在ECMWF数据中具有GRIB代码130。要查找某个字段的GRIB代码，可以使用g1print.exe和g2print.exe实用程序。
-给定GRIB代码，“级别类型”，“从级别1”和“从级别2”字段用于指定可在哪个级别找到字段。与“ GRIB1 Param”字段一样，g1print.exe和g2print.exe程序可用于查找级别字段的值。级别字段的含义取决于“级别类型”字段，并在下表中进行了概述。
-Level	Level Type	From Level1	To Level2
-Upper-air	100	*	(blank)
-Surface	1	0	(blank)
-Sea-level	102	0	(blank)
-Levels at a specified height AGL	105	Height, in meters, of the level above ground	(blank)
-Fields given as layers	112	Starting level for the layer	Ending level for the layer
-指定图层字段（Level Type 112）时，图层的起点和终点具有取决于字段本身的单位。在g1print.exe和g2print.exe实用程序中可以找到适当的值。
+```
+
+“GRIB1 Param”字段为气象字段指定GRIB代码，这是数据集中该字段唯一的数字标识。但是，不同的数据集可能对同一字段使用不同的GRIB代码，例如，高空温度在GFS数据中的GRIB代码是11，而在ECMWF数据中的GRIB代码是130。要查找某个字段的GRIB代码，可以使用g1print.exe和g2print.exe实用程序。
+
+“Level Type”，“From Level1”和“To Level2”字段的GRIB代码用于指定可在哪个层找到本字段。与“GRIB1 Param”字段一样，g1print.exe和g2print.exe程序可用于查找层字段的值。层字段的含义取决于“Level Type”字段，并在下表中进行了概述。
+
+**Level**                        |**Level Type**|**From Level1**|**To Level2**
+---------------------------------|--------------|---------------|-------------
+Upper-air                        | 100	        | *             | (blank)
+Surface                          | 1            | 0             | (blank)
+Sea-level                        | 102          | 0             | (blank)
+Levels at a specified height AGL | 105          | Height, in meters, of the level above ground | (blank)
+Fields given as layers           | 112          | Starting level for the layer | Ending level for the layer
+
+指定层字段（Level Type 112）时，层的起点和终点具有取决于字段本身的单位。在g1print.exe和g2print.exe实用程序中可以找到适当的值。
+
 Vtable中的第二组字段，描述了如何在metgrid和实际程序中标识数据，这些字段属于下面显示的列标题。
+
+```
 | metgrid  | metgrid | metgrid                                 |
 | Name     |  Units  | Description                             |
 +----------+---------+-----------------------------------------+
-这三个字段中最重要的是“ metgrid Name”字段，该字段确定在由ungrib写入中间文件时将分配给气象字段的变量名称。此名称还应该与METGRID.TBL文件中的条目匹配，以便metgrid程序可以确定如何水平内插该字段。“ metgrid单位”和“ metgrid描述”字段分别指定该字段的单位和简短描述。在此，重要的是要注意，如果未对字段进行描述，则ungrib不会将该字段写到中间文件中。
-在下面的列标题下可以找到提供GRIB2特定信息的最后一组字段。
+```
+
+这三个字段中最重要的是“metgrid Name”字段，该字段确定在由ungrib写入中间文件时将分配给气象字段的变量名称。此名称还应该与METGRID.TBL文件中的条目匹配，以便metgrid程序可以确定如何水平内插该字段。“metgrid Units”和“metgrid Description”字段分别指定该字段的单位和简短描述。*在此要注意，如果未对字段进行描述，则ungrib不会将该字段写到中间文件中。*
+
+在下面的列标题下可以找到用于提供GRIB2特定信息的最后一组字段。
+
+```
 |GRIB2|GRIB2|GRIB2|GRIB2|
 |Discp|Catgy|Param|Level|
 +-----------------------+
-仅在将用于GRIB Edition 2数据集的Vtable中需要GRIB2字段，尽管在Vtable中具有这些字段不会阻止该Vtable也用于GRIB Edition 1数据。例如，Vtable.GFS文件包含GRIB2 Vtable字段，但用于1度（GRIB1）GFS和0.5度（GRIB2）GFS数据集。由于Vtables是为大多数已知的GRIB Edition 2数据集提供的，因此此处不介绍相应的Vtable字段。
+```
+
+仅在将用于GRIB Edition 2数据集的Vtable中需要GRIB2字段，尽管在Vtable中具有这些字段不会阻止该Vtable也用于GRIB Edition 1数据。例如，Vtable.GFS文件包含GRIB2 Vtable字段，但也可以用于1度（GRIB1）GFS和0.5度（GRIB2）GFS数据集。由于Vtables是为大多数已知的GRIB Edition 2数据集提供的，因此此处不介绍相应的Vtable字段。
 
 <a id=Writing_Static_Data></a>
 
 ## 将静态数据写入Geogrid二进制格式
 
-由geogrid程序内插的静态地理数据集存储为以简单二进制栅格格式编写的常规2维和3维数组。对于给定静态字段具有新来源的用户，可以通过将数据集写入此二进制格式来使用WPS提取其数据。土工格栅格式能够支持单级和多级连续字段，表示为主要类别的类别字段以及为每个类别指定为分数字段的类别字段。就以二进制格式表示而言，这些字段类型中最简单的是在每个源网格点处被指定为主要类别的分类字段，其中一个例子是30秒的USGS土地使用数据集。
- 
-对于作为主要类别指定的类别字段，必须首先将数据存储在规则的2维整数数组中，每个整数在对应的源网格点处给出主要类别。给定此数组，数据将从最底部或最南端的行开始逐行写入文件。例如，在上图中，n´m数组的元素将按x11，x12，...，x1m，x21，...，x2m，...，xn1，...， xnm。写入文件时，每个元素以大端字节顺序存储为1、2、3或4字节整数（即，对于4字节整数ABCD，字节A存储在最低位）。地址和字节D最高），尽管可以通过在数据集的“索引”文件中设置endian = little来使用little-endian文件。文件中的每个元素都必须使用相同数量的字节进行存储，当然，使用最少的字节数来表示数组中值的完整范围是有利的。
-将二进制数据写入文件时，不应写入标头，记录标记或其他字节。例如，一个2字节的1000×1000数组将导致一个文件，其大小恰好是2,000,000字节。由于未格式化的Fortran写入会添加记录标记，因此无法直接从Fortran写入地理网格二进制格式的文件。相反，建议在从C或Fortran代码写入数据时，调用read_geogrid.c和write_geogrid.c（在geogrid / src目录中）中的C例程。
+由geogrid程序内插的静态地理数据集存储为以简单二进制栅格格式编写的常规2维和3维数组。对于有新来源静态字段的用户，可以通过将数据集写入此二进制格式来使用WPS提取其数据。geogrid格栅格式能够支持单层和多层的连续字段，表示为主要类别的类别字段以及为每个类别指定为分数字段的类别字段。就以二进制格式表示而言，这些字段类型中最简单的是在每个源网格点处被指定为主要类别的分类字段，其中一个例子是30秒的USGS土地使用数据集。
+
+![array](images/chap3_array.png)
+
+对于作为主要类别指定的类别字段，必须首先将数据存储在规则的2维整数数组中，每个整数在对应的源网格点处给出主要类别。给定此数组，数据将从最底部或最南端的行开始逐行写入文件。例如，在上图中，n×m数组的元素将按x11，x12，...，x1m，x21，...，x2m，...，xn1，...， xnm。写入文件时，每个元素以大端字节顺序存储为1、2、3或4字节整数（即，对于4字节整数ABCD，字节A存储在最低位）。地址和字节D最高），尽管可以通过在数据集的“索引”文件中设置endian=little来使用little-endian文件。文件中的每个元素都必须使用相同数量的字节进行存储，当然，使用最少的字节数来表示数组中值的完整范围是有利的。
+
+将二进制数据写入文件时，不应写入标头，记录标记或其他字节。例如，一个2字节的1000×1000数组将导致一个文件，其大小恰好是2,000,000字节。由于未格式化的Fortran写入会添加记录标记，因此无法直接从Fortran写入地理网格二进制格式的文件。相反，建议在从C或Fortran代码写入数据时，调用read_geogrid.c和write_geogrid.c（在geogrid/src目录中）中的C例程。
+
 格式与主要类别的字段相似的是连续值或实值字段的情况。像主要类别字段一样，单级连续字段首先被组织为规则的2维数组，然后逐行写入二进制文件。但是，由于连续字段可能包含非整数或负值，因此文件内每个元素的存储表示会稍微复杂一些。数组中的所有元素必须首先转换为整数值。首先，将所有元素缩放一个常数，选择该元素以保持所需的精度，然后通过舍入除去任何剩余的小数部分。例如，如果需要三个小数位精度，则值-2.71828将需要除以0.001，并四舍五入为-2718。在将所有数组元素转换为整数值之后，如果在数组中发现任何负值，则必须进行第二次转换：如果每个元素使用1个字节存储，则每个负元素加28。为了使用2个字节存储，在每个负元素中添加216；为了使用3个字节存储，将224添加到每个否定元素；为了使用4个字节进行存储，将232值添加到每个负元素。重要的是要注意，没有转换应用于阳性元素。最终，将生成的正整数数组写入显性类别字段中。
+
 多级连续字段的处理与单级连续字段几乎相同。对于n´m´r阵列，首先如上所述将其转换为正整数场。然后，从最小的r-index开始，每个n´m子数组都像以前一样连续写入二进制文件。可以将针对每个可能类别的分数字段给出的分类字段视为多级连续字段，其中每个级别k（1≤k≤r）是类别k的分数字段。
-将字段以Geogrid二进制格式写入文件时，用户应遵守geogrid程序使用的命名约定，该约定要求数据文件的名称格式为xstart-xend.ystart-yend，其中xstart，xend， ystart和yend是五位数的正整数，分别指定文件中包含的数组的起始x-index，数组的结束x-index，数组的起始y-index和结尾的y-数组的索引；在这里，索引从1开始，而不是从0开始。因此，例如，一个800×1200数组（即800行和1200列）的名称可能是00001-01200.00001-00800。
+
+将字段以Geogrid二进制格式写入文件时，用户应遵守geogrid程序使用的命名约定，该约定要求数据文件的名称格式为xstart-xend.ystart-yend，其中xstart，xend，ystart和yend是五位数的正整数，分别指定文件中包含的数组的起始x-index，数组的结束x-index，数组的起始y-index和结尾的y-数组的索引；在这里，索引从1开始，而不是从0开始。因此，例如，一个800×1200数组（即800行和1200列）的名称可能是00001-01200.00001-00800。
+
 当数据集被分成几段时，每段都可以形成为规则的矩形阵列，并且每个阵列都可以写入单独的文件中。在这种情况下，数组的相对位置由每个数组的文件名中x和y索引的范围确定。但是，必须注意的是，数据集中的每个图块必须具有相同的x和y维，并且数据集中的数据图块不得重叠；此外，所有图块都必须在索引范围的倍数处开始和结束。例如，全球30秒的USGS地形数据集被划分为尺寸为1200´1200的数组，每个数组包含该数据集的10度´10度片段。西南角位于（90S，180W）的文件名为00001-01200.00001-01200，东北角位于（90N，180E）的文件名为42001-43200.20401-21600。
-如果要将数据集拆分为多个图块，并且x方向上的网格点数未均匀除以x方向上的图块数，则必须填充图块的最后一列带有标志值（在索引文件中使用missing_value关键字指定），以便所有图块都具有相同的尺寸。例如，如果数据集在x方向上有2456个点，并且将使用在x方向上的三个图块，则图块的x坐标范围可能为1 – 820、821 – 1640和1641 – 2460，并在第2457至2460列中填充标志值。
+
+如果要将数据集拆分为多个图块，并且x方向上的网格点数未均匀除以x方向上的图块数，则必须填充图块的最后一列带有标志值（在[索引文件](#index_Options)中使用missing_value关键字指定），以便所有图块都具有相同的尺寸。例如，如果数据集在x方向上有2456个点，并且将使用在x方向上的三个图块，则图块的x坐标范围可能为1 – 820、821 – 1640和1641 – 2460，并在第2457至2460列中填充标志值。
+
 显然，由于起始索引和结束索引必须具有五位数字，因此一个字段在x或y方向上的数据点不能超过99999。如果一个字段在任一维度上都具有超过99999个数据点，则用户可以简单地将数据集拆分为几个较小的数据集，这些数据集将分别通过土工格栅进行标识。例如，非常大的全球数据集可以分为东半球和西半球的数据集。
+
 除二进制数据文件外，geogrid每个数据集还需要一个额外的元数据文件。该元数据文件始终被命名为“索引”，因此，两个数据集不能位于同一目录中。本质上，此元数据文件是geogrid在处理数据集时要查找的第一个文件，并且文件的内容为geogrid提供了构造可能的数据文件的名称所需的所有信息。下面给出了示例索引文件的内容。
+
+```
 	type = continuous
 	signed = yes
 	projection = regular_ll
@@ -1203,7 +1262,9 @@ Vtable中的第二组字段，描述了如何在metgrid和实际程序中标识�
 	tile_bdr=3
 	units="meters MSL"
 	description="Topography height"
-有关可能出现在索引文件中的关键字的完整列表以及每个关键字的含义，请参考索引文件选项部分的内容。
+```
+
+有关可能出现在索引文件中的关键字的完整列表以及每个关键字的含义，请参考[索引文件](#index_Options)选项部分的内容。
 
 <a id=Creating_Urban_Fraction></a>
 
