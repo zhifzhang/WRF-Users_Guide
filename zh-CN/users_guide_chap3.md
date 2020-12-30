@@ -1270,16 +1270,25 @@ Vtable中的第二组字段，描述了如何在metgrid和实际程序中标识�
 
 ## 从NLCD数据创建城市分数字段
 
-注意：自WPS v4.0版本发布以来，美国大陆地区已经可以使用基于30米NLCD 2011土地覆盖而准备的城市分数字段。该数据集可从WPS地理下载页面的“可选字段”部分下获得。以下详细信息可能仍有助于准备其他地区的城市分数场。
-为了创建更不均匀和详细的城市分数域以供NUDAPT使用，用户可以通过多分辨率土地特征协会从国家土地覆盖数据库（NLCD）获取高分辨率的土地覆盖信息。在WRF中生成称为FRC_URB2D的城市分数字段的过程包括：首先下载WRF域覆盖的区域上的NLCD数据，将数据转换为Geogrid使用的二进制格式（binary format），最后仅将城市类别提取为新的城市分数领域。以下步骤可作为完成此过程的指南。
-1.从http://gisdata.usgs.net/website/MRLC/viewer.php 下载NLCD数据。可以使用1992、2001或2006数据集。选择要下载的区域后，请确保通过单击“修改数据请求”在“请求摘要页面”中选择GeoTIFF格式。如果可用，则可以以BIL格式下载数据，在这种情况下，可以跳过下一步中描述的格式转换。
+*注意：自WPS v4.0版本发布以来，美国大陆地区已经可以使用基于30米NLCD 2011土地覆盖而准备的城市分数字段。该数据集可从WPS地理下载页面的“optional fields”部分下获得。以下详细信息可能仍有助于准备其他地区的城市分数字段。*
 
-2.下载数据后，解压缩存档将产生一个目录，其中包含.tif文件和.tfw文件等。为了使GeoTIFF文件中的信息有用，必须将.tif图像转换为WPS使用的二进制格式。可以使用GDAL转换工具gdal_translate（http://gdal.org ）通过运行以下命令来完成此转换
+为了创建更不均匀和详细的城市分数域以供NUDAPT使用，用户可以通过多分辨率土地特征协会从国家土地覆盖数据库（NLCD）获取高分辨率的土地覆盖信息。在WRF中生成称为FRC_URB2D的城市分数字段的过程包括：首先下载WRF域覆盖的区域上的NLCD数据，将数据转换为Geogrid使用的二进制格式（binary format），最后仅将城市类别提取为新的城市分数字段。以下步骤可作为完成此过程的指南。
+
+1. 从http://gisdata.usgs.net/website/MRLC/viewer.php 下载NLCD数据。可以使用1992、2001或2006数据集。选择要下载的区域后，在“Request Summary Page”中单击“Modify Data Request”，选择GeoTIFF格式。如果可用，则可以以BIL格式下载数据，在这种情况下，可以跳过下一步中描述的格式转换。
+
+2. 下载数据后，解压缩存档将产生一个目录，其中包含.tif文件和.tfw文件等。为了使GeoTIFF文件中的信息有用，必须将.tif图像转换为WPS使用的二进制格式。可以使用GDAL转换工具[gdal_translate](http://gdal.org )，通过运行以下命令来完成此转换
+
+```
    > gdal_translate -of ENVI foo.tif data.bil
+```
 
-其中foo.tif是在步骤1中下载的GeoTIFF图像的名称。输出格式“ ENVI”是一种简单的二进制栅格格式，与geogrid使用的格式匹配。将GeoTIFF转换为二进制文件后，必须将生成的data.bil文件重命名为00001-ncols.00001-nrows，其中ncols是列数（采用i5.5格式），nrows是行数（也就是图片中的i5.5格式）；运行gdal_translate程序时，这些值应已打印到屏幕上。
-3.使用可从http://www2.mmm.ucar.edu/people/duda/uf/ 获得的转换器程序从二进制图块中提取城市类别，并编写一个包含城市分数的新数据图块。此转换器的输出文件应复制到原始土地用途图块上，即，城市分数文件应重命名为00001-ncols.00001-nrows，其中ncols是列数（采用i5.5格式）和nrows是磁贴中的行数（也为i5.5格式），如步骤2所示。
-4.为城市分数数据创建索引元数据文件。在通过解压缩土地使用数据而创建的目录中，.tfw文件也应该存在。该文件的最后两行给出了数据图块西北角的位置，该位置在索引文件中用于变量known_lat和known_lon。如果此位置是以米为单位的（x，y）坐标，则可以使用http://www2.mmm.ucar.edu/people/duda/uf/ 提供的坐标转换器实用程序将其转换为（纬度，经度），这是索引文件所必需的。基本索引文件应包含以下元素：
+其中foo.tif是在步骤1中下载的GeoTIFF图像的名称。输出格式“ENVI”是一种简单的二进制栅格格式，与geogrid使用的格式匹配。将GeoTIFF转换为二进制文件后，必须将生成的data.bil文件重命名为00001-ncols.00001-nrows，其中ncols是图像的列数（采用i5.5格式），nrows是图像的行数（也是i5.5格式）；运行gdal_translate程序时，这些值应已打印到屏幕上。
+
+3. 使用可从http://www2.mmm.ucar.edu/people/duda/uf/ 获得的转换器程序（converter program）从二进制图块中提取城市类别，并编写一个包含城市分数的新数据图块。此转换器的输出文件应覆盖原始土地用途图块文件，即城市分数文件应重命名为00001-ncols.00001-nrows，其中ncols是图像的列数（采用i5.5格式），nrows是图像的行数（也为i5.5格式），如步骤2所示。
+
+4. 为城市分数数据创建索引元数据文件。在通过解压缩土地使用数据而创建的目录中，.tfw文件也应该存在。该文件的最后两行给出了数据图块西北角的位置，该位置在索引文件中由变量known_lat和known_lon定义。如果此位置是以米为单位的（x，y）坐标，则可以使用http://www2.mmm.ucar.edu/people/duda/uf/ 提供的坐标转换器实用程序（coordinate converter utility）将其转换为（纬度、经度），这是索引文件所必需的。基本索引文件应包含以下元素：
+
+```
 type=continuous
 projection=albers_nad83
 dx=30.0
@@ -1299,7 +1308,11 @@ tile_y=2351               # <- edit
 tile_z=1
 units="unitless"
 description="urban fraction"
-5.在重新运行geogrid.exe程序之前，将以下条目添加到GEOGRID.TBL文件中：
+```
+
+5. 在重新运行geogrid.exe程序之前，将以下条目添加到GEOGRID.TBL文件中：
+
+```
 =============================== 
 name=FRC_URB2D 
         priority=1 
@@ -1307,284 +1320,444 @@ name=FRC_URB2D
         fill_missing = 0. 
         interp_option=default: average_gcell(1.0)+four_pt
         abs_path=default:/path/to/dataset/ ===============================
-分别在上面的条目中用“ / path / to / dataset /”替换分别在第3步和第4步中创建的数据集和索引文件的路径。
+```
+
+在上面的条目中用分别在第3步和第4步中分别创建的数据集和索引文件的路径替换“/path/to/dataset/”。
 
 <a id=Namelist_Variables></a>
 
 ## 名称列表变量说明
-A.SHARE section
-本节描述了多个WPS程序使用的变量。例如，wrf_core变量指定WPS是为ARW还是NMM核心生成数据-geogrid和metgrid程序都需要该信息。
-1. WRF_CORE：设置为'ARW'或'NMM'的字符串，它告诉WPS正在为输入数据准备哪个动态核心。默认值为“ ARW”。
-2. MAX_DOM：一个整数，指定模拟中的域/嵌套总数，包括父域。预设值为1。
-3. START_YEAR：MAX_DOM 4位整数的列表，指定每个嵌套的模拟开始UTC年。无默认值。
-4. START_MONTH：MAX_DOM 2位整数的列表，指定每个嵌套的模拟开始UTC月。无默认值。
-5. START_DAY：MAX_DOM 2位整数的列表，指定每个嵌套的模拟开始UTC日。无默认值。
-6. START_HOUR：MAX_DOM 2位整数的列表，指定每个嵌套的模拟开始UTC小时。无默认值。
-7. END_YEAR：MAX_DOM 4位整数的列表，指定每个嵌套的模拟结束UTC年。无默认值。
-8. END_MONTH：MAX_DOM 2位整数的列表，指定每个嵌套的模拟结束UTC月。无默认值。
-9. END_DAY：MAX_DOM 2位整数的列表，指定每个嵌套的模拟结束UTC日。无默认值。
-10. END_HOUR：MAX_DOM 2位整数的列表，指定每个嵌套的模拟结束UTC小时。无默认值。
-11. START_DATE：格式为'YYYY-MM-DD_HH：mm：ss'的MAX_DOM字符串列表，指定每个嵌套的模拟开始UTC日期。 start_date变量是指定start_year，start_month，start_day和start_hour的替代方法，并且如果两种方法都用于指定开始时间，则start_date变量将优先。无默认值。
-12. END_DATE：格式为“ YYYY-MM-DD_HH：mm：ss”的MAX_DOM字符串列表，指定每个嵌套的模拟结束UTC日期。 end_date变量是指定end_year，end_month，end_day和end_hour的替代方法，并且如果两种方法都用于指定结束时间，则end_date变量将优先。无默认值。
-13. INTERVAL_SECONDS：随时间变化的气象输入文件之间的秒数的整数。无默认值。
-14. ACTIVE_GRID：MAX_DOM逻辑值的列表，为每个网格指定是否应由geogrid和metgrid处理该网格。默认值为.TRUE。
-15. IO_FORM_GEOGRID：将写入由Geogrid程序创建的域文件的WRF I / O API格式。 NetCDF为2； GRIB1为3。给定选项1时，域文件的后缀为.int；给定选项2时，域文件的后缀为.nc；给定选项3时，域文件的后缀为.gr1。默认值为2（NetCDF）。
-16. OPT_OUTPUT_FROM_GEOGRID_PATH：一个字符串，提供相对于或绝对的指向应该写入和读取来自geogrid的输出文件的位置的路径。默认值为“ ./”。
+
+### A. SHARE部分
+
+本节描述了多个WPS程序使用的变量。例如，`wrf_core`变量指定WPS是为ARW还是NMM核心生成数据——geogrid和metgrid程序都需要该信息。
+
+1. WRF_CORE：设置为“ARW”或“NMM”的字符串，它告诉WPS正在为哪个动态核心准备输入数据。默认值为“ARW”。
+
+2. MAX_DOM：一个整数，指定模拟中的域/嵌套总数，包括父域。默认值为1。
+
+3. START_YEAR：MAX_DOM个4位整数的列表，指定每个嵌套的模拟开始UTC年。无默认值。
+
+4. START_MONTH：MAX_DOM个2位整数的列表，指定每个嵌套的模拟开始UTC月。无默认值。
+
+5. START_DAY：MAX_DOM个2位整数的列表，指定每个嵌套的模拟开始UTC日。无默认值。
+
+6. START_HOUR：MAX_DOM个2位整数的列表，指定每个嵌套的模拟开始UTC小时。无默认值。
+
+7. END_YEAR：MAX_DOM个4位整数的列表，指定每个嵌套的模拟结束UTC年。无默认值。
+
+8. END_MONTH：MAX_DOM个2位整数的列表，指定每个嵌套的模拟结束UTC月。无默认值。
+
+9. END_DAY：MAX_DOM个2位整数的列表，指定每个嵌套的模拟结束UTC日。无默认值。
+
+10. END_HOUR：MAX_DOM个2位整数的列表，指定每个嵌套的模拟结束UTC小时。无默认值。
+
+11. START_DATE：格式为“YYYY-MM-DD_HH:mm:ss”的MAX_DOM个字符串列表，指定每个嵌套的模拟开始UTC时间。START_DATE变量是指定START_YEAR、START_MONTH、START_DAY和START_HOUR的替代方法，如果两种方法都用于指定开始时间，则优先采用START_DATE变量的值。无默认值。
+
+12. END_DATE：格式为“YYYY-MM-DD_HH:mm:ss”的MAX_DOM个字符串列表，指定每个嵌套的模拟结束UTC时间。END_DATE变量是指定END_YEAR、END_MONTH、END_DAY和END_HOUR的替代方法，并且如果两种方法都用于指定结束时间，则优先采用END_DATE变量的值。无默认值。
+
+13. INTERVAL_SECONDS：随时间变化的气象输入文件之间间隔的秒数的整数。无默认值。
+
+14. ACTIVE_GRID：MAX_DOM个逻辑值的列表，为每个网格指定是否应由geogrid和metgrid处理该网格。默认值为.TRUE.。
+
+15. IO_FORM_GEOGRID：由Geogrid程序创建的域文件的WRF I/O API格式。选项包括：1是二进制格式、2是NetCDF格式、3是GRIB1格式。给定选项1时，域文件的后缀为.int；给定选项2时，域文件的后缀为.nc；给定选项3时，域文件的后缀为.gr1。默认值为2（NetCDF）。
+
+16. OPT_OUTPUT_FROM_GEOGRID_PATH：一个字符串，提供需要写入和读取的来自geogrid的输出文件的相对或绝对路径。默认值为“./”。
+
 17. DEBUG_LEVEL：一个整数值，指示应将不同类型的消息发送到标准输出的程度。当debug_level设置为0时，仅一般有用的消息和警告消息将被写入标准输出。当debug_level大于100时，提供更多运行时详细信息的参考消息也将写入标准输出。调试消息和专门用于日志文件的消息永远不会写入标准输出，而始终会写入日志文件。预设值为0。
 
-B. GEOGRID部分
+### B. GEOGRID部分
+
 本部分指定了特定于geogrid程序的变量。geogrid部分中的变量主要定义所有模型域的大小和位置，以及定义静态地理数据的位置。
-1. PARENT_ID：MAX_DOM整数列表，为每个嵌套指定嵌套父级的域名；对于最粗糙的域，此变量应设置为1。默认值为1。
-2. PARENT_GRID_RATIO：MAX_DOM整数列表，为每个嵌套指定相对于域父级的嵌套比例。无默认值。
-3. I_PARENT_START：MAX_DOM整数列表，为每个嵌套指定父级未交错网格中嵌套左下角的x坐标。对于最粗糙的域，应将值指定为1。无默认值。
-4. J_PARENT_START：MAX_DOM整数列表，为每个嵌套指定父级未交错网格中嵌套左下角的y坐标。对于最粗糙的域，应将值指定为1。无默认值。
-5. S_WE：MAX_DOM整数列表，应将其全部设置为1。默认值为1。
-6. E_WE：MAX_DOM整数列表，为每个嵌套指定嵌套的整个东西向尺寸。对于嵌套域，e_we必须大于嵌套的parent_grid_ratio的整数倍（即，对于某个正整数n，e_we = n * parent_grid_ratio + 1）。无默认值。
-7. S_SN：MAX_DOM整数列表，应将其全部设置为1。默认值为1。
-8. E_SN：MAX_DOM整数列表，为每个嵌套指定嵌套的整个南北维度。对于嵌套域，e_sn必须比嵌套的parent_grid_ratio的整数倍大1（即，对于某个正整数n，e_sn = n * parent_grid_ratio + 1）。无默认值。
-9. GEOG_DATA_RES：MAX_DOM字符串的列表，为每个嵌套指定相应的分辨率或分辨率列表，该列表由将静态地面数据插入到嵌套网格的源数据的+符号分隔。对于每个嵌套，此字符串应包含与每个字段的GEOGRID.TBL文件中的rel_path或abs_path规范（请参见GEOGRID.TBL选项的描述）中的冒号前面的字符串匹配的分辨率。如果字符串的分辨率与GEOGRID.TBL中某个字段的rel_path或abs_path规范中的任何此类字符串都不匹配，则将使用该字段的默认数据分辨率（如果已指定）。如果多个分辨率匹配，将使用与GEOGRID.TBL文件中的rel_path或abs_path规范中的字符串匹配的第一个分辨率。默认值为“默认”。
-10. DX：一个实值，指定地图比例因子为1时在x方向上的网格距离。对于ARW，“极坐标”，“兰伯特”和“墨卡托”投影的网格距离以米为单位，并且“经纬度”投影的经度；对于NMM，网格距离以经度为单位。嵌套的网格距离是根据为parent_grid_ratio和parent_id指定的值递归确定的。无默认值。
-11. DY：这是一个实值，指定了地图比例因子为1时在y方向上的标称网格距离。对于ARW，“极坐标”，“兰伯特”和“墨卡托”投影的网格距离以米为单位， “纬度”投影的纬度；对于NMM，网格距离以纬度为单位。嵌套的网格距离是根据为parent_grid_ratio和parent_id指定的值递归确定的。无默认值。
-12. MAP_PROJ：一个字符串，指定模拟域的投影。对于ARW，可接受的预测是“朗伯”，“极地”，“水星”和“拉特”。对于NMM，必须指定“ rotated_ll”的投影。默认值为“朗伯”。
-13. REF_LAT：一个实值，指定（纬度，经度）位置的纬度部分，其（i，j）位置在模拟域中是已知的。对于ARW，默认情况下（即，当未指定ref_x和ref_y时），ref_lat给出粗略区域中心点的纬度。对于NMM，ref_lat始终给出原点旋转到的纬度。无默认值。
-14. REF_LON：一个实数值，指定（纬度，经度）位置的经度部分，其（i，j）位置在模拟域中是已知的。对于ARW，默认情况下（即，当未指定ref_x和ref_y时），ref_lon给出粗略区域中心点的经度。对于NMM，ref_lon始终给出原点旋转到的经度。对于ARW和NMM，西经均为负，并且ref_lon的值应在[-180，180]范围内。无默认值。
-15. REF_X：一个实数值，指定（i，j）位置的i部分，该位置在模拟域中的（纬度，经度）位置已知。 （i，j）位置始终相对于质量交错网格给出，其质量比未交错网格的尺寸小一。默认值为（（（E_WE-1。）+ 1。）/ 2。）=（E_WE / 2。）
-16. REF_Y：一个实数值，指定（i，j）位置的j部分，该位置的模拟域中的（纬度，经度）位置已知。 （i，j）位置始终相对于质量交错网格给出，其质量比未交错网格的尺寸小一。默认值为（（（E_SN-1。）+ 1。）/ 2。）=（E_SN / 2。）
-17. TRUELAT1：一个实值，对于ARW，指定Lambert保角投影的第一个真实纬度，或墨卡托投影和极地立体投影的唯一真实纬度。对于NMM，将忽略truelat1。无默认值。
-18. TRUELAT2：一个实值，对于ARW，指定Lambert保形圆锥投影的第二个真实纬度。对于所有其他投影，将忽略truelat2。无默认值。
-19. STAND_LON：一个实值，对于ARW，指定与Lambert共形投影和极坐标立体投影中的y轴平行的经度。对于常规的经纬度投影，此值给出了绕地球地理极的旋转。对于NMM，将忽略stand_lon。无默认值。
-20. POLE_LAT：对于ARW的纬度-经度投影，相对于计算纬度-经度网格的北极纬度，其中-90.0°纬度在全局域的底部，90.0°纬度在顶部，并且180.0°经度位于中心。默认值为90.0。
-21. POLE_LON：对于ARW的纬度-经度投影，相对于计算纬度/经度网格的北极经度，其中-90.0°纬度在全局域的底部，90.0°纬度在顶部，并且180.0°经度位于中心。默认值为0.0
-22. GEOG_DATA_PATH：一个字符串，提供了可以找到地理数据目录的目录的相对路径或绝对路径。此路径是与GEOGRID.TBL文件中的rel_path规范相关的路径。无默认值。
-23. OPT_GEOGRID_TBL_PATH：一个字符串，给出了GEOGRID.TBL文件的相对路径或绝对路径。该路径不应包含实际的文件名（如假定为GEOGRID.TBL），而应仅提供此文件所在的路径。默认值为“ ./geogrid/”。
 
-C. UNGRIB部分
+1. PARENT_ID：MAX_DOM个整数的列表，为每个嵌套指定嵌套父级的域名；对于最粗的域，此变量应设置为1。默认值为1。
+
+2. PARENT_GRID_RATIO：MAX_DOM个整数的列表，为每个嵌套指定相对于父级域的嵌套比例。无默认值。
+
+3. I_PARENT_START：MAX_DOM个整数的列表，为每个嵌套指定父级未交错网格中嵌套左下角的x坐标。对于最粗糙的域，应将值指定为1。无默认值。
+
+4. J_PARENT_START：MAX_DOM个整数的列表，为每个嵌套指定父级未交错网格中嵌套左下角的y坐标。对于最粗糙的域，应将值指定为1。无默认值。
+
+5. S_WE：MAX_DOM个整数的列表，应将其全部设置为1。默认值为1。
+
+6. E_WE：MAX_DOM个整数的列表，为每个嵌套指定嵌套的整个东西向尺寸。对于嵌套域，`E_WE`必须比嵌套的`parent_grid_ratio`的整数倍大1（即，对于某个正整数n，e_we=n×parent_grid_ratio+1）。无默认值。
+
+7. S_SN：MAX_DOM个整数的列表，应将其全部设置为1。默认值为1。
+
+8. E_SN：MAX_DOM个整数的列表，为每个嵌套指定嵌套的整个南北向尺寸。对于嵌套域，`E_SN`必须比嵌套的`parent_grid_ratio`的整数倍大1（即，对于某个正整数n，e_sn=n×parent_grid_ratio+1）。无默认值。
+
+9. GEOG_DATA_RES：MAX_DOM个字符串的列表，为每个嵌套指定相应的分辨率，或在将静态地面数据插值到嵌套网格时使用的源数据的分辨率列表，该列表由“+”符号分隔。对于每个嵌套，此字符串应包含与每个字段的GEOGRID.TBL文件中的`rel_path`或`abs_path`规范（请参见[Geogrid.TBL选项说明](#Geogrid_TBL_Options)）中的冒号前面的字符串匹配的分辨率。如果字符串的分辨率与GEOGRID.TBL中某个字段的`rel_path`或`abs_path`规范中的任何此类字符串都不匹配，则将使用该字段的默认数据分辨率（如果已指定）。如果多个分辨率匹配，将使用与GEOGRID.TBL文件中的`rel_path`或`abs_path`规范中的字符串匹配的第一个分辨率。默认值为“default”。
+
+10. DX：一个实数值，指定地图比例因子为1时在x方向上的网格距离。对于ARW，“极坐标”、“兰伯特”和“墨卡托”投影的网格距离以米为单位，“经纬度”投影的网格距离以经度为单位；对于NMM，网格距离以经度为单位。嵌套的网格距离是根据为`parent_grid_ratio`和`parent_id`指定的值递归确定的。无默认值。
+
+11. DY：一个实数值，指定了地图比例因子为1时在y方向上的标称网格距离。对于ARW，“极坐标”、“兰伯特”和“墨卡托”投影的网格距离以米为单位，“经纬度”投影的网格距离以纬度为单位；对于NMM，网格距离以纬度为单位。嵌套的网格距离是根据为`parent_grid_ratio`和`parent_id`指定的值递归确定的。无默认值。
+
+12. MAP_PROJ：一个字符串，指定模拟域的投影。对于ARW，可用的参数是“lambert”、“polar”、“mercator”和“lat-lon”。对于NMM，必须指定为“rotated_ll”投影。默认值为“lambert”。
+
+13. REF_LAT：一个实数值，指定（纬度，经度）位置的纬度部分，其（i，j）位置在模拟域中是已知的。对于ARW，默认情况下（即未指定ref_x和ref_y时），ref_lat给出粗略区域中心点的纬度。对于NMM，ref_lat始终给出原点旋转到的纬度。无默认值。
+
+14. REF_LON：一个实数值，指定（纬度，经度）位置的经度部分，其（i，j）位置在模拟域中是已知的。对于ARW，默认情况下（即未指定ref_x和ref_y时），ref_lon给出粗略区域中心点的经度。对于NMM，ref_lon始终给出原点旋转到的经度。对于ARW和NMM，西经均为负，并且ref_lon的值应在[-180，180]范围内。无默认值。
+
+15. REF_X：一个实数值，指定（i，j）位置的i部分，该位置在模拟域中的（纬度，经度）位置已知。（i，j）位置始终相对于质量交错网格给出，比未交错网格的尺寸小一。默认值为 (((E_WE-1.)+1.)/2.) = (E_WE/2.)。
+
+16. REF_Y：一个实数值，指定（i，j）位置的j部分，该位置的模拟域中的（纬度，经度）位置已知。（i，j）位置始终相对于质量交错网格给出，比未交错网格的尺寸小一。默认值为 (((E_SN-1.)+1.)/2.) = (E_SN/2.)。
+
+17. TRUELAT1：一个实数值，对于ARW，指定Lambert共形投影的第一个真实纬度，或墨卡托投影和极地立体投影的唯一真实纬度。对于NMM，将忽略truelat1。无默认值。
+
+18. TRUELAT2：一个实数值，对于ARW，指定Lambert共形圆锥投影的第二个真实纬度。对于所有其他投影，将忽略truelat2。无默认值。
+
+19. STAND_LON：一个实数值，对于ARW，指定与Lambert共形投影和极坐标立体投影中的y轴平行的经度。对于常规的经纬度投影，此值给出了绕地球地理极的旋转。对于NMM，将忽略stand_lon。无默认值。
+
+20. POLE_LAT：对于ARW的纬度-经度投影，相对于计算纬度/经度网格的北极纬度，其中-90.0°纬度在全局域的底部，90.0°纬度在顶部，并且180.0°经度位于中心。默认值为90.0。
+
+21. POLE_LON：对于ARW的纬度-经度投影，相对于计算纬度/经度网格的北极经度，其中-90.0°纬度在全局域的底部，90.0°纬度在顶部，并且180.0°经度位于中心。默认值为0.0。
+
+22. GEOG_DATA_PATH：一个字符串，提供了地理数据目录的相对路径或绝对路径。此路径是与GEOGRID.TBL文件中的rel_path规范相关的路径。无默认值。
+
+23. OPT_GEOGRID_TBL_PATH：一个字符串，给出了GEOGRID.TBL文件的相对路径或绝对路径。该路径不应包含实际的文件名（如GEOGRID.TBL），而应仅提供此文件所在的路径。默认值为“./geogrid/”。
+
+### C. UNGRIB部分
+
 当前，此部分仅包含两个变量，这些变量确定ungrib编写的输出格式和输出文件的名称。
-1. OUT_FORMAT：设置为“ WPS”，“ SI”或“ MM5”的字符串。如果设置为“ MM5”，则ungrib将以MM5预网格程序的格式写入输出；如果设置为“ SI”，则ungrib将以grib_prep.exe格式写入输出；如果设置为“ WPS”，则ungrib将以WPS中间格式写入数据。默认值为“ WPS”。
-2. PREFIX：一个字符串，将用作由ungrib创建的中间格式文件的前缀；在这里，前缀是指中间文件的文件名PREFIX：YYYY-MM-DD_HH中的字符串PREFIX。前缀可以包含相对或绝对的路径信息，在这种情况下，中间文件将写入指定的目录中。如果要在多个GRIB数据源上运行ungrib，则此选项对于避免重命名中间文件可能很有用。默认值为“ FILE”。
-3. ADD_LVLS：一种逻辑，用于确定非固定对象是否会尝试垂直插入到使用NEW_PLVL和INTERP_TYPE名称列表选项指定的一组其他垂直级别。默认值为.FALSE ..
-4. INTERP_TYPE：一个整数值，指定在垂直内插到新级别时，ungrib将使用的方法。值为0会导致ungrib在压力中线性插值，而值为1会导致ungrib在对数压力中线性插值。预设值为0。
-5. NEW_PLVL：一个实数值数组，用于指定附加垂直级别（以Pa为单位），当ADD_LVLS为true时，ungrib程序将尝试对其进行插值。可以显式指定一组新的水平，或者，如果这些水平在压力中均匀分布，则可以精确地指定三个值：起始压力，结束压力和压力增量。当指定了起始压力，结束压力和增量时，压力增量必须为负数，以向ungrib程序发出信号，该值不是目标压力水平，而是在第一和第二压力之间使用的增量价值观。无默认值。
-6. PMIN：一个实际值，指定要从GRIB数据中处理的最小压力水平，单位为Pa。此选项仅适用于等压数据集。预设值为100。
 
-D. METGRID部分
-本节定义仅由metgrid程序使用的变量。通常，用户将主要对fg_name变量感兴趣，并且可能需要较少地修改此部分的其他变量。
-1. FG_NAME：字符串列表，指定未编排数据文件的路径和前缀。路径可以是相对路径，也可以是绝对路径，并且前缀应包含文件名中的所有字符，直到（但不包括）日期前的冒号。如果指定了多个fg_name，并且在两个或多个输入源中找到了相同的字段，则最后遇到的源中的数据将优先于该字段的所有先前源。默认值为空列表（即没有气象字段）。
-2. CONSTANTS_NAME：字符串列表，用于指定时不变的非肋状数据文件的路径和完整文件名。路径可以是相对路径，也可以是绝对路径，文件名应该是完整的文件名；由于假定数据是时不变的，因此不会在指定的文件名后附加日期。默认值是一个空列表（即没有常量字段）。
-3. IO_FORM_METGRID：将写入由metgrid程序创建的输出的WRF I / O API格式。可能的选项是：1表示二进制； 2表示可选。 NetCDF为2； GRIB1为3。给定选项1时，输出文件的后缀为.int；给定选项2时，输出文件的后缀为.nc；给定选项3时，输出文件的后缀为.gr1。默认值为2（NetCDF）。
-4. OPT_OUTPUT_FROM_METGRID_PATH：一个字符串，给出到metgrid输出文件应写入的位置的相对或绝对路径。默认值为当前工作目录（即默认值为“ ./”）。
-5. OPT_METGRID_TBL_PATH：字符串，提供到METGRID.TBL文件的相对或绝对路径；该路径不应包含实际的文件名（如假定为METGRID.TBL），而应仅提供此文件所在的路径。默认值为“ ./metgrid/”。
+1. OUT_FORMAT：设置为“WPS”、“SI”或“MM5”的字符串。如果设置为“MM5”，则ungrib将以MM5 pregrid程序的格式写入输出；如果设置为“SI”，则ungrib将以grib_prep.exe格式写入输出；如果设置为“WPS”，则ungrib将以WPS中间格式写入数据。默认值为“WPS”。
+
+2. PREFIX：一个字符串，将用作由ungrib创建的中间格式文件的前缀；在这里，前缀是指中间文件的文件名PREFIX：YYYY-MM-DD_HH中的字符串PREFIX。前缀可以包含相对或绝对的路径信息，在这种情况下，中间文件将写入指定的目录中。如果要在多个GRIB数据源上运行ungrib，则此选项对于避免重命名中间文件可能很有用。默认值为“FILE”。
+
+3. ADD_LVLS：一个逻辑值，用于确定非固定对象是否会尝试垂直插入到使用NEW_PLVL和INTERP_TYPE名称列表选项指定的一组其他垂直级别。默认值为.FALSE.。
+
+4. INTERP_TYPE：一个整数值，指定在垂直内插到新级别时，ungrib将使用的方法。值为0，ungrib会在压力中线性插值，而值为1时，ungrib会在对数压力中线性插值。预设值为0。
+
+5. NEW_PLVL：一个实数值数组，用于指定附加垂直级别（以Pa为单位），当ADD_LVLS为true时，ungrib程序将尝试对其进行插值。可以显式指定一组新的层，或者，如果这些水平在压力中均匀分布，则可以精确地指定三个值：起始压力、结束压力和压力增量。当指定了起始压力、结束压力和压力增量时，压力增量必须为负数，以向ungrib程序发出信号，该值不是目标压力水平，而是在第一和第二压力之间使用的增量值。无默认值。
+
+6. PMIN：一个实数值，指定要从GRIB数据中处理的最小压力层，单位为Pa。此选项仅适用于等压数据集。预设值为100。
+
+### D. METGRID部分
+本节定义仅由metgrid程序使用的变量。通常，用户将主要关注fg_name变量，并且可能需要较少地修改此部分的其他变量。
+
+1. FG_NAME：字符串列表，指定未网格化数据文件的路径和前缀。路径可以是相对路径，也可以是绝对路径，并且前缀应包含文件名中的所有字符，直到（但不包括）日期前的冒号。如果指定了多个fg_name，并且在两个或多个输入源中找到了相同的字段，则最后遇到的源中的数据将优先于该字段的所有先前源。默认值为空列表（即没有气象字段）。
+
+2. CONSTANTS_NAME：字符串列表，用于指定不随时间变化的未网格化数据文件的路径和完整文件名。路径可以是相对路径，也可以是绝对路径，文件名应该是完整的文件名；由于数据是不随时间变化的，因此不会在指定的文件名后附加日期。默认值是一个空列表（即没有常量字段）。
+
+3. IO_FORM_METGRID：将由metgrid程序创建的输出的WRF I/O API格式。可能的选项是：1表示二进制；2表示NetCDF；3表示GRIB1。给定选项1时，输出文件的后缀为.int；给定选项2时，输出文件的后缀为.nc；给定选项3时，输出文件的后缀为.gr1。默认值为2（NetCDF）。
+
+4. OPT_OUTPUT_FROM_METGRID_PATH：一个字符串，给出metgrid输出文件应写入的位置的相对或绝对路径。默认值为当前工作目录（即默认值为“./”）。
+
+5. OPT_METGRID_TBL_PATH：一个字符串，提供METGRID.TBL文件的相对或绝对路径；该路径不应包含实际的文件名（如METGRID.TBL），而应仅提供此文件所在的路径。默认值为“./metgrid/”。
+
 6. PROCESS_ONLY_BDY：一个整数，指定在初始时间之后的时间段内由metgrid处理的边界行和列的数目；对于最初的时间，metgrid将始终插值到每个网格点。将此选项设置为WRF namelist.input中spec_bdy_width的预期值将加速metgrid中的处理，但是如果在域内部需要插值数据，则不应设置此选项。如果将此选项设置为零，则metgrid会将气象数据水平插值到模型域中的每个网格点。此选项仅适用于ARW。默认值为0。
 
 <a id=Geogrid_TBL_Options></a>
 
 ## Geogrid.TBL选项说明
 
-GEOGRID.TBL文件是一个文本文件，定义了要由geogrid插值的每个数据集的参数。每个数据集都在一个单独的部分中定义，各部分之间用一行等号符号（例如'=============='）分隔。在每个部分中，都有规范，每个规范都具有关键字=值的形式。每个数据集部分中都需要一些关键字，而其他则是可选的。一些关键字与其他关键字互斥。下面，描述了可能的关键字及其期望的值范围。
-1.NAME：一个字符串，指定输出时将分配给插值字段的名称。无默认值。
+GEOGRID.TBL文件是一个文本文件，定义了要由geogrid插值的每个数据集的参数。每个数据集都在一个单独的部分中定义，各部分之间用一行等号符号（例如“==============”）分隔。在每个部分中，每个参数都具有“关键字=值”的形式。每个数据集部分中都需要一些关键字，而其他则是可选的。一些关键字与其他关键字互斥。下面，描述了可能的关键字及其期望的值范围。
+
+1. NAME：一个字符串，指定输出时将分配给插值字段的名称。无默认值。
+
 2. PRIORITY：一个整数，指定表部分中标识的数据源相对于同一字段的其他数据源所具有的优先级。如果一个字段具有n个数据源，则该字段必须有n个单独的表条目，每个表条目都必须被赋予唯一的值，优先级范围为[1，n]。无默认值。
+
 3. DEST_TYPE：字符串，无论是分类字符串还是连续字符串，它指示将表部分中给出的数据源中的插值字段视为连续字段还是分类字段。无默认值。
-4. INTERP_OPTION：一个或多个字符串的序列，它们是在水平内插字段时要使用的内插方法的名称。可用的插值方法是：average_4pt，average_16pt，wt_average_4pt，wt_average_16pt，neighborst_neighbor，four_pt，steenteen_pt，search（r）和average_gcell（r）。对于搜索方法（搜索），可选参数r以源数据网格中的网格点为单位指定最大搜索半径；默认搜索半径为1200点。对于网格单元平均方法（average_gcell），可选参数r指定将应用该方法的源数据分辨率与模拟网格分辨率的最小比率；除非指定，否则r = 0.0，并且该选项可用于任何比率。当给出两个或多个方法的序列时，方法应以+号分隔。无默认值。
-5. SMOOTH_OPTION：一个字符串，给出要在插值后应用于字段的平滑方法的名称。可用的平滑选项为：1-2-1，smth-desmth和smth-desmth_special（仅适用于ARW）。默认值为null（即不应用任何平滑处理）。
+
+4. INTERP_OPTION：一个或多个字符串的序列，它们是在水平内插字段时要使用的内插方法的名称。可用的插值方法是：average_4pt、average_16pt、wt_average_4pt、wt_average_16pt、neighborst_neighbor、four_pt、steenteen_pt、search（r）和average_gcell（r）。对于搜索方法（search），可选参数r以源数据网格中的网格点为单位指定最大搜索半径；默认搜索半径为1200点。对于网格单元平均方法（average_gcell），可选参数r指定将应用该方法的源数据分辨率与模拟网格分辨率的最小比率；除非指定，否则r=0.0，并且该选项可用于任何比率。当给出两个或多个方法的序列时，方法应以+号分隔。无默认值。
+
+5. SMOOTH_OPTION：一个字符串，给出要在插值后应用于字段的平滑方法的名称。可用的平滑选项为：1-2-1、smth-desmth和smth-desmth_special（仅适用于ARW）。默认值为null（即不应用任何平滑处理）。
+
 6. SMOOTH_PASSES：如果要对插值字段执行平滑处理，则smooth_passes指定要应用于该字段的整数次平滑处理方法。预设值为1。
-7. REL_PATH：一个字符串，指定相对于名称列表变量geog_data_path中给定的路径的路径。规范的格式为RES_STRING：REL_PATH，其中RES_STRING是一个字符串，以某种独特的方式标识数据的来源或分辨率，可以在名称列表变量geog_data_res中指定，REL_PATH是相对于geog_data_path的路径，其中索引并找到数据源的数据图块。如果有多个数据源或数据源的分辨率，则在表节中可以给出一个以上的rel_path规范，就像可以为geog_data_res指定多个分辨率（以+符号分隔的顺序）一样。另请参见abs_path。无默认值。
-8. ABS_PATH：一个字符串，它指定数据源的索引和数据切片的绝对路径。规范的格式为RES_STRING：ABS_PATH，其中RES_STRING是一个以某种独特的方式标识数据源或分辨率的字符串，可以在名称列表变量geog_data_res中指定，而ABS_PATH是数据源文件的绝对路径。 。如果有多个源或数据源的分辨率，则在表节中可以给出一个以上的abs_path规范，就像可以为geog_data_res指定多个分辨率（以+符号分隔的顺序）一样。另请参见rel_path。无默认值。
-9. OUTPUT_STAGGER：一个字符串，指定要插入字段的交错网格。对于ARW域，可能的值为U，V和M；对于NMM域，可能的值为HH和VV。 ARW的默认值为M； NMM的默认值为HH。
-10. LANDMASK_WATER：一个或多个逗号分隔的整数值，给出表示水的字段中类别的索引。在dest_type = categorical的字段的表部分中指定了landmask_water时，将使用指定的类别作为水类别从该字段计算LANDMASK字段。关键字landmask_water和landmask_land是互斥的。默认值为null（即，不会从该字段计算出地面遮罩）。
-11. LANDMASK_LAND：一个或多个逗号分隔的整数值，给出表示土地的字段中类别的索引。在dest_type = categorical的字段的表部分中指定了landmask_water时，将使用指定的类别作为土地类别从该字段计算LANDMASK字段。关键字landmask_water和landmask_land是互斥的。默认值为null（即，不会从该字段计算出地面遮罩）。
-12.MASKED：无论是陆地还是水域，分别表示该字段在陆地或水域无效。如果将masked关键字用于字段，则将为那些具有masked类型（土地或水域）的网格点分配由fill_missing指定的值。默认值为null（即未屏蔽该字段）。
+
+7. REL_PATH：一个字符串，指定相对于名称列表变量geog_data_path中给定的路径的路径。规范的格式为RES_STRING：REL_PATH，其中RES_STRING是一个字符串，以某种独特的方式标识数据的来源或分辨率，可以在名称列表变量geog_data_res中指定，REL_PATH是相对于geog_data_path的路径，其中索引并找到数据源的数据图块。如果有多个数据源或数据源的分辨率，则在表节中可以给出一个以上的rel_path参数，就像可以为geog_data_res指定多个分辨率（以+符号分隔的顺序）一样。另请参见abs_path。无默认值。
+
+8. ABS_PATH：一个字符串，它指定数据源的索引和数据切片的绝对路径。规范的格式为RES_STRING：ABS_PATH，其中RES_STRING是一个以某种独特的方式标识数据源或分辨率的字符串，可以在名称列表变量geog_data_res中指定，而ABS_PATH是数据源文件的绝对路径。如果有多个源或数据源的分辨率，则在表节中可以给出一个以上的abs_path规范，就像可以为geog_data_res指定多个分辨率（以+符号分隔的顺序）一样。另请参见rel_path。无默认值。
+
+9. OUTPUT_STAGGER：一个字符串，指定要插入字段的交错网格。对于ARW域，可能的值为U、V和M；对于NMM域，可能的值为HH和VV。ARW的默认值为M；NMM的默认值为HH。
+
+10. LANDMASK_WATER：一个或多个逗号分隔的整数值，给出表示水的字段中类别的索引。在dest_type=categorical的字段的表部分中指定了landmask_water时，将使用指定的类别作为水类别从该字段计算LANDMASK字段。关键字landmask_water和landmask_land是互斥的。默认值为null（即，不会从该字段计算出地面遮罩）。
+
+11. LANDMASK_LAND：一个或多个逗号分隔的整数值，给出表示土地的字段中类别的索引。在dest_type=categorical的字段的表部分中指定了landmask_water时，将使用指定的类别作为土地类别从该字段计算LANDMASK字段。关键字landmask_water和landmask_land是互斥的。默认值为null（即，不会从该字段计算出地面遮罩）。
+
+12. MASKED：无论是陆地还是水域，分别表示该字段在陆地或水域无效。如果将masked关键字用于字段，则将为那些具有masked类型（土地或水域）的网格点分配由fill_missing指定的值。默认值为null（即未屏蔽该字段）。
+
 13. FILL_MISSING：一个实数值，用于填充内插字段中所有丢失或掩盖的网格点。默认值为1.E20。
-14. HALT_ON_MISSING：是或否，指示当在插值字段中遇到缺失值时，土工格栅是否应以致命消息停止。默认值为“否”。
-15. DOMINANT_CATEGORY：指定为字符串时，其作用是使Geogrid从分数分类字段中计算出主要类别，并输出具有由dominant_category值指定的名称的主要类别字段。此选项只能用于具有dest_type = categorical的字段。默认值为空（即，不会从分数分类字段中计算出主要类别）。
-16. DOMINANT_ONLY：当指定为字符串时，其效果类似于dominant_category关键字的效果：geogrid将根据分数分类字段计算优势类别，并输出名称由dominant_only值指定的优势类别字段。但是，与dominant_category不同，当使用dominant_only时，分数分类字段将不会出现在土工格栅输出中。此选项只能用于具有dest_type = categorical的字段。默认值为空（即，不会从分数分类字段中计算出主要类别）。
+
+14. HALT_ON_MISSING：是或否，指示当在插值字段中遇到缺失值时，geogrid是否应以致命消息停止。默认值为“no”。
+
+15. DOMINANT_CATEGORY：指定字符串时，其作用是使Geogrid从分数分类字段中计算出主要类别，并输出具有由dominant_category值指定的名称的主要类别字段。此选项只能用于具有dest_type=categorical的字段。默认值为空（即，不会从分数分类字段中计算出主要类别）。
+
+16. DOMINANT_ONLY：指定字符串时，其效果类似于dominant_category关键字的效果：geogrid将根据分数分类字段计算优势类别，并输出名称由dominant_only值指定的优势类别字段。但是，与dominant_category不同，当使用dominant_only时，分数分类字段将不会出现在geogrid输出中。此选项只能用于具有dest_type=categorical的字段。默认值为空（即，不会从分数分类字段中计算出主要类别）。
+
 17. DF_DX：为df_dx分配一个字符串值时，其作用是使Geogrid使用沿域内部的中心差或在处的单向差来计算x方向上场的方向导数。域的边界；派生字段将根据分配给关键字df_dx的字符串命名。默认值为null（即不计算任何派生字段）。
+
 18. DF_DY：为df_dy分配了字符串值时，其作用是使Geogrid使用沿域内部的中心差或在处的单向差来计算y方向上场的方向导数。域的边界；派生字段将根据分配给关键字df_dy的字符串命名。默认值为null（即不计算任何派生字段）。
+
 19. Z_DIM_NAME：对于3维输出字段，是一个字符串，给出了垂直尺寸或z尺寸的名称。连续字段可以具有多个级别，因此是3维字段，并且如果将其写为每个类别的分数字段，则分类字段可以采用3维字段的形式。无默认值。
+
 20. FLAG_IN_OUTPUT：给出全局属性名称的字符串，该属性将被赋值为1并写入到geogrid输出中。默认值为null（即，不会为该字段写入任何标志）。
-21.OPTIONAL：是或否，表示由geog_data_res名称列表选项中指定的分辨率标识的数据集是否可选。如果GEOGRID.TBL文件中的条目是可选的，并且无法读取指定的数据分辨率，则geogrid将打印一条信息消息，指示未插值数据集并继续；否则，如果该条目不是可选的，并且无法读取指定的数据分辨率，则geogrid会因错误而停止。同一字段的不同优先级级别条目可以指定可选关键字的不同值，例如，某个字段的priority = 2条目可以是可选的，而priority = 1条目可以是非可选的（即，可选的=否）。默认值为“否”。
+
+21. OPTIONAL：是或否，表示由geog_data_res名称列表选项中指定的分辨率标识的数据集是否可选。如果GEOGRID.TBL文件中的条目是可选的，并且无法读取指定的数据分辨率，则geogrid将打印一条信息消息，指示未插值数据集并继续；否则，如果该条目不是可选的，并且无法读取指定的数据分辨率，则geogrid会因错误而停止。同一字段的不同优先级级别条目可以指定可选关键字的不同值，例如，某个字段的priority=2条目可以是可选的，而priority=1条目可以是非可选的（即，可选的=否）。默认值为“否”。
 
 <a id=index_Options></a>
 
 ## 索引选项说明
 
-与GEOGRID.TBL相关的是与每个静态数据集关联的索引文件。索引文件定义了特定于该数据集的参数，而GEOGRID.TBL文件描述了Geogrid应该如何处理每个数据集。与GEOGRID.TBL文件一样，索引文件中的规范的格式为keyword = value。以下是可能的关键字及其可能的值。
-1.PROJECTION：指定数据投影的字符串，可以是lambert，polar，mercator，regular_ll，albers_nad83或polar_wgs84。无默认值。
-2. TYPE：字符串，可以是分类CATEGORICAL的或连续CONTINUOUS的，用于确定是将数据文件中的数据解释为连续字段还是离散索引。对于每个可能类别的分数字段表示的类别数据，TYPE应设置为连续CONTINUOUS。无默认值。
-3. SIGNED（已签名）：是YES或否NO，指示数据文件中的值（始终以整数表示）是否以二进制补码形式签名。默认值为“否”。
+与GEOGRID.TBL相关的是与每个静态数据集关联的索引文件。索引文件定义了特定于该数据集的参数，而GEOGRID.TBL文件描述了Geogrid应该如何处理每个数据集。与GEOGRID.TBL文件一样，索引文件中的参数的格式为keyword=value。以下是可能的关键字及其可能的值。
+
+1. PROJECTION：指定数据投影的字符串，可以是lambert、polar、mercator、regular_ll、albers_nad83或polar_wgs84。无默认值。
+
+2. TYPE：字符串，可以是`categorical`或`continuous`，用于确定是将数据文件中的数据解释为连续字段还是离散索引。对于每个可能类别的分数字段表示的类别数据，TYPE应设置为`continuous`。无默认值。
+
+3. SIGNED：是YES或否NO，指示数据文件中的值（始终以整数表示）是否以二进制补码形式签名。默认值为“no”。
+
 4. UNITS：一个字符串，用引号（“）括起来，指定插值字段的单位；该字符串将作为变量与时间无关的属性写入到geogrid输出文件中。无默认值。
-5.描述：字符串，用引号（“）括起来，对插值字段进行简短描述；该字符串将作为变量与时间无关的属性写入到geogrid输出文件中。无默认值。
-6. DX：一个实数值，给出数据集在x方向上的网格间距。如果投影是lambert，polar，mercator，albers_nad83或polar_wgs84之一，则dx以米为单位给出网格间距；如果投影为regular_ll，则dx以度为单位给出网格间距。无默认值。
-7. DY：一个实数值，给出了数据集y方向上的网格间距。如果投影是兰伯特，极地，墨卡托，albers_nad83或polar_wgs84之一，则dy给出以米为单位的网格间距；如果投影为regular_ll，则dy以度为单位给出网格间距。无默认值。
+
+5. DESCRIPTION：字符串，用引号（“）括起来，对插值字段进行简短描述；该字符串将作为变量与时间无关的属性写入到geogrid输出文件中。无默认值。
+
+6. DX：一个实数值，给出数据集在x方向上的网格间距。如果投影是lambert、polar、mercator、albers_nad83或polar_wgs84之一，则dx以米为单位给出网格间距；如果投影为regular_ll，则dx以度为单位给出网格间距。无默认值。
+
+7. DY：一个实数值，给出了数据集y方向上的网格间距。如果投影是lambert、polar、mercator、albers_nad83或polar_wgs84之一，则dy以米为单位给出网格间距；如果投影为regular_ll，则dy以度为单位给出网格间距。无默认值。
+
 8. KNOWN_X：一个实数值，指定与投影中已知的（纬度，经度）位置相对应的（i，j）位置的i坐标。预设值为1。
+
 9. KNOWN_Y：一个实数值，指定与投影中已知的（纬度，经度）位置相对应的（i，j）位置的j坐标。预设值为1。
+
 10. KNOWN_LAT：一个实数值，指定投影中已知的（纬度，经度）位置的纬度。无默认值。
+
 11. KNOWN_LON：一个实数值，指定投影中已知的（纬度，经度）位置的经度。无默认值。
+
 12. STDLON：一个实值，指定在圆锥形和方位角投影中与y轴平行的经度。无默认值。
+
 13. TRUELAT1：一个实值，指定圆锥投影的第一个真实纬度或方位角投影的唯一真实纬度。无默认值。
+
 14. TRUELAT2：一个实际值，它指定圆锥投影的第二个真实纬度。无默认值。
+
 15. WORDSIZE：一个整数，给出用于表示数据文件中每个网格点的值的字节数。无默认值。
+
 16. TILE_X：一个整数，指定源数据的单个图块在x方向上的网格点数（不包括任何光晕点）。无默认值。
+
 17. TILE_Y：一个整数，指定源数据的单个图块在y方向上的网格点数（不包括任何光晕点）。无默认值。
+
 18. TILE_Z：一个整数，指定源数据的单个图块在z方向上的网格点数；此关键字可以替代一对tile_z_start和tile_z_end关键字，并且使用此关键字时，起始z-index假定为1。没有默认值。
+
 19. TILE_Z_START：一个整数，指定数据文件中数组在z方向上的起始索引。如果使用此关键字，则还必须指定tile_z_end。无默认值。
+
 20. TILE_Z_END：一个整数，指定数据文件中数组在z方向上的结束索引。如果使用此关键字，则还必须指定tile_z_start。无默认值
-21. CATEGORY_MIN：对于分类数据（类型=分类），一个整数，指定在数据集中找到的最小类别索引。如果使用此关键字，则还必须指定category_max。无默认值。
-22. CATEGORY_MAX：对于分类数据（类型=分类），一个整数，指定在数据集中找到的最大类别索引。如果使用此关键字，则还必须指定category_min。无默认值。
+
+21. CATEGORY_MIN：一个整数，对于分类数据（type=categorical），指定在数据集中找到的最小类别索引。如果使用此关键字，则还必须指定category_max。无默认值。
+
+22. CATEGORY_MAX：一个整数，对于分类数据（type=categorical），指定在数据集中找到的最大类别索引。如果使用此关键字，则还必须指定category_min。无默认值。
+
 23. TILE_BDR：一个整数，指定每个数据图块的晕轮宽度（以网格点为单位）。预设值为0。
-24. MISSING_VALUE：当在数据集中遇到时，应将其解释为缺失数据的实数值。无默认值。
-25. SCALE_FACTOR：一个实际值，在从数据集的切片中以整数形式读取数据后，应该对数据进行缩放（通过乘法）。预设值为1。
+
+24. MISSING_VALUE：一个实数值，当在数据集中遇到时，应将其解释为缺失数据。无默认值。
+
+25. SCALE_FACTOR：一个实数值，在从数据集的切片中以整数形式读取数据后，应该对数据进行缩放（通过乘法）。预设值为1。
+
 26. ROW_ORDER：一个字符串，bottom_top或top_bottom，指定写入数据集数组的行是从最低索引行到最高索引（bottom_top），还是从最高索引行到最低索引（top_bottom）。当利用某些以top_bottom顺序提供的USGS数据集时，此关键字可能很有用。默认值为bottom_top。
-27. ENDIAN：大或小字符串，用于指定静态数据集数组中的值是以big-endian还是little-endian字节顺序排列。默认值是大。
-28. ISWATER：一个整数，指定水的土地使用类别。预设值为16。
+
+27. ENDIAN：一个字符串，可设置为big或者little，用于指定静态数据集数组中的值是以big-endian还是little-endian字节顺序排列。默认值是big。
+
+28. ISWATER：一个整数，指定水体的土地使用类别。预设值为16。
+
 29. ISLAKE：一个整数，指定内陆水域的土地使用类别。默认值为-1（即没有单独的内陆水域类别）。
+
 30. ISICE：一个整数，指定冰的土地使用类别。预设值为24。
-31. ISURBAN：一个整数，指定城市区域的土地使用类别。 预设值为1。
-32. ISOILWATER：一个整数，指定水的土壤类别。 预设值为14。
-33. MMINLU：一个字符串，用引号（“）括起来，指示在查找土地使用类别的参数时将使用WRF的LANDUSE.TBL和VEGPARM.TBL的哪一部分。默认值为” USGS“。
-34. FILENAME_DIGITS：一个整数，指定数据切片名称中使用的位数。 可能的值为5或6。默认值为5。
+
+31. ISURBAN：一个整数，指定城市区域的土地使用类别。预设值为1。
+
+32. ISOILWATER：一个整数，指定水的土壤类别。预设值为14。
+
+33. MMINLU：一个字符串，用引号（“）括起来，指示在查找土地使用类别的参数时将使用WRF的LANDUSE.TBL和VEGPARM.TBL的哪一部分。默认值为“USGS”。
+
+34. FILENAME_DIGITS：一个整数，指定数据切片名称中使用的位数。可能的值为5或6。默认值为5。
 
 <a id=METGRID_TBL_Options></a>
 
 ## METGRID.TBL选项说明
 
-METGRID.TBL文件是一个文本文件，定义了要由metgrid插入的每个气象字段的参数。每个字段的参数均在单独的部分中定义，各部分之间用一排等号（例如='============='）分隔。在每个部分中，都有规范，每个规范都具有关键字=值的形式。部分中的某些关键字是必需的，而其他则是可选的。一些关键字与其他关键字互斥。下面，描述了可能的关键字及其期望的值范围。
-1.NAME：一个字符串，给出表的包含部分所属的气象字段的名称。该名称应与中间文件中给出的字段名称完全匹配（因此，应与在生成中间文件时使用的Vtable中给出的名称相匹配）。这是必填栏。无默认值。
-2. OUTPUT：是YES或否NO，指示是否将字段写入metgrid输出文件。默认值为是YES。
-3.MANDATORY：是或否，指示成功完成metgrid是否需要该字段。默认值为“否NO”。
+METGRID.TBL文件是一个文本文件，定义了要由metgrid插入的每个气象字段的参数。每个字段的参数均在单独的部分中定义，各部分之间用一排等号（例如“=============”）分隔。在每个部分中，每个参数都具有关键字=值的形式。部分中的某些关键字是必需的，而其他则是可选的。一些关键字与其他关键字互斥。下面，描述了可能的关键字及其期望的值范围。
+
+1. NAME：一个字符串，给出表的包含部分所属的气象字段的名称。该名称应与中间文件中给出的字段名称完全匹配（因此，应与在生成中间文件时使用的Vtable中给出的名称相匹配）。这是必填栏。无默认值。
+
+2. OUTPUT：是YES或否NO，指示是否将字段写入metgrid输出文件。默认值为是“YES”。
+
+3. MANDATORY：是YES或否NO，指示成功完成metgrid是否需要该字段。默认值为“NO”。
+
 4. OUTPUT_NAME：一个字符串，给出应将内插字段输出为的名称。为output_name指定值时，将使用表部分中与具有指定名称的字段有关的插值选项。因此，指定output_name的效果有两个方面：内插字段在写出之前被分配了指定的名称，并且内插方法取自与该字段名称匹配分配给output_name关键字的值的字段有关的部分。无默认值。
-5. FROM_INPUT：一个字符串，用于与fg_name名称列表变量中的值进行比较；如果指定了from_input，则仅当时变输入源的文件名包含from_input的值作为子字符串时，才使用包含表部分。因此，取决于正在处理字段的哪个源，from_input可用于为同一字段指定不同的插值选项。无默认值。
-6. OUTPUT_STAGGER：应将字段插值到的模型网格错开。对于ARW，它必须是U，V和M之一；对于NMM，它必须是HH和VV之一。 ARW的默认值为M； NMM的默认值为HH。
-7. IS_U_FIELD：是或否，指示是否将该字段用作风U分量字段。对于ARW，必须将风的U分量字段内插到U交错（output_stagger = U）；对于NMM，必须将风U分量字段内插到V交错（output_stagger = VV）。默认值为“否”。
-8. IS_V_FIELD：是或否，指示是否将该字段用作风V分量字段。对于ARW，必须将风的V分量字段内插到V交错（output_stagger = V）；对于NMM，必须将风的V分量字段内插到V交错（output_stagger = VV）。默认值为“否”。
-9. INTERP_OPTION：一个或多个字符串的序列，它们是在水平内插字段时要使用的内插方法的名称。可用的插值方法是：average_4pt，average_16pt，wt_average_4pt，wt_average_16pt，neighborst_neighbor，four_pt，steenteen_pt，search（r）和average_gcell（r）。对于搜索方法（搜索），可选参数r以源数据网格中的网格点为单位指定最大搜索半径；默认搜索半径为1200点。对于网格单元平均方法（average_gcell），可选参数r指定将应用该方法的源数据分辨率与模拟网格分辨率的最小比率；除非指定，否则r = 0.0，并且该选项可用于任何比率。当给出两个或多个方法的序列时，方法应以+号分隔。默认值是最近邻。
-10. INTERP_MASK：用作插值掩码的字段的名称，以及该字段中的值，该值指示被掩码的点和可选的关系符号<或>。规范的形式为field（？maskval），其中field是字段的名称，？是一个可选的关系符号（<或>），而maskval是一个实数值。如果字段字段中的对应点分别等于，大于或小于没有关系符号，>符号或<符号的maskval的值，则不会在插值中使用源数据点。默认值为无掩码。
-11. INTERP_LAND_MASK：插值到水位时将用作插值掩码的字段名称（由静态LANDMASK字段确定），以及该字段中的值，该值表示着陆点和可选的关系符号<或> 。规范的形式为field（？maskval），其中field是字段的名称，？是一个可选的关系符号（<或>），而maskval是一个实数值。默认值为无掩码。
-12. INTERP_WATER_MASK：插值到陆地点时将用作插值掩码的字段名称（由静态LANDMASK字段确定），以及该字段中的值（表示水位）和可选的关系符号<或> 。规范的形式为field（？maskval），其中field是字段的名称，？是一个可选的关系符号（<或>），而maskval是一个实数值。默认值为无掩码。
+
+5. FROM_INPUT：一个字符串，用于与fg_name名称列表变量中的值进行比较；如果指定了from_input，则仅当随时间变化的输入源的文件名包含from_input的值作为子字符串时，才使用包含表部分。因此，取决于正在处理字段的哪个源，from_input可用于为同一字段指定不同的插值选项。无默认值。
+
+6. OUTPUT_STAGGER：将字段插值到的模型网格错开。对于ARW，它必须是U，V和M之一；对于NMM，它必须是HH和VV之一。 ARW的默认值为M；NMM的默认值为HH。
+
+7. IS_U_FIELD：是YES或否NO，指示是否将该字段用作风U分量字段。对于ARW，必须将风的U分量字段内插到U交错（output_stagger=U）；对于NMM，必须将风U分量字段内插到V交错（output_stagger=VV）。默认值为“否”。
+
+8. IS_V_FIELD：是YES或否NO，指示是否将该字段用作风V分量字段。对于ARW，必须将风的V分量字段内插到V交错（output_stagger=V）；对于NMM，必须将风的V分量字段内插到V交错（output_stagger=VV）。默认值为“否”。
+
+9. INTERP_OPTION：一个或多个字符串的序列，它们是在水平内插字段时要使用的内插方法的名称。可用的插值方法是：average_4pt、average_16pt、wt_average_4pt、wt_average_16pt、neighborst_neighbor、four_pt、steenteen_pt、search（r）和average_gcell（r）。对于搜索方法（search），可选参数r以源数据网格中的网格点为单位指定最大搜索半径；默认搜索半径为1200点。对于网格单元平均方法（average_gcell），可选参数r指定将应用该方法的源数据分辨率与模拟网格分辨率的最小比率；除非指定，否则r=0.0，并且该选项可用于任何比率。当给出两个或多个方法的序列时，方法应以+号分隔。默认值是最近邻。
+
+10. INTERP_MASK：用作插值掩码的字段的名称，以及该字段中的值，该值指示被掩码的点和可选的关系符号“<”或“>”。规范的形式为field（？maskval），其中field是字段的名称，？是一个可选的关系符号（“<”或“>”），而maskval是一个实数值。如果字段字段中的对应点分别等于、大于或小于没有关系符号，>符号或<符号的maskval的值，则不会在插值中使用源数据点。默认值为无掩码。
+
+11. INTERP_LAND_MASK：插值到水位时将用作插值掩码的字段名称（由静态LANDMASK字段确定），以及该字段中的值，该值表示着陆点和可选的关系符号“<”或“>”。规范的形式为field（？maskval），其中field是字段的名称，？是一个可选的关系符号（“<”或“>”），而maskval是一个实数值。默认值为无掩码。
+
+12. INTERP_WATER_MASK：插值到陆地点时将用作插值掩码的字段名称（由静态LANDMASK字段确定），以及该字段中的值（表示水位）和可选的关系符号“<”或“>”。规范的形式为field（？maskval），其中field是字段的名称，？是一个可选的关系符号（“<”或“>”），而maskval是一个实数值。默认值为无掩码。
+
 13. FILL_MISSING：一个实数，指定要分配给没有插值的模型网格点的值，例如，由于缺少或不完整的气象数据。默认值为1.E20。
+
 14. Z_DIM_NAME：对于3维气象字段，是一个字符串，给出了要用于输出字段的垂直维度的名称。默认值为num_metgrid_levels。
-15. DERIVED（是）：是或否，指示该字段是否要从其他插值字段派生，而不是从输入字段插值。默认值为“否”。
-16. FILL_LEV：fill_lev关键字（可以在表节中多次指定）指定如果该级别尚不存在，应如何填充该字段的级别。关键字的通用值格式为DLEVEL：FIELD（SLEVEL），其中DLEVEL指定要填充的字段中的级别，FIELD指定要从中复制级别的源字段，而SLEVEL指定要使用的源字段中的级别。 DLEVEL可以是整数，也可以是字符串all。 FIELD可以是另一个字段的名称，字符串const或字符串vertical_index。如果将FIELD指定为const，则SLEVEL是将用于填充的常量值；如果将FIELD指定为vertical_index，则必须不指定（SLEVEL），并且使用源字段的垂直索引的值；如果DLEVEL为'all'，则使用level_template关键字指定的字段中的所有级别填充一次该字段中的相应级别。无默认值。
+
+15. DERIVED（是）：是YES或否NO，指示该字段是否要从其他插值字段派生，而不是从输入字段插值。默认值为“no”。
+
+16. FILL_LEV：fill_lev关键字（可以在表节中多次指定）指定如果该级别尚不存在，应如何填充该字段的级别。关键字的通用值格式为DLEVEL：FIELD（SLEVEL），其中DLEVEL指定要填充的字段中的级别，FIELD指定要从中复制级别的源字段，而SLEVEL指定要使用的源字段中的级别。DLEVEL可以是整数，也可以是字符串all。FIELD可以是另一个字段的名称，字符串const或字符串vertical_index。如果将FIELD指定为const，则SLEVEL是将用于填充的常量值；如果将FIELD指定为vertical_index，则必须不指定（SLEVEL），并且使用源字段的垂直索引的值；如果DLEVEL为'all'，则使用level_template关键字指定的字段中的所有级别填充一次该字段中的相应级别。无默认值。
+
 17. LEVEL_TEMPLATE：一个字符串，提供字段名称，应从该字段中获取垂直级别列表并将其用作模板。此关键字与fill_lev规范结合使用，该规范在其规范的DLEVEL部分中全部使用。无默认值。
-18.MASKED：土地，水域或两者兼有。将“屏蔽”设置为陆地或水域表示该字段不应分别插入WRF陆地或水域点；但是，将MASKED设置为两者都表示应该仅使用源数据中的陆地点将字段插值到WRF陆地点，而仅使用源数据中的水点插值到WRF水点。当某个字段被屏蔽或无效时，将使用静态LANDMASK字段来确定应将该字段插入到哪个模型网格点；将为无效点分配FILL_MISSING关键字给出的值。源数据点是陆地还是水是由使用INTERP_LAND_MASK和INTERP_WATER_MASK选项指定的掩码确定的。默认值为空（即该字段对陆地和水位均有效）。
-19. MISSING_VALUE：实数，用于在输入字段中提供值，假定该值代表丢失的数据。无默认值。
+
+18. MASKED：选项有land、water、both。将MASKED设置为land或water表示该字段不应分别插入WRF陆地或水域点；但是，将MASKED设置为both表示应该仅使用源数据中的陆地点将字段插值到WRF陆地点，而仅使用源数据中的水点插值到WRF水点。当某个字段被屏蔽或无效时，将使用静态LANDMASK字段来确定应将该字段插入到哪个模型网格点；将为无效点分配FILL_MISSING关键字给出的值。源数据点是陆地还是水是由使用INTERP_LAND_MASK和INTERP_WATER_MASK选项指定的掩码确定的。默认值为空（即该字段对陆地和水位均有效）。
+
+19. MISSING_VALUE：一个实数值，用于在输入字段中提供值，假定该值代表丢失的数据。无默认值。
+
 20. VERTICAL_INTERP_OPTION：一个字符串，用于指定垂直插值到缺失点时应使用的垂直插值方法。当前，此选项未实现。无默认值。
-21. FLAG_IN_OUTPUT：一个字符串，给出全局属性的名称，如果要输出插值字段，则该字符串将被赋值为1并写入metgrid输出（输出=是）。默认值为null（即，不会为该字段写入任何标志）。
+
+21. FLAG_IN_OUTPUT：一个字符串，给出全局属性的名称，如果要输出插值字段，则该字符串将被赋值为1并写入metgrid输出（output=yes）。默认值为null（即，不会为该字段写入任何标志）。
 
 <a id=Available_Interpolation_Options></a>
 
 ## Geogrid和Metgrid中可用的插值选项
 
-通过GEOGRID.TBL和METGRID.TBL文件，用户可以控制插值源数据的方法-土工格栅是静态字段，气象数据是梅格里德。实际上，可以给出内插方法的列表，在这种情况下，如果不可能在列表中采用第i种方法，则第（i + 1）-st
-将使用method方法，直到可以使用某些方法或列表中没有其他方法可以尝试为止。例如，要对字段使用四点双线性插值方案，我们可以指定interp_option = four_pt。但是，如果字段中缺少值的区域，这可能会阻止使用four_pt选项，则可以通过指定interp_option = four_pt + average_4pt来请求如果无法使用four_pt方法，则尝试尝试简单的四点平均值。下面，从概念上描述了WPS中的每个可用插值选项。有关每种方法的详细信息，请参考文件WPS / geogrid / src / interp_options.F中的源代码。
-1. four_pt：四点双线性插值
- 
-四点双线性插值方法需要四个有效的源点aij，围绕点（x，y），土工格栅或metgrid必须对其进行插值，如上图所示。 直观地讲，该方法通过线性内插到a11和a12之间以及a21和a22之间的点（x，y）的x坐标，然后使用这两个内插值线性内插到y坐标。
+通过GEOGRID.TBL和METGRID.TBL文件，用户可以控制插值源数据的方法——geogrid是静态字段，metgrid是气象场。实际上，可以给出内插方法的列表，在这种情况下，如果不可能在列表中采用第i种方法，则使用第（i+1）-st种方法，直到可以使用某些方法或列表中没有其他方法可以尝试为止。例如，要对字段使用四点双线性插值方案，我们可以指定`interp_option = four_pt`。但是，如果字段中有缺少值的区域，这可能会阻止使用`four_pt`选项，则可以通过指定`interp_option = four_pt + average_4pt`来请求如果无法使用`four_pt`方法，则尝试尝试简单的四点平均值。下面，从概念上描述了WPS中的每个可用插值选项。有关每种方法的详细信息，请参考文件WPS/geogrid/src/interp_options.F中的源代码。
 
-2. sixteen_pt：十六点重叠抛物线插值
- 
-如上图所示，sixteen_pt重叠抛物线插值方法需要围绕点（x，y）的十六个有效源点。对于第i行，该方法的工作原理是将一个抛物线拟合到点ai1，ai2和ai3，将另一个抛物线拟合到点ai2，ai3和ai4。然后，通过取在x处评估的两个抛物线的平均值，计算在第i行在该点的x坐标处的中间插值pi，该平均值通过x与ai2和ai3的距离线性加权。最后，通过执行与对一行行相同的操作找到在（x，y）处的内插值，但是对于到（x，y）y坐标的内插值pi的列。
+### 1. four_pt：四点双线性插值
 
-3. average_4pt：简单的四点平均插值
+![chap3_four_pt](images/chap3_four_pt.png)
+
+四点双线性插值方法需要四个有效的源点aij（1≤i，j≤2），围绕点（x，y），geogrid或metgrid进行插值，如上图所示。直观地讲，该方法通过线性内插到a11和a12之间以及a21和a22之间的点（x，y）的x坐标，然后使用这两个内插值线性内插到y坐标。
+
+### 2. sixteen_pt：十六点重叠抛物线插值
+
+![chap3_sixteen_pt](images/chap3_sixteen_pt.png)
+
+如上图所示，sixteen_pt重叠抛物线插值方法需要围绕点（x，y）的十六个有效源点。对于第i行，该方法的工作原理是将一个抛物线拟合到点ai1，ai2和ai3，将另一个抛物线拟合到点ai2，ai3和ai4。然后，通过取在x处评估的两个抛物线的平均值，计算在第i行在该点的x坐标处的中间插值pi，该平均值通过x与ai2和ai3的距离线性加权。最后，通过执行与对一行行相同的操作找到在（x，y）处的内插值，对于到（x，y）y坐标的内插值pi的列。
+
+### 3. average_4pt：简单四点平均插值
+
 四点平均插值方法需要从点（x，y）周围的四个源点中至少获取一个有效源数据点。插值只是这四个点中所有有效值的平均值。
 
-4. wt_average_4pt：加权四点平均插值
-加权四点平均插值方法可以处理丢失或掩盖的源数据点，并且插值作为所有有效值的加权平均值给出，其中源点aij的权重wij为
- 
-在这里，xi是aij的x坐标，而yj是aij的y坐标。
+### 4. wt_average_4pt：加权四点平均插值
 
-5. average_16pt：简单的十六点平均插值
+加权四点平均插值方法可以处理丢失或掩盖的源数据点，并且插值作为所有有效值的加权平均值给出，其中源点aij（1≤i，j≤2）的权重wij为
+
+![chap3_wt_average_4pt](images/chap3_wt_average_4pt.png)
+
+式中，xi是aij的x坐标，而yj是aij的y坐标。
+
+### 5. average_16pt：简单十六点平均插值
+
 十六点平均插值方法的工作方式与四点平均相同，但是考虑了围绕点（x，y）的十六个点。
 
-6. wt_average_16pt：加权十六点平均插值
-加权十六点平均插值方法的工作原理类似于加权四点平均值，但是考虑了围绕（x，y）的十六个点； 该方法的权重为
- 
-其中xi和yj如加权四点法所定义，而。
-7.nearest_neighbor：最近邻插值
-当用于连续数据集（即，其索引文件中具有type = continuous的数据集）时，最邻近插值方法仅将（x，y）处的插值设置为最接近的源数据点的值，无论是否最近的源点有效，丢失或被遮罩。对于分类数据集（即，其索引文件中具有type = categorical的数据集），此选项实际上使geogrid程序考虑位于每个WRF网格单元中的所有源像素，并找到WRF网格单元中由源数据中的每个类别组成。
+### 6. wt_average_16pt：加权十六点平均插值
 
-8.search：广度优先搜索插值
-广度优先搜索选项通过将源数据数组视为二维网格图来工作，其中每个源数据点（无论有效与否）均由一个顶点表示。然后，通过在与（x，y）的最近邻居相对应的顶点处开始广度优先搜索，并停止一次代表有效点（即未屏蔽）的顶点，找到分配给点（x，y）的值或缺少）找到源数据点。实际上，该方法可以被认为是“最近有效邻居”。
+加权十六点平均插值方法的工作原理类似于加权四点平均值，但是考虑了围绕（x，y）的十六个点；该方法的权重为
 
-9. average_gcell：模型网格单元平均值
- 
+![chap3_wt_average_16pt](images/chap3_wt_average_16pt.png) 
+
+式中，xi和yj如加权四点法所定义，而1≤i，j≤4。
+
+### 7. nearest_neighbor：最近邻插值
+
+当用于连续数据集（即索引文件中具有type=continuous的数据集）时，最邻近插值方法仅将（x，y）处的插值设置为最接近的源数据点的值，无论是否最近的源点有效，丢失或被遮罩。对于分类数据集（即索引文件中具有type=categorical的数据集），此选项实际上使geogrid程序考虑位于每个WRF网格单元中的所有源像素，并找到WRF网格单元中由源数据中的每个类别组成。
+
+### 8. search：广度优先搜索插值
+
+广度优先搜索选项通过将源数据数组视为二维网格图来工作，其中每个源数据点（无论有效与否）均由一个顶点表示。然后，通过在与（x，y）的最近邻居相对应的顶点处开始广度优先搜索，并停止一次代表有效点（即未屏蔽）的顶点，找到分配给点（x，y）的值或缺少）找到源数据点。实际上，该方法可以被认为是“最近有效邻近”。
+
+### 9. average_gcell：模型网格单元平均值
+
+![chap3_average_gcell](images/chap3_average_gcell.png) 
+
 当源数据的分辨率高于模型网格的分辨率时，可以使用网格单元平均插值器。对于模型网格单元Γ，该方法对所有源数据点的值进行简单的平均，该值比任何其他网格单元的中心更靠近Γ的中心。网格单元平均方法的操作如上图所示，其中模型网格单元的内插值（表示为大矩形）由所有阴影源网格单元的值的简单平均值给出。
 
 <a id=Land_Use_and_Soil_Categories></a>
 
 ## 静态数据中的土地利用和土壤类别
 
-作为WPS静态数据tar文件的一部分提供的默认土地使用和土壤类别数据集包含与WRF运行目录中VEGPARM.TBL和SOILPARM.TBL文件中描述的USGS类别匹配的类别。下表提供了24种土地利用类别和16种土壤类别的描述。
-表1：USGS 24类土地使用类别
-Land Use Category	Land Use Description
-1	Urban and Built-up Land城市和建筑用地
-2	Dryland Cropland and Pasture旱地农田
-3	Irrigated Cropland and Pasture农田灌溉
-4	Mixed Dryland/Irrigated Cropland and Pasture混合旱地/灌溉农田和牧场
-5	Cropland/Grassland Mosaic农田/草原
-6	Cropland/Woodland Mosaic农田/林地
-7	Grassland草地
-8	Shrubland灌木丛
-9	Mixed Shrubland/Grassland灌木/草原混合
-10	Savanna稀树草原
-11	Deciduous Broadleaf Forest落叶阔叶林
-12	Deciduous Needleleaf Forest落叶针叶林
-13	Evergreen Broadleaf常绿阔叶
-14	Evergreen Needleleaf常绿针叶
-15	Mixed Forest混交林
-16	Water Bodies水体
-17	Herbaceous Wetland草本湿地
-18	Wooden Wetland木制湿地
-19	Barren or Sparsely Vegetated贫瘠or稀疏的植被
-20	Herbaceous Tundra草本苔原
-21	Wooded Tundra树木繁茂苔原
-22	Mixed Tundra混合苔原
-23	Bare Ground Tundra裸露苔原
-24	Snow or Ice雪地or冰原
-表2：IGBP修改的MODIS 20类土地使用类别
-Land Use Category	Land Use Description
-1	Evergreen Needleleaf Forest常绿针叶林
-2	Evergreen Broadleaf Forest常绿阔叶林
-3	Deciduous Needleleaf Forest落叶针叶林
-4	Deciduous Broadleaf Forest落叶阔叶林
-5	Mixed Forests混合林
-6	Closed Shrublands密闭灌木丛
-7	Open Shrublands开放灌木丛
-8	Woody Savannas多树草原
-9	Savannas稀树草原
-10	Grasslands草原
-11	Permanent Wetlands永久湿地
-12	Croplands更低
-13	Urban and Built-Up城市和建筑
-14	Cropland/Natural Vegetation Mosaic农田/自然植被
-15	Snow and Ice雪地和冰原
-16	Barren or Sparsely Vegetated贫瘠or稀疏的植被
-17	Water水体
-18	Wooded Tundra树木繁茂的苔原
-19	Mixed Tundra混合苔原
-20	Barren Tundra贫瘠苔原
-表3:16种土壤类型
-Soil Category	Soil Description
-1	Sand沙沙地
-2	Loamy Sand壤沙地
-3	Sandy Loam
-4	Silt Loam
-5	Silt
-6	Loam
-7	Sandy Clay Loam
-8	Silty Clay Loam
-9	Clay Loam
-10	Sandy Clay
-11	Silty Clay
-12	Clay
-13	Organic Material
-14	Water
-15	Bedrock
-16	Other (land-ice)
+作为WPS静态数据压缩文件的一部分提供的默认土地利用和土壤类别数据集包含与WRF运行目录中VEGPARM.TBL和SOILPARM.TBL文件中描述的USGS类别匹配的类别。下表提供了24种土地利用类别和16种土壤类别的描述。
+
+**表1 USGS 24类土地利用类别**
+**土地利用类别**|**土地利用描述**
+----------------|-----------------
+1  | Urban and Built-up Land 城市和建筑用地
+2  | Dryland Cropland and Pasture 旱地
+3  | Irrigated Cropland and Pasture 水浇地
+4  | Mixed Dryland/Irrigated Cropland and Pasture 旱地/水浇地混合农田和牧场
+5  | Cropland/Grassland Mosaic 农田/草原交错
+6  | Cropland/Woodland Mosaic 农田/林地交错
+7  | Grassland 草地
+8  | Shrubland 灌木丛
+9  | Mixed Shrubland/Grassland 灌木丛/草地混合
+10 | Savanna 热带的稀树大草原
+11 | Deciduous Broadleaf Forest 落叶阔叶林
+12 | Deciduous Needleleaf Forest 落叶针叶林
+13 | Evergreen Broadleaf 常绿阔叶林
+14 | Evergreen Needleleaf 常绿针叶林
+15 | Mixed Forest 混交林
+16 | Water Bodies 水体
+17 | Herbaceous Wetland 草本湿地
+18 | Wooden Wetland 木本湿地
+19 | Barren or Sparsely Vegetated 贫瘠或稀疏的植被
+20 | Herbaceous Tundra 草本苔原
+21 | Wooded Tundra 树木繁茂苔原
+22 | Mixed Tundra 混合苔原
+23 | Bare Ground Tundra 裸露苔原
+24 | Snow or Ice 雪地or冰原
+
+**表2 IGBP修改的MODIS 20类土地利用类别**
+**土地利用类别**|**土地利用描述**
+----------------|-----------------
+1  | Evergreen Needleleaf Forest 常绿针叶林
+2  | Evergreen Broadleaf Forest 常绿阔叶林
+3  | Deciduous Needleleaf Forest 落叶针叶林
+4  | Deciduous Broadleaf Forest 落叶阔叶林
+5  | Mixed Forests 混合林
+6  | Closed Shrublands 密闭灌木丛
+7  | Open Shrublands 开放灌木丛
+8  | Woody Savannas 多树草原
+9  | Savannas 热带的稀树大草原
+10 | Grasslands 草原
+11 | Permanent Wetlands 永久湿地
+12 | Croplands 农田
+13 | Urban and Built-Up 城市和建筑
+14 | Cropland/Natural Vegetation Mosaic 农田/自然植被交错
+15 | Snow and Ice 雪地和冰原
+16 | Barren or Sparsely Vegetated 贫瘠或稀疏的植被
+17 | Water 水体
+18 | Wooded Tundra 树木繁茂的苔原
+19 | Mixed Tundra 混合苔原
+20 | Barren Tundra 贫瘠苔原
+
+**表3 16种土壤类型**
+**土壤类型**|**土壤描述**
+------------|-----------------
+1  | Sand 砂土
+2  | Loamy Sand 壤质砂土
+3  | Sandy Loam 砂质壤土
+4  | Silt Loam 粉砂壤土
+5  | Silt 粉土
+6  | Loam 壤土
+7  | Sandy Clay Loam 砂质粘壤土
+8  | Silty Clay Loam 粉砂粘壤土
+9  | Clay Loam 粘性壤土
+10 | Sandy Clay 砂质粘土
+11 | Silty Clay 粉砂粘土
+12 | Clay 粘土
+13 | Organic Material 有机物
+14 | Water 水体
+15 | Bedrock 基岩
+16 | Other (land-ice) 其他（陆地冰雪覆盖）
 
 <a id=WPS_Output_Fields></a>
 
 ## WPS输出字段
-下面列出了写入Geogrid程序输出文件的全局属性和字段。 当在典型的geo_em.d01.nc文件上运行时，此清单是ncdump程序输出的摘要版本。
+
+下面列出了写入Geogrid程序输出文件的全局属性和字段。当在典型的geo_em.d01.nc文件上运行时，此清单是ncdump程序输出的摘要版本。
+
+```
 netcdf geo_em.d01 {
 dimensions:
 	Time = UNLIMITED ; // (1 currently)
@@ -1797,27 +1970,34 @@ variables:
 		:FLAG_LAI12M = 1 ;
 		:FLAG_LAKE_DEPTH = 1 ;
 }
+```
 
-全局属性corner_lats和corner_lons包含相对于不同网格交错（质量，u，v和未交错）的域角的lat-lon位置。 下表和下表总结了corner_lats和corner_lons数组的每个元素所引用的位置。
-Array index	Staggering	Corner
-1	Mass	Lower-left
-2		Upper-left
-3			Upper-right
-4		Lower-right
-5	U	Lower-left
-6		Upper-left
-7		Upper-right
-8		Lower-right
-9	V	Lower-left
-10		Upper-left
-11		Upper-right
-12		Lower-right
-13	Unstaggered	Lower-left
-14		Upper-left
-15		Upper-right
-16		Lower-right
- 
-除了geogrid输出文件（例如geo_em.d01.nc）中的字段外，以下字段和全局属性还将出现在metgrid程序的典型输出文件中，并使用默认的METGRID.TBL文件和气象信息运行 来自NCEP的GFS模型的数据。
+全局属性`corner_lats`和`corner_lons`包含相对于不同网格交错（mass、u、v和未交错）的域角的经纬度位置。下表和下图总结了`corner_lats`和`corner_lons`数组的每个元素所引用的位置。
+
+**Array index**|**Staggering**|**Corner**
+---------------|--------------|----------
+1  | Mass        | Lower-left
+2  | Mass        | Upper-left
+3  | Mass        | Upper-right
+4  | Mass        | Lower-right
+5  | U           | Lower-left
+6  | U           | Upper-left
+7  | U           | Upper-right
+8  | U           | Lower-right
+9  | V           | Lower-left
+10 | V           | Upper-left
+11 | V           | Upper-right
+12 | V           | Lower-right
+13 | Unstaggered | Lower-left
+14 | Unstaggered | Upper-left
+15 | Unstaggered | Upper-right
+16 | Unstaggered | Lower-right
+
+![chap3_corner_lats_lons](images/chap3_corner_lats_lons.png) 
+
+除了geogrid输出文件（例如geo_em.d01.nc）中的字段外，以下字段和全局属性还将出现在metgrid程序的典型输出文件中，并使用默认的METGRID.TBL文件和气象信息运行来自NCEP的GFS模型的数据。
+
+```
 netcdf met_em.d01.2016-04-07_00\:00\:00 {
 dimensions:
 	Time = UNLIMITED ; // (1 currently)
@@ -2022,3 +2202,4 @@ variables:
 		:FLAG_MF_XY = 1 ;
 		:FLAG_LAI12M = 1 ;
 		:FLAG_LAKE_DEPTH = 1 ;
+```
