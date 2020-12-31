@@ -82,125 +82,153 @@ which mpirun
 	* NCAR命令语言由NCAR的计算机信息系统实验室(前身为科学计算部门)编写
 	* 由WRF支持编写和维护NCL脚本
 	* 提供了许多[模板脚本](http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Graphics/NCL/NCL_examples.htm )，这些脚本是针对特定的real-数据和ideal-数据案例进行定制的
-	* raw WRF output can be input with the NCL scripts
-	* interactive or command-file driven
+	* 原始的WRF输出文件可用于NCL脚本输入
+	* 交互式或命令文件驱动
 
-* GrADS (homepage and WRF download)
-	* download GrADS executable, build format converter
-	* programs (ARWpost) are available to convert the WRF output into an input format suitable for GrADS
-	* simple to generate publication quality
-	* interactive or command-file driven
+* GrADS([主页](http://grads.iges.org/grads/grads.html )和[WRF下载](http://www.mmm.ucar.edu/wrf/users/download/get_source.html )）
+	* 下载GrADS可执行文件，构建格式转换器
+	* 程序（ARWpost）可用于将WRF输出转换为适合GrADS的输入格式
+	* 易于生成出版物质量的图形
+	* 交互式或命令文件驱动
 
-* RIP4 (homepage and WRF download)
-	* RIP4 written and maintained by Mark Stoelinga, UW
-	* interpolation to various surfaces, trajectories, hundreds of diagnostic calculations
-	* Fortran source provided
-	* based on the NCAR Graphics package
-	* pre-processor converts WRF, WPS, and WRFDA data to RIP input format
-	* table driven
+* RIP4([主页](http://www.mmm.ucar.edu/wrf/users/docs/ripug.htm )和[WRF下载](http://www.mmm.ucar.edu/wrf/users/download/get_source.html )）
+	* RIP4由UW的Mark Stoelinga编写和维护
+	* 插值到各种表面、轨迹、数百种诊断计算
+	* 提供了Fortran源代码
+	* 基于NCAR图形包
+	* 预处理器将WRF、WPS和WRFDA数据转换为RIP输入格式
+	* 表驱动
 
 <a id=UNIX_Environment></a>
 
 ## UNIX环境设置
 
-There are only a few environmental settings that are WRF system related. Most of these are not required, but when things start acting badly, test some out. In Cshell syntax:
+与WRF系统相关的环境设置很少，其中大多数不是必需的，如果发生问题，请检查Cshell中的以下设置：
 
-·      setenv WRF_EM_CORE 1
+`setenv WRF_EM_CORE 1
 
-o   explicitly defines which model core to build
+	* 明确定义要构建的模型核心
 
-·      setenv WRF_NMM_CORE 0
+`setenv WRF_NMM_CORE 0
 
-explicitly defines which model core NOT to build
-·      setenv WRF_DA_CORE 0
+	* 明确定义不构建的模型核心
 
-o   explicitly defines no data assimilation
+`setenv WRF_DA_CORE 0
 
-·      setenv NETCDF /usr/local/netcdf (or wherever you have it stored)
+	* 明确定义没有数据同化
 
-o   all of the WRF components want both the lib and the include directories
+`setenv NETCDF /usr/local/netcdf`（或者其他存放位置）
 
-·      setenv OMP_NUM_THREADS n (where n is the number of procs to use)
+	* 所有WRF组件都需要链接此lib和include目录
 
-if you have OpenMP on your system, this is how to specify the number of threads
-·      setenv MP_STACK_SIZE 64000000
+`setenv OMP_NUM_THREADS n`（n是使用的核心数）
 
-o   OpenMP blows through the stack size, set it large
+	* 如果您的系统上装有OpenMP，这样可以指定线程数
 
-o   However, if the model still crashes, it may be a problem of over- specifying stack size. Set stack size sufficiently large, but not unlimited.
+`setenv MP_STACK_SIZE 64000000
 
-o   On some systems, the equivalent parameter could be KMP_STACKSIZE, or OMP_STACKSIZE
+	* 将OpenMP内存设置得很大
+	
+	* 但是，如果模型仍然崩溃，则可能是过度指定内存大小的问题。应将内存大小设置为足够大，但不能无限。
+	
+	* 在某些系统上，等效参数可以是KMP_STACKSIZE或OMP_STACKSIZE
 
-·      unlimit
+`unlimit
 
-o   especially if you are on a small system
+	* 特别是在小型系统上时
 
 <a id=Building_WRF></a>
 
 ## 编译WRF核心
 
-The WRF code has a fairly complicated build mechanism. It tries to determine the architecture that you are on, and then presents you with options to allow you to select the preferred build method. For example, if you are on a Linux machine, it determines whether this is a 32 or 64 bit machine, and then prompts you for the desired usage of processors (such as serial, shared memory, or distributed memory).  You select from among the available compiling options in the build mechanism.  For example, do not choose a PGI build if you do not have PGI compilers installed on your system.
+WRF代码具有相当复杂的构建机制。它尝试确定您所使用的体系结构，然后为您提供选项以允许您选择首选的构建方法。例如，如果您使用的是Linux计算机，它将确定这是32位还是64位计算机，然后提示您使用所需的处理器（例如串行、共享内存或分布式内存）。您可以从构建机制的可用编译选项中进行选择。例如，如果您的系统上未安装PGI编译器，则不要选择PGI构建。
 
-An instructional web site describes the sequence of steps required to build the WRF and WPS codes (though the instructions are specifically given for tcsh and GNU compilers).
+这个[网站](http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php )描述了构建WRF和WPS代码所需的步骤顺序（尽管这些说明是专门为tcsh和GNU编译器提供的）。
 
-http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
+1. 从[此处](http://www2.mmm.ucar.edu/wrf/users/download/get_source.html )获得WRF V4的WRF的tar压缩文件（如果您不打算持续进行长时间的项目或者重复以前的工作时，请始终获取最新版本）
 
-Get the WRF zipped tar file for WRFV4 from
-http://www2.mmm.ucar.edu/wrf/users/download/get_source.html
-Always get the latest version if you are not trying to continue a long project, or duplicate previous work
-unzip and untar the file
-gzip -cd WRFV4.0.TAR.gz | tar -xf –
-Alternatively tar –xzf WRFV4.0.TAR.gz on some systems
-cd WRF
-./configure
-serial means single processor
-smpar means Symmetric Multi-Processing/Shared Memory Parallel (OpenMP) – this does not reliably work on most non-IBM machines
-dmpar means Distributed Memory Parallel (MPI)
-dm+sm means Distributed Memory with Shared Memory (for example, MPI across nodes with OpenMP within a node) – usually better performance is through dmpar only
-The second option is for nesting: 0 = no nesting, 1 = standard static nesting, 2 = nesting with a prescribed set of moves, 3 = nesting that allows a domain to follow a vortex (typhoon tracking)
-A typical option that may be included on the ./configure command is the flag “-d” (for debug).  This option removes optimization, which is useful when running a debugger (such as gdb or dbx)
-For bounds checking and some additional exception handling, the debugging flag “-D” may be selected.  Only PGI, Intel, and gfortran have been set up to use this option.
-./compile em_real (or any of the directory names in ./WRF/test directory)
-ls -ls main/*.exe
-If you built a real-data case, you should see ndown.exe, real.exe, and wrf.exe
-If you built an ideal-data case, you should see ideal.exe and wrf.exe
+2. 解压缩文件
 
-The WRF code supports a parallel build option, an option that compiles separate source code files in the WRF directories at the same time on separate processors (though those processors need to share memory) via a parallel make.  The purpose of the parallel build option is to be able to speed-up the time required to construct executables.  In practice, users typically see approximately a 2x speed-up, a limit imposed by the various dependencies in the code due to modules and USE association.  To enable the parallel build option, the user sets an environment variable, J.  In csh, to utilize two processors, before the ./compile command, issue the following:
+	`gzip -cd WRFV4.0.TAR.gz | tar -xf –
 
-setenv J “-j 2”
+	在某些系统上也可以使用`tar –xzf WRFV4.0.TAR.gz`
 
-Users may wish to only use a single processor for the build.  In which case:
+3. `cd WRF
 
-setenv J “-j 1”
+4. `./configure
 
-Users wishing to run the WRF chemistry code must first download the WRF model tar file, and untar it.  Then the chemistry code is untar’ed in the WRF directory (this is the chem directory structure).  Once the source code from the tar files is combined, then users may proceed with the WRF chemistry build.
+	**serial**表示单处理器
+	
+	**smpar**表示对称多处理/共享内存并行（OpenMP）——在大多数非IBM计算机上无法可靠运行
+	
+	**dmpar**表示分布式内存并行（MPI）
+	
+	**dm+sm**表示具有共享内存的分布式内存（例如，跨节点的MPI（在一个节点内具有OpenMP的节点））——通常比只有采用**dmpar**时有更好的性能
+	
+	第二个选项用于嵌套：0=不嵌套，1=标准静态嵌套，2=带有一组预定动作的嵌套，3=允许域跟随涡旋的嵌套（台风跟踪）
+	
+	**./configure**命令中可能包含的典型选项是标志**“-d”**（用于调试）。此选项删除优化，这在运行调试器（例如gdb或dbx）时非常有用
+	
+	为了进行边界检查和其他一些异常处理，可以选择调试标志**“-D”**。仅PGI、Intel和gfortran已设置为使用此选项。
+	
+5. `./compile em_real` (或`./WRF/test`中的任何目录名称)
+
+6. `ls -ls main/*.exe
+
+	如果构建了real-data案例，则应该看到ndown.exe，real.exe和wrf.exe
+	
+	如果构建了ideal-data案例，应该会看到Ideal.exe和wrf.exe
+
+WRF代码支持并行构建选项，该选项可通过并行make同时在单独的处理器上编译WRF目录中的单独源代码文件（尽管这些处理器需要共享内存）。并行构建选项的目的是能够加快构建可执行文件所需的时间。实际上，用户通常会看到大约2倍的提速，这是由于模块和USE关联而导致的代码中各种依赖项所施加的限制。要启用并行构建选项，用户需要设置环境变量J。在csh中，要使用两个处理器，请在`./compile`命令之前发出以下命令：
+
+`setenv J “-j 2”
+
+用户可能希望仅使用单个处理器进行构建。在这种情况下：
+
+`setenv J “-j 1”
+
+希望运行WRF化学代码的用户必须首先下载WRF模型的tar文件，然后将其解压缩。然后，将化学代码放到WRF目录（这是chem目录结构）中。合并tar文件中的源代码后，用户即可继续进行WRF化学构建。
 
 <a id=Building_WPS></a>
 
 ## 编译WPS核心
 
-Building WPS requires that WRF be already built.
+**构建WPS要求已构建WRF。
 
-If you plan to use Grib2 data, additional libraries for zlib, png, and jasper are required.  Please see details in Chapter 3.
+**如果您打算使用Grib2数据，则需要zlib、png和jasper的其他库。请参阅[第3章](users_guide_chap3.md#How_to_Install)中的详细信息。
 
-Get the WPS zipped tar file WPSV4.0.TAR.gz from 
-http://www2.mmm.ucar.edu/wrf/users/download/get_source.html
-Also download the geographical datasets from the same page. There are new data sets for land cover for North America (NLCD), and high-resolution urban data sets for select North American cities.
-Unzip and untar the source code file
-gzip -cd WPSV4.0.TAR.gz | tar -xf -
-cd WPS
-./configure
-Choose one of the options
-Usually, serial builds are the best for an initial test. Most large domains work with a single processor for WPS
-WPS requires that you build for the appropriate Grib decoding. Select an option that is suitable for the data you will use with the ungrib program (the Grib2 option will work for either Grib1 or Grib2 data)
-If you select a Grib2 option, you must have those libraries prepared and built in advance (see the chapter on WPS for the location of these compression libraries).  Add the paths to these libraries and include files using variables COMPRESSION_LIBS and COMPRESSION_INC in configure.wps. Also inside the configure.wps file is the location of the built WRF directory, which needs to be modified.  This is how the WPS picks up all of the required IO pieces to build the geogrid.exe and metgrid.exe files.
-./compile
-ls -ls *.exe
-You should see geogrid.exe, ungrib.exe, and metgrid.exe (if you are missing both geogrid.exe and metgrid.exe, you probably need to fix where the path to WRF is pointing in the configure.wps file; if you are missing ungrib.exe, try a Grib1-only build to further isolate the problem)
- 
+1. 从[此位置](http://www2.mmm.ucar.edu/wrf/users/download/get_source.html )获取WPS的tar压缩文件WPSV4.0.TAR.gz
 
-ls -ls util/*.exe
-You should see a number of utility executables: avg_tsfc.exe, calc_ecmwf_p.exe, g1print.exe, g2print.exe, height_ukmo.exe, mod_levs.exe, plotfmt.exe, plotgrids.exe, and rd_intermediate.exe (files requiring NCAR Graphics are plotfmt.exe and plotgrids.exe)
-If geogrid.exe and metgrid.exe executables are missing, the path to the built WRF directory structure is probably incorrect (found inside the configure.wps file)
-If the ungrib.exe is missing, the Grib2 libraries are probably not linked or built correctly
-If  the plotfmt.exe or the plotgrids.exe programs is missing, the NCAR Graphics path is probably set incorrectly
+2. 还可以从同一页面下载地理数据集。对于北美地区（NLCD）有新的数据集；对于某些北美城市，有高分辨率的城市数据集。
+
+3. 解压源代码文件
+
+	`gzip -cd WPSV4.0.TAR.gz | tar -xf -
+
+4. `cd WPS
+
+5. `./configure
+
+	选择一个选项
+	
+	通常，串行构建是进行初始测试的最佳选择。大多数大型域都可以使用单个处理器进行WPS
+	
+	WPS要求您针对适当的Grib解码进行构建。选择一个适合您将与ungrib程序一起使用的数据的选项（Grib2选项可用于Grib1或Grib2数据）
+	
+	如果选择Grib2选项，则必须预先准备和构建那些库（有关这些压缩库的位置，请参阅[WPS上的章节](users_guide_chap3.md#How_to_Install )）。并在configure.wps中使用变量COMPRESSION_LIBS和COMPRESSION_INC添加这些libraries和include文件的路径。同样，configure.wps文件中还包含构建的WRF目录的位置，需要对其进行修改。这就是WPS拾取所有必需的IO件以构建geogrid.exe和metgrid.exe文件的方式。
+
+6. `./compile
+
+7. `ls -ls *.exe
+
+	您应该看到geogrid.exe、ungrib.exe和metgrid.exe（如果同时缺少geogrid.exe和metgrid.exe，则可能需要修复configure.wps文件中指向WRF的路径的位置；如果您 缺少ungrib.exe，请尝试使用仅Grib1的版本以进一步解决问题）
+
+8. `ls -ls util/*.exe
+	
+	您应该看到许多实用程序可执行文件：avg_tsfc.exe、calc_ecmwf_p.exe、g1print.exe、g2print.exe、height_ukmo.exe、mod_levs.exe、plotfmt.exe、plotgrids.exe和rd_intermediate.exe（需要NCAR Graphics的文件是plotfmt.exe和plotgrids.exe）
+	
+9. 如果缺少geogrid.exe和metgrid.exe可执行文件，则所构建的WRF目录结构的路径可能不正确（可在configure.wps文件中找到）
+
+10. 如果缺少ungrib.exe，则Grib2库可能未正确链接或构建
+
+11. 如果缺少plotfmt.exe或plotgrids.exe程序，则NCAR Graphics路径可能设置不正确
