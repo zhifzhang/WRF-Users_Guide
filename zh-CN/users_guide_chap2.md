@@ -107,31 +107,31 @@ which mpirun
 
 `setenv WRF_EM_CORE 1`
 
-	* 明确定义要构建的模型核心
+* 明确定义要构建的模型核心
 
 `setenv WRF_NMM_CORE 0`
 
-	* 明确定义不构建的模型核心
+* 明确定义不构建的模型核心
 
 `setenv WRF_DA_CORE 0`
 
-	* 明确定义没有数据同化
+* 明确定义没有数据同化
 
 `setenv NETCDF /usr/local/netcdf`（或者其他存放位置）
 
-	* 所有WRF组件都需要链接此lib和include目录
+* 所有WRF组件都需要链接此lib和include目录
 
 `setenv OMP_NUM_THREADS n`（n是使用的核心数）
 
-	* 如果您的系统上装有OpenMP，这样可以指定线程数
+* 如果您的系统上装有OpenMP，这样可以指定线程数
 
 `setenv MP_STACK_SIZE 64000000`
 
-	* 将OpenMP内存设置得很大
+* 将OpenMP内存设置得很大
 	
-	* 但是，如果模型仍然崩溃，则可能是过度指定内存大小的问题。应将内存大小设置为足够大，但不能无限。
+* 但是，如果模型仍然崩溃，则可能是过度指定内存大小的问题。应将内存大小设置为足够大，但不能无限。
 	
-	* 在某些系统上，等效参数可以是KMP_STACKSIZE或OMP_STACKSIZE
+* 在某些系统上，等效参数可以是KMP_STACKSIZE或OMP_STACKSIZE
 
 `unlimit`
 
@@ -193,9 +193,9 @@ WRF代码支持并行构建选项，该选项可通过并行make同时在单独�
 
 ## 编译WPS核心
 
-**构建WPS要求已构建WRF。
+**构建WPS要求已构建WRF。**
 
-**如果您打算使用Grib2数据，则需要zlib、png和jasper的其他库。请参阅[第3章](users_guide_chap3.md#How_to_Install)中的详细信息。
+**如果您打算使用Grib2数据，则需要zlib、png和jasper的其他库。请参阅[第3章](users_guide_chap3.md#How_to_Install)中的详细信息。**
 
 1. 从[此位置](http://www2.mmm.ucar.edu/wrf/users/download/get_source.html )获取WPS的tar压缩文件WPSV4.0.TAR.gz
 
