@@ -105,15 +105,15 @@ which mpirun
 
 与WRF系统相关的环境设置很少，其中大多数不是必需的，如果发生问题，请检查Cshell中的以下设置：
 
-`setenv WRF_EM_CORE 1
+`setenv WRF_EM_CORE 1`
 
 	* 明确定义要构建的模型核心
 
-`setenv WRF_NMM_CORE 0
+`setenv WRF_NMM_CORE 0`
 
 	* 明确定义不构建的模型核心
 
-`setenv WRF_DA_CORE 0
+`setenv WRF_DA_CORE 0`
 
 	* 明确定义没有数据同化
 
@@ -125,7 +125,7 @@ which mpirun
 
 	* 如果您的系统上装有OpenMP，这样可以指定线程数
 
-`setenv MP_STACK_SIZE 64000000
+`setenv MP_STACK_SIZE 64000000`
 
 	* 将OpenMP内存设置得很大
 	
@@ -133,9 +133,9 @@ which mpirun
 	
 	* 在某些系统上，等效参数可以是KMP_STACKSIZE或OMP_STACKSIZE
 
-`unlimit
+`unlimit`
 
-	* 特别是在小型系统上时
+* 特别是在小型系统上时
 
 <a id=Building_WRF></a>
 
@@ -149,13 +149,13 @@ WRF代码具有相当复杂的构建机制。它尝试确定您所使用的体�
 
 2. 解压缩文件
 
-	`gzip -cd WRFV4.0.TAR.gz | tar -xf –
+	`gzip -cd WRFV4.0.TAR.gz | tar -xf –`
 
 	在某些系统上也可以使用`tar –xzf WRFV4.0.TAR.gz`
 
-3. `cd WRF
+3. `cd WRF`
 
-4. `./configure
+4. `./configure`
 
 	**serial**表示单处理器
 	
@@ -173,7 +173,7 @@ WRF代码具有相当复杂的构建机制。它尝试确定您所使用的体�
 	
 5. `./compile em_real` (或`./WRF/test`中的任何目录名称)
 
-6. `ls -ls main/*.exe
+6. `ls -ls main/*.exe`
 
 	如果构建了real-data案例，则应该看到ndown.exe，real.exe和wrf.exe
 	
@@ -181,11 +181,11 @@ WRF代码具有相当复杂的构建机制。它尝试确定您所使用的体�
 
 WRF代码支持并行构建选项，该选项可通过并行make同时在单独的处理器上编译WRF目录中的单独源代码文件（尽管这些处理器需要共享内存）。并行构建选项的目的是能够加快构建可执行文件所需的时间。实际上，用户通常会看到大约2倍的提速，这是由于模块和USE关联而导致的代码中各种依赖项所施加的限制。要启用并行构建选项，用户需要设置环境变量J。在csh中，要使用两个处理器，请在`./compile`命令之前发出以下命令：
 
-`setenv J “-j 2”
+`setenv J “-j 2”`
 
 用户可能希望仅使用单个处理器进行构建。在这种情况下：
 
-`setenv J “-j 1”
+`setenv J “-j 1”`
 
 希望运行WRF化学代码的用户必须首先下载WRF模型的tar文件，然后将其解压缩。然后，将化学代码放到WRF目录（这是chem目录结构）中。合并tar文件中的源代码后，用户即可继续进行WRF化学构建。
 
@@ -203,11 +203,11 @@ WRF代码支持并行构建选项，该选项可通过并行make同时在单独�
 
 3. 解压源代码文件
 
-	`gzip -cd WPSV4.0.TAR.gz | tar -xf -
+	`gzip -cd WPSV4.0.TAR.gz | tar -xf -`
 
-4. `cd WPS
+4. `cd WPS`
 
-5. `./configure
+5. `./configure`
 
 	选择一个选项
 	
@@ -217,13 +217,13 @@ WRF代码支持并行构建选项，该选项可通过并行make同时在单独�
 	
 	如果选择Grib2选项，则必须预先准备和构建那些库（有关这些压缩库的位置，请参阅[WPS上的章节](users_guide_chap3.md#How_to_Install )）。并在configure.wps中使用变量COMPRESSION_LIBS和COMPRESSION_INC添加这些libraries和include文件的路径。同样，configure.wps文件中还包含构建的WRF目录的位置，需要对其进行修改。这就是WPS拾取所有必需的IO件以构建geogrid.exe和metgrid.exe文件的方式。
 
-6. `./compile
+6. `./compile`
 
-7. `ls -ls *.exe
+7. `ls -ls *.exe`
 
 	您应该看到geogrid.exe、ungrib.exe和metgrid.exe（如果同时缺少geogrid.exe和metgrid.exe，则可能需要修复configure.wps文件中指向WRF的路径的位置；如果您 缺少ungrib.exe，请尝试使用仅Grib1的版本以进一步解决问题）
 
-8. `ls -ls util/*.exe
+8. `ls -ls util/*.exe`
 	
 	您应该看到许多实用程序可执行文件：avg_tsfc.exe、calc_ecmwf_p.exe、g1print.exe、g2print.exe、height_ukmo.exe、mod_levs.exe、plotfmt.exe、plotgrids.exe和rd_intermediate.exe（需要NCAR Graphics的文件是plotfmt.exe和plotgrids.exe）
 	
