@@ -149,7 +149,6 @@ chem/        |WRF-chem模型，由NOAA/GSD提供支持
 clean        |用于清除创建的文件和可执行文件的脚本
 compile      |用于编译WRF代码的脚本
 configure    |用于创建configure.wrf编译文件的脚本
-
 doc/         |有关模型各种功能的信息
 dyn_em/      |ARW动力学与数值目录
 dyn_nmm/     |NMM动力学和数值目录，由DTC提供支持
@@ -176,7 +175,7 @@ wrftladj/    |WRFPLUS
 
 转到WRF顶级目录并输入：
 
-`./configure
+`./configure`
 
 WRF模型的构建允许在configure命令中使用一些选项。
 
@@ -254,11 +253,11 @@ Compile for nesting? (0=no nesting, 1=basic, 2=preset moves, 3=vortex following)
 
 **提示**：如果您想使用由Argonne国家实验室开发的[并行netCDF（p-netCDF）](http://trac.mcs.anl.gov/projects/parallel-netcdf )，则需要单独安装p-netCDF，并使用环境变量PNETCDF设置路径：
 
-`setenv PNETCDF path-to-pnetcdf-library
+`setenv PNETCDF path-to-pnetcdf-library`
 
 要编译代码，请键入:
 
-`./compile
+`./compile`
 
 然后将出现以下选择：
 
@@ -311,7 +310,7 @@ Ideal案例是一种用于模拟简单的测试范围广泛的空间和时间尺
 
 对于任何2D测试案例（在案例名称中有标记），必须使用串行或OpenMP（smpar）编译选项。此外，在配置时只能选择`0=no nesting`选项。对于其他所有案例，可以使用串行或并行（dmpar）和嵌套（除了`em_scm_xy`案例，它是一个1-D案例，必须串行编译，没有嵌套）。假设您要编译并运行二维案例，请键入：
 
-`./compile em_squall2d_x >& compile.log
+`./compile em_squall2d_x >& compile.log`
 
 成功编译后，您应该在`main/`目录中创建两个可执行文件：`ideal.exe`和`wrf.exe`。这两个可执行文件将链接到相应的`test/case_name`和`run/`目录。`cd`到任一目录以运行模型。
 
@@ -321,7 +320,7 @@ Ideal案例是一种用于模拟简单的测试范围广泛的空间和时间尺
 
 一个real-data案例使用的气象输入主要来源于以前的预测或分析，可能来自具有相对粗略分辨率的大尺度区域（例如全球）。一个real-data案例将提供一个三维预测或模拟。对于一个real-data案例，键入：
 
-`./compile em_real >& compile.log
+`./compile em_real >& compile.log`
 
 编译成功后，它将在`main/`目录中创建四个可执行文件：
 
@@ -349,31 +348,31 @@ tc.exe：TC模型
 
 假设测试案例`em_squall2d_x`已编译。要运行，请键入:
 
-`cd test/em_squall2d_x
+`cd test/em_squall2d_x`
 
 编辑namelist.input文件以更改积分长度、输出频率、区域大小、时间步长、物理选项和其他参数（详细信息请参阅`WRF/run/`目录下的README.namelist，或者[namelist变量描述](#Namelist_Variables)）。
 
 如果在测试用例目录中看到一个名为`run_me_first.csh`的脚本，请通过键入以下内容首先运行该脚本：
 
-`./run_me_first.csh
+`./run_me_first.csh`
 
 这会链接一些运行案例所需的物理数据文件。
 
 要运行初始化程序，请键入:
 
-`./ideal.exe >& ideal.out
+`./ideal.exe >& ideal.out`
 
 该程序通常将读取位于案例目录中的输入探测文件，并生成初始条件文件`wrfinput_d01`。由于ideal案例不需要横向边界文件，因为边界条件通过namelist选项在代码中进行处理。如果工作成功，`ideal.out`文件的结尾应该是：
 
-`wrf: SUCCESS COMPLETE IDEAL INIT
+`wrf: SUCCESS COMPLETE IDEAL INIT`
 
 要运行模型，请键入
 
-`./wrf.exe >& wrf.out
+`./wrf.exe >& wrf.out`
 
 或者对于使用MPI（dmpar）选项编译的3D测试案例（注意，对于不同的机器和不同的MPI安装，MPI运行的执行命令可能不同），请键入
 
-`mpirun –np 4 ./wrf.exe
+`mpirun –np 4 ./wrf.exe`
 
 如果成功，则将wrf输出文件写入到名为`wrfout_d01_0001-01-01_00:00:00.`的文件中。
 
@@ -389,7 +388,7 @@ tc.exe：TC模型
 
 要运行real-data案例，请通过键入`cd`进入工作目录：
 
-`cd test/em_real (or cd run)
+`cd test/em_real (or cd run)`
 
 编辑目录中的namelist.input模板文件，以匹配您的案例。
 
@@ -465,25 +464,25 @@ real.exe程序是针对real-data案例的初始化程序。它获取WPS程序的
 
 要运行使用串行或OpenMP（smpar）选项进行编译的real-data初始化程序，请键入：
 
-`./real.exe >& real.out
+`./real.exe >& real.out`
 
 成功完成工作后，应在`real.out`文件的末尾打印`real_em: SUCCESS EM_REAL INIT`。它还应产生`wrfinput_d0*`（每个区域一个文件）和`wrfbdy_d01`文件，这个文件都是运行wrf.exe前必要的。
 
 运行WRF：
 
-`./wrf.exe >& wrf.out
+`./wrf.exe >& wrf.out`
 
 成功运行后，应产生一个或几个名称为`wrfout_d<domain>_<date>`的输出文件，其中<domain>代表区域ID，<date>代表日期字符串，格式为yyyy-mm-dd_hh:mm:ss。例如，如果您在UTC时间2000年1月24日12：00启动模型，则第一个输出文件应具有以下名称：
 
-`wrfout_d01_2000-01-24_12:00:00
+`wrfout_d01_2000-01-24_12:00:00`
 
 文件名上的时间戳始终是第一次写入输出文件的时间。键入以下命令检查写入输出文件的时间：
 
-`ncdump -v Times wrfout_d01_2000-01-24_12:00:00
+`ncdump -v Times wrfout_d01_2000-01-24_12:00:00`
 
 您可能还有其他wrfout文件，具体取决于namelist选项（分割输出文件的频率由namelist选项`frames_per_outfile`来确定）。如果您在总积分时间内设置了重启动文件频率（在namelist.input中的`restart_interval`选项），则也可以创建重启动文件。重启动文件应具有以下命名：
 
-`wrfrst_d<domain>_<date>
+`wrfrst_d<domain>_<date>`
 
 重启动文件上的时间戳记是该重新启动文件的时刻。
 
