@@ -119,10 +119,13 @@ WRF V4.0版本主要更新点如下：
 	3.26 [WPS输出字段](users_guide_chap3.md#WPS_Output_Fields)
 
 
-4. WRF Initialization
-	Introduction	4-1
-	Initialization for Ideal Cases	4-3
-	Initialization for Real Data Cases	4-6
+4. [WRF初始化](users_guide_chap4.md)
+
+	4.1 [简介](users_guide_chap4.md#Introduction)
+
+	4.2 [Ideal数据案例的初始化](users_guide_chap4.md#Initialization_for_Ideal)
+
+	4.3 [Real数据案例的初始化](users_guide_chap4.md#Initialization_for_Real)
 
 5. WRF Model
 	Introduction 	5-2
