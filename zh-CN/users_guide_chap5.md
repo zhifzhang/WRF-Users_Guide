@@ -10,7 +10,7 @@
 	
 	3.1 [ideal案例](#Idealized_Case)
 
-	3.2 [real数据案例](#Real_Data_Case)
+	3.2 [real-data案例](#Real_Data_Case)
 	
 	3.3 [重启动运行](#Restart_Run)
 	
@@ -76,83 +76,148 @@
 
 ## 简介
 
-WRF模型是完全可压缩的非静水模型（带有运行时静水选项）。它的垂直坐标可以选择为地形跟随（TF）或（从3.9版开始）混合垂直坐标（HVC）静水压力坐标。网格错开的是Arakawa C-grid网格。该模型在水平和垂直方向上均使用Runge-Kutta二阶和三阶时间积分方案，以及二阶至六阶对流方案。它对声波和重力波模式使用了一个时间分割的小步长。动态节省了标量变量。
-WRF模型代码包含一个初始化程序（用于实数据，real.exe 或理想化数据，ideal.exe ；请参见第4章），一个数值积分程序（wrf.exe ），一个用于单向嵌套的程序（ndown.exe ）和一个用于进行热带风暴伪造的程序（tc.exe ）。WRF模型的版本4支持多种功能。这些包括
-•	真实数据和理想模拟
-•	各种横向边界条件选项，用于真实数据和理想模拟
-•	完整的物理选项和各种过滤器选项
-•	正定对流方案
-•	非静液压和静液压（运行时选项）
-•	单向和双向嵌套，以及移动的嵌套
-•	三维分析钉
-•	观察推拿
-•	区域和全球应用
-•	数字滤波器初始化
-•	子域中的垂直细化
- 
-其他参考 
-•	WRF教程演示：http://www.mmm.ucar.edu/wrf/users/supports/tutorial.html
-•	WRF-ARW技术说明：http ://www.mmm.ucar.edu/wrf/users/pub-doc.html （V4.0技术说明正在准备中）
-•	有关软件要求，请参见本文档的第2章。
+Advanced Research WRF（ARW）模型是完全可压缩的非静力模型（带有运行时的静水压选项）。它的垂直坐标可以选择为地形跟随（TF）或混合垂直坐标（HVC）静水压力坐标。网格交错采用Arakawa C-grid网格。模型在水平和垂直方向上均使用Runge-Kutta二阶和三阶时间积分方案，以及二阶至六阶对流方案。对声波和重力波模式使用了一个时间分割的小步长。动力学守恒的是标量变量。
+
+WRF模型代码包含一个初始化程序（用于real-data、real.exe或ideal数据、ideal.exe，详见第4章），一个数值积分程序（wrf.exe），一个单独运行的对区域进行单向嵌套的程序（ndown.exe）和一个用于进行热带风暴模拟的程序（tc.exe）。WRF第4带版本支持多种功能，包括：
+
+* real数据和ideal模拟
+
+* 各种横向边界条件选项，用于real数据和ideal模拟
+
+* 完整的物理选项和各种过滤器选项
+
+* 正定对流方案
+
+* 非静水压和静水压（运行时选项）
+
+* 单向和双向反馈嵌套，以及移动嵌套
+
+* 三维分析数据推动
+
+* 观测数据推动
+
+* 区域和全球应用
+
+* 数字滤波器初始化
+
+* 子区域中的垂直细化
+
+### 其他参考资料
+
+* [WRF教程演示](http://www.mmm.ucar.edu/wrf/users/supports/tutorial.html)
+
+* [WRF-ARW技术说明](https://www2.mmm.ucar.edu/wrf/users/docs/technote/contents.html)
+
+* 有关软件需求请参见本文档第2章。
 
 <a id=Installing_WRF></a>
 
 ## 安装WRF
 
-在计算机上编译WRF代码之前，请检查是否已安装netCDF库。这是因为netCDF是受支持的WRF I/O选项之一，它是后处理程序常用和支持的选项。如果netCDF安装在/usr/local/以外的目录中，则找到路径，并使用环境变量NETCDF定义路径在哪里。为此，请键入
-setenv NETCDF path-to-netcdf-library
-通常，netCDF库及其include /目录是并置的。如果不是这种情况，请创建目录，同时链接netCDF lib和包含该目录中的目录，并使用环境变量设置该目录的路径。例如
-netcdf_links/lib -> /netcdf-lib-dir/lib
-netcdf_links/include -> /where-include-dir-is/include 
+在编译WRF代码之前，请按照[How to Compile WRF](https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php )页面上的`System Environment Tests`检查系统是否满足所有要求。
+
+下一步是确保安装必要的库。netCDF库是构建WRF的唯一必需库，但根据需要的应用程序，可能需要其他库（例如，使用多个处理器运行的MPI库等）。如果尚未安装netCDF，请按照[How to Compile WRF](https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php )页面的`Building Libraries`部分中的安装说明（以及其他说明）操作。否则，跳转到`Library Compatibility Tests`部分，以确保您的库与将用于构建WRF的编译器兼容。通过以下命令，确保正确设置netCDF库的环境变量路径（示例为csh）
+
+```
+setenv NETCDF path-to-netcdf-library/netcdf
+setenv PATH path-to-netcdf-library/netcdf/bin
+```
+
+通常，netCDF库及其include/目录是并置的。如果不是这种情况，请手动创建目录，同时链接netCDF lib和include目录到此目录中，并使用环境变量设置该目录的路径。例如：
+
+```
+netcdf_links/lib -> /netcdf-lib-dir/lib 
+netcdf_links/include -> /where-include-dir-is/include
+
 setenv NETCDF /directory-where-netcdf_links-is/netcdf_links
-如果计算机上没有可用的netCDF库，则需要先安装它。可以从位于http://www.unidata.ucar.edu/ 的Unidata网页上下载NetCDF源代码或预构建的二进制文件，并在其上找到安装说明。
-提示：对于Linux用户：
-如果在Linux计算机上使用了PGI，Intel，gfortran或g95编译器，请确保使用相同的编译器安装了netCDF。使用NETCDF环境变量指向PGI / Intel / g95编译的netCDF库。
-提示：如果使用netCDF-4，请确保在安装时未激活新功能（例如基于HDF5的并行I / O），除非您打算使用netCDF-4的压缩功能（在V3中受支持）。 5.下面的更多信息。
-可以从http://www.mmm.ucar.edu/wrf/users/download/get_source.html下载WRF源代码tar文件。将tar文件解压缩（gunzip WRFV4.TAR.gz ）和解压缩（tar -xf WRFV4.TAR ）后，它将创建一个WRF /目录。其中包含：
-Makefile	Top-level makefile
-README	General information about the WRF/ARW core
-doc/	Information on various functions of the model
-Registry/	Directory for WRF Registry files
-arch/	Directory where compile options are gathered
-clean	script to clean created files and executables
-compile	script for compiling the WRF code
-configure	script to create the configure.wrf file for compiling
-chem/	WRF chemistry, supported by NOAA/GSD
-dyn_em/	Directory for ARW dynamics and numerics
-dyn_nmm/	Directory for NMM dynamics and numerics, supported by DTC
-external/	Directory that contains external packages, such as those for IO, time keeping and MPI
-frame/	Directory that contains modules for the WRF framework
-inc/	Directory that contains ‘include’ files
-main/	Directory for main routines, such as wrf.F, and all executables after compilation
-phys/	Directory for all physics modules
-run/	Directory where one may run WRF
-share/	Directory that contains mostly modules for the WRF mediation layer and WRF I/O 
-test/	Directory that contains test case directories, may be used to run WRF 
-tools/	Directory that contains tools for developers
+```
+
+如果在Linux计算机上使用了PGI、Intel或gfortran编译器，请确保使用相同的编译器安装netCDF。使用NETCDF环境变量指向PGI/Intel/gnu编译的netCDF库。
+
+**提示**：如果使用netCDF-4，请确保在安装时未激活新功能（例如基于HDF5的并行I/O），除非您打算使用netCDF-4的压缩功能（更新信息详见下述）。
+
+可以从[WRF网站](http://www2.mmm.ucar.edu/wrf/users/download/get_source.html )下载WRF的源代码。在WRF/目录中包含：
+
+文件/目录名称|描述
+-------------|----
+Makefile     |顶级makefile文件
+README       |WRF/ARW核心的一般信息
+README.md    |重要链接和注册信息
+Registry/    |WRF注册文件目录
+arch/        |收集编译选项的目录
+chem/        |WRF-chem模型，由NOAA/GSD提供支持
+clean        |用于清除创建的文件和可执行文件的脚本
+compile      |用于编译WRF代码的脚本
+configure    |用于创建configure.wrf编译文件的脚本
+
+doc/         |有关模型各种功能的信息
+dyn_em/      |ARW动力学与数值目录
+dyn_nmm/     |NMM动力学和数值目录，由DTC提供支持
+external/    |包含外部程序包的目录，例如IO、计时和MPI的程序包
+frame/       |包含WRF框架模块的目录
+hydro/       |WRF-hydro，由[NCAR/RAL提供支持](https://ral.ucar.edu/projects/wrf_hydro/overview)
+inc/         |包含“include”文件的目录
+main/        |包含主要例程（如wrf.F）和编译后所有可执行文件的目录
+phys/        |包含所有物理模块的目录
+run/         |运行WRF的目录
+share/       |包含主要WRF中间层和WRF I/O的模块的目录
+test/        |包含测试案例的目录，可用于运行WRF
+tools/       |包含开发人员工具的目录
+var/         |WRF数据同化
+wrftladj/    |WRFPLUS
 
 编译和运行模型的步骤为：
-1.	配置：生成配置文件进行编译
-2.	编译：编译代码
-3.	运行模型
-转到WRF（顶部）目录并键入：
-./configure
+
+1. 配置：生成配置文件用于编译
+
+2. 编译：编译代码
+
+3. 运行模型
+
+转到WRF顶级目录并输入：
+
+`./configure
 
 WRF模型的构建允许在configure命令中使用一些选项。
-./configure –d   在打开调试的情况下构建代码
-./configure –D   与–d相同，加上范围和范围检查，未初始化的变量，浮动陷阱
-./configure –r8   构建代码以使用64位实数进行计算和输出
-对于任何./configure命令，应显示计算机的选项列表。这些选择范围从为单个处理器作业（串行）进行编译，到使用OpenMP共享内存（smpar），为多个处理器使用分布式内存并行化（dmpar）选项，或者将共享内存和分布式内存选项（dm）组合在一起。 + sm）。做出选择后，将出现第二个用于编译嵌套的选择。例如，在Linux计算机上，上述步骤可能类似于：
-> setenv NETCDF / usr / local / netcdf-pgi > ./ 
+
+`./configure –d`：在打开调试选项的情况下构建代码
+
+`./configure –D`：与–d相同，但加上了边界和范围检查、未初始化的变量、浮动陷阱
+
+`./configure –r8`：构建代码以使用64位实数进行计算和输出
+
+对于任何`./configure`命令，都会显示计算机的选项列表。每个选项组合了一个操作系统、一个编译器类型和一个并行选项。由于配置脚本不会检查系统上实际安装了哪些编译器，因此请确保只在可用的选项中进行选择。并行选项包括：
+
+1. 编译为单处理器作业（serial）
+
+2. 使用OpenMP共享内存（smpar）
+
+3. 为多处理器作业使用分布式内存并行化（dmpar）选项
+
+4. 共享内存和分布式内存选项的组合（dm+sm）
+
+做出选择后，将出现用于编译嵌套的第二个选择。例如，在Linux计算机上，上述步骤可能类似于：
+
+```
+> setenv NETCDF /usr/local/netcdf-pgi 
 > ./configure
+
 checking for perl5... no
+
 checking for perl... found /usr/bin/perl (perl)
+
 Will use NETCDF in dir: /glade/apps/opt/netcdf/4.3.0/intel/12.1.5
+
 HDF5 not set in environment. Will configure WRF for use without.
+
 PHDF5 not set in environment. Will configure WRF for use without.
+
 Will use 'time' to report timing information
+
 $JASPERLIB or $JASPERINC not found in environment, configuring to build without grib2 I/O...
+
 -------------------------------------------------- ----------------------
+
 Please select from among the following Linux x86_64 options:
 
   1. (serial)   2. (smpar)   3. (dmpar)   4. (dm+sm)   PGI (pgf90/gcc)
@@ -177,113 +242,180 @@ Please select from among the following Linux x86_64 options:
  72. (serial)  73. (smpar)  74. (dmpar)  75. (dm+sm)   FUJITSU (frtpx/fccpx): FX10/FX100 SPARC64 IXfx/Xlfx
 
 Enter selection [1-75] : ------------------------------------------------------------------------
-Compile for nesting? (0=no nesting, 1=basic, 2=preset moves, 3=vortex following) [default 0]: 
-输入最适合您的计算机和应用程序的适当选项。
-当按下返回键时，将创建一个configure.wrf 文件。如有必要，编辑编译选项/路径。
-提示：从简单的事情开始（例如串行构建）是有帮助的。如果成功，则继续构建dmpar或smpar代码。当您更改一个注册表文件或在配置步骤中更改选项时，请记住在每个内部版本之间键入“ ./clean –a”。
-提示：如果您想使用由Argonne国家实验室（http://trac.mcs.anl.gov/projects/parallel-netcdf）开发的并行netCDF（p-netCDF ），则需要单独安装p-netCDF，并使用环境变量PNETCDF设置路径：
-setenv PNETCDF path-to-pnetcdf-library
-提示：  从V3.5开始，由于添加了CLM4模块，编译可能会花费一些时间。如果您不打算使用CLM4陆面模型选项，则可以通过从ARCH_LOCAL中删除-DWRF_USE_CLM 来修改configure.wrf 文件。
 
-要编译代码，请键入
-./compile
-并且将出现以下选择：
- Usage:
- 
-compile wrf           compile wrf in run dir (Note, no real.exe, ndown.exe or ideal.exe generated)
- 
+Compile for nesting? (0=no nesting, 1=basic, 2=preset moves, 3=vortex following) [default 0]: 
+```
+
+输入最适合您的计算机和应用程序的适当选项。
+
+当按下回车键时，将创建一个`configure.wrf`文件。如有必要，你可以在此文件中编辑编译选项/路径。
+
+**提示**：从简单的事情开始（例如串行构建）是有帮助的。如果成功，则继续构建dmpar或smpar代码（除非您非常熟悉dm+sm，否则不建议使用它）。当您更改一个注册文件或在配置步骤中更改了选项时，请记住在每次编译之间输入`./clean –a`命令。
+
+**提示**：如果您想使用由Argonne国家实验室开发的[并行netCDF（p-netCDF）](http://trac.mcs.anl.gov/projects/parallel-netcdf )，则需要单独安装p-netCDF，并使用环境变量PNETCDF设置路径：
+
+`setenv PNETCDF path-to-pnetcdf-library
+
+要编译代码，请键入:
+
+`./compile
+
+然后将出现以下选择：
+
+```
+Usage:
+
+compile [-j n] wrf           compile wrf in run dir (Note, no real.exe, ndown.exe or ideal.exe generated)
+
 or choose a test case (see README_test_cases for details):
  
-compile em_b_wave
-compile em_convrad (new in V3.7)
-compile em_esmf_exp (example only)
-compile em_grav2d_x
-compile em_heldsuarez
-compile em_hill2d_x
-compile em_les
-compile em_quarter_ss
-compile em_real
-compile em_seabreeze2d_x
-compile em_squall2d_x
-compile em_squall2d_y
-compile em_tropical_cyclone
-compile nmm_real (NMM solver)
-compile nmm_tropical_cyclone (NMM solver)
+	compile [-j n] em_b_wave
+	compile [-j n] em_convrad 
 
-   compile –h              help message
+	compile [-j n] em_esmf_exp (example only)
+	compile [-j n] em_fire
+	compile [-j n] em_grav2d_x
+
+	compile [-j n] em_heldsuarez
+	compile [-j n] em_hill2d_x
+
+	compile [-j n] em_les
+	compile [-j n] em_quarter_ss
+	compile [-j n] em_real
+
+	compile [-j n] em_seabreeze2d_x
+	compile [-j n] em_squall2d_x
+	compile [-j n] em_squall2d_y
+	compile [-j n] em_tropical_cyclone
+
+	compile [-j n] nmm_real (NMM solver)
+	compile [-j n] nmm_tropical_cyclone (NMM solver)
  
-其中EM 代表高级研究WRF动态解算器（也就是“ Eulerian –mass-coordinate”解算器）。键入以上内容之一进行编译。从一个测试用例切换到另一个测试用例时，必须键入以上其中一个以重新编译。重新编译对于创建新的初始化可执行文件（即real.exe 和Ideal.exe-每个理想化的测试用例都有一个不同的Ideal.exe）是必需的，而wrf.exe对于所有测试用例都是相同的。 
-如果要删除所有目标文件（除了那些在external/ directory），可执行文件，键入“./ clean” 。
-键入'./ clean -a ' 以删除所有目录中的内置文件，包括configure.wrf （原始的configure.wrf 将保存为configure.wrf.backup ）。如果您已编辑configure.wrf   或任何注册表文件，则需要使用' ./clean –a ' 命令。
-从V4.0开始，如果默认编译器检测到所有受支持的库均可用，则它将使用netCDF4压缩功能。此选项通常会将文件大小减少50％以上，但是写入可能需要更长的时间。如果所需的库不存在，则编译将改回使用经典的netCDF。也可以通过设置环境变量NETCDF_classic，然后设置“ configure ”和“ compile ” ，来强制使用经典的netCDF 。有关更多详细信息，请访问：http://www.mmm.ucar.edu/wrf/users/wrfv3.5/building-netcdf4.html
-a.理想情况
-对于任何2D测试用例（在用例名称中标记），必须使用串行或OpenMP（smpar）编译选项。此外，在配置时，您只能选择“ 0 =无嵌套”选项。对于所有其他情况，可以使用串行或并行（dmpar）和嵌套。假设您要编译并运行二维流案例，请键入
-./compile em_squall2d_x>＆compile.log
-成功编译后，您应该在主目录/中创建两个可执行文件：Ideal.exe 和wrf.exe 。这两个可执行文件将链接到相应的test/case_name 和run/ 目录。cd 到任一目录以运行模型。
-将整个编译输出保存到文件是一个好的操作习惯。当不存在可执行文件时，此输出可用于帮助诊断编译错误。
-b.real-data 情况
-对于一个real-data 案例，键入：
-./compile em_real >& compile.log &
-编译成功后，它将在主目录中创建三个可执行文件：ndown.exe，real.exe和wrf.exe。
-real.exe：用于WRF初始化实际数据的情况
+compile -j n            parallel make using n tasks if supported (default 2)
+compile –h              help message
+```
+
+其中cm代表ARW动态解算器（即“Eulerian mass-coordinate”解算器）。键入以上内容之一进行编译。如果你想切换到一个不同的测试案例，则需要重新编译新的案例。重新编译是创建新的初始化可执行文件（即real.exe和ideal.exe——对于每个ideal测试用案例需要不同的ideal.exe），而wrf.exe文件对于所有测试案例都是相同的。
+
+如果要删除所有目标文件（除了那些在external/目录下的）和可执行文件，则输入`./clean`命令。
+
+输入`./clean -a`命令以删除所有目录中的编译文件，包括configure.wrf（原始的configure.wrf将保存为configure.wrf.backup）。如果您已编辑configure.wrf或任何注册文件，则需要使用`./clean -a`命令。
+
+如果检测到所有支持库都可用的前提下，则默认将使用netCDF4压缩函数进行编译。此选项通常会将文件大小减少50%以上，但请注意，输出可能需要更长的写入时间。如果所需的库不存在，将自动使用经典netCDF进行编译。也可以通过在编译前设置环境变量NETCDF_classic（setenv NETCDF_classic 1）来强制使用经典netCDF进行编译。
+
+有关更多详细信息，请访问[此网站](http://www2.mmm.ucar.edu/wrf/users/building_netcdf4.html)
+
+### Ideal案例
+
+Ideal案例是一种用于模拟简单的测试范围广泛的空间和时间尺度的手段。测试案例再现已知的解决方案（解析的、收敛的等）。这些案例为其他Ideal实验提供了一个起点（例如，修改一个测试案例来衡量结果的差异）。
+
+对于任何2D测试案例（在案例名称中有标记），必须使用串行或OpenMP（smpar）编译选项。此外，在配置时只能选择`0=no nesting`选项。对于其他所有案例，可以使用串行或并行（dmpar）和嵌套（除了`em_scm_xy`案例，它是一个1-D案例，必须串行编译，没有嵌套）。假设您要编译并运行二维案例，请键入：
+
+`./compile em_squall2d_x >& compile.log
+
+成功编译后，您应该在`main/`目录中创建两个可执行文件：`ideal.exe`和`wrf.exe`。这两个可执行文件将链接到相应的`test/case_name`和`run/`目录。`cd`到任一目录以运行模型。
+
+将整个编译的标准错误和输出信息保存到文件是一个好的操作习惯（如上所示使用`>&`命令）。当不存在可执行文件时，此输出可用于帮助诊断编译错误。
+
+### real-data案例
+
+一个real-data案例使用的气象输入主要来源于以前的预测或分析，可能来自具有相对粗略分辨率的大尺度区域（例如全球）。一个real-data案例将提供一个三维预测或模拟。对于一个real-data案例，键入：
+
+`./compile em_real >& compile.log
+
+编译成功后，它将在`main/`目录中创建四个可执行文件：
+
+real.exe：用于real-data案例的WRF初始化
+
 ndown.exe：用于单向嵌套
-wrf.exe：WRF模型集成
-像理想情况下一样，这些可执行文件将链接到test / em_real和run /目录。 cd到这两个目录之一以运行模型。
+
+wrf.exe：WRF模型
+
+tc.exe：TC模型
+
+这些可执行文件将链接到`test/em_real`和`run/`目录。`cd`到这两个目录之一以运行模型。
 
 <a id=Running_WRF></a>
 
 ## 运行WRF
 
-可以在run /目录或test / case_name目录中运行模型可执行文件。无论哪种情况，都应该在目录中看到可执行文件Ideal.exe或real.exe（和ndown.exe）和wrf.exe，链接文件（主要用于实际数据情况）以及一个或多个namelist.input文件。
-提示：如果您想在另一个目录中运行模型可执行文件，请将test / em_ *目录中的文件复制或链接到该目录，然后从那里运行。
+可以在`run/`目录或`test/case_name`目录中运行模型可执行文件。在这两种情况下，您都应该在目录下看到可执行文件、链接文件（主要用于real-data情况）和一个或多个namelist.input文件。
+
+**提示**：如果您想在其他目录中运行模型可执行文件，请将`test/em_*`目录中的文件复制或链接到该目录，然后从那里运行。
 
 <a id=Idealized_Case></a>
 
 ### ideal案例
 
-假设测试用例em_squall2d_x已编译。要运行，请键入
-cd test/em_squall2d_x
-编辑namelist.input文件（请参阅WRF / run /目录或Web版本的README.namelist）以更改集成长度，输出频率，域大小，时间步长，物理选项和其他参数。
-如果在测试用例目录中看到一个名为run_me_first.csh的脚本，请通过键入以下内容首先运行该脚本：
-./run_me_first.csh
+假设测试案例`em_squall2d_x`已编译。要运行，请键入:
+
+`cd test/em_squall2d_x
+
+编辑namelist.input文件以更改积分长度、输出频率、区域大小、时间步长、物理选项和其他参数（详细信息请参阅`WRF/run/`目录下的README.namelist，或者[namelist变量描述](#Namelist_Variables)）。
+
+如果在测试用例目录中看到一个名为`run_me_first.csh`的脚本，请通过键入以下内容首先运行该脚本：
+
+`./run_me_first.csh
+
 这会链接一些运行案例所需的物理数据文件。
-要运行初始化程序，请键入
-./ideal.exe
-该程序通常将读取位于该目录中的输入探测文件，并生成初始条件文件wrfinput_d01。由于所有理想情况都使用边界条件选择（例如周期性选项），因此不需要横向边界文件。如果作业成功运行，则打印的最后一件事应该是‘wrf: SUCCESS COMPLETE IDEAL INIT’。
-要运行模型并将标准输出保存到文件中，请键入
-./wrf.exe >& wrf.out &
-或使用MPI（dmpar）选项编译的3D测试用例，
-mpirun –np 4 ./wrf.exe
-如果成功，则将wrf输出文件写入到名为的文件中。
-wrfout_d01_0001-01-01_00:00:00.
-成对的rsl.out.*和rsl.error.*文件将与任何MPI运行一起出现。这些是标准输出和错误文件。请注意，MPI运行的执行命令在不同的计算机上以及不同的MPI安装中可能会有所不同。检查用户手册。
-如果模型运行成功，则在“ wrf.out”或rsl.*.0000文件中最后打印的内容应为：“ wrf：SUCCESS COMPLETE WRF”。输出文件wrfout_d01_0001-01-01 *和wrfrst *应该存在于运行目录中，具体取决于为输出指定名称列表变量的方式。这些文件上的时间戳记起源于名称列表文件中的开始时间。
+
+要运行初始化程序，请键入:
+
+`./ideal.exe >& ideal.out
+
+该程序通常将读取位于案例目录中的输入探测文件，并生成初始条件文件`wrfinput_d01`。由于ideal案例不需要横向边界文件，因为边界条件通过namelist选项在代码中进行处理。如果工作成功，`ideal.out`文件的结尾应该是：
+
+`wrf: SUCCESS COMPLETE IDEAL INIT
+
+要运行模型，请键入
+
+`./wrf.exe >& wrf.out
+
+或者对于使用MPI（dmpar）选项编译的3D测试案例（注意，对于不同的机器和不同的MPI安装，MPI运行的执行命令可能不同），请键入
+
+`mpirun –np 4 ./wrf.exe
+
+如果成功，则将wrf输出文件写入到名为`wrfout_d01_0001-01-01_00:00:00.`的文件中。
+
+成对的`rsl.out.*`和`rsl.error.*`文件将与MPI运行一起出现。这些是标准输出和错误文件。使用的每个处理器将有一对。
+
+如果模型运行成功，则在`wrf.out`或`rsl.*.0000`文件结尾，打印的内容应为：`wrf: SUCCESS COMPLETE WRF`。
+
+输出文件`wrfout_d01_0001-01-01*`和`wrfrst*`应该存在于运行目录中，具体取决于为输出指定namelist变量的方式。这些文件上的时间戳记开始于namelist文件中的开始时间。
 
 <a id=Real_Data_Case></a>
 
-### real数据案例
+### real-data案例
 
-要运行实际数据案例，请通过键入cd进入工作目录
-cd test/em_real (or cd run)
-从目录中的namelist.input模板文件开始，然后对其进行编辑以匹配您的情况。
-运行实际数据案例需要成功运行WRF预处理系统程序（或WPS）。 确保来自WPS的met_em。*文件在运行目录中可见（链接或复制文件）：
+要运行real-data案例，请通过键入`cd`进入工作目录：
+
+`cd test/em_real (or cd run)
+
+编辑目录中的namelist.input模板文件，以匹配您的案例。
+
+运行real-data案例需要先成功运行WRF预处理系统（WPS）。确保来自WPS的`met_em.*`文件在运行目录中可见（可采用链接或复制文件的方式）：
+
+```
 cd test/em_real
-ls –l ../../../WPS/met_em*
-ln –s ../../..WPS/met_em* . 
-确保在namelist.input文件的＆time_control和＆domains部分中编辑变量（可以在本章的后面找到名称列表的描述）：
+ln –s ../../..WPS/met_em* .
+```
+
+确保在namelist.input文件的`&time_control`和`&domains`部分中编辑变量，以匹配您的案例（详见[namelist变量描述](#Namelist_Variables)）：
+
+```
 &time_control
  run_days                            = 0,
- run_hours                           = 24,
+ run_hours                           = 36,
  run_minutes                         = 0,
  run_seconds                         = 0,
- start_year                          = 2000, 2000, 2000,
- start_month                         = 01,   01,   01,
- start_day                           = 24,   24,   24,
+ start_year                          = 2019, 2019, 2019,
+ start_month                         = 09,   09,   09,
+ start_day                           = 04,   04,   04,
  start_hour                          = 12,   12,   12,
- end_year                            = 2000, 2000, 2000,
- end_month                           = 01,   01,   01,
- end_day                             = 25,   25,   25,
- end_hour                            = 12,   12,   12,
+ end_year                            = 2019, 2019, 2019,
+ end_month                           = 09,   09,   09,
+ end_day                             = 06,   06,   06,
+ end_hour                            = 00,   00,   00,
  interval_seconds                    = 21600
  input_from_file                     = .true.,.true.,.true.,
  history_interval                    = 180,  60,   60,
@@ -291,55 +423,117 @@ ln –s ../../..WPS/met_em* .
 /
  
 &domains
- time_step                           = 180,
+ time_step                           = 90,
  max_dom                             = 1,
- e_we                                = 74,    112,   94,
- e_sn                                = 61,    97,    91,
- e_vert                              = 30,    30,    30,
+ e_we                                = 150,    220,   200,
+ e_sn                                = 130,    214,   210,
+ e_vert                              = 45,     45,    45,
  p_top_requested                     = 5000,
- num_metgrid_levels                  = 27,
+ num_metgrid_levels                  = 34,
  num_metgrid_soil_levels             = 4,
- dx                                  = 30000, 10000,  3333.33,
- dy                                  = 30000, 10000,  3333.33,
+ dx                                  = 15000,
+ dy                                  = 15000,
  grid_id                             = 1,     2,     3,
  parent_id                           = 0,     1,     2,
- i_parent_start                      = 1,     31,    30,
- j_parent_start                      = 1,     17,    30,
+ i_parent_start                      = 1,     53,    30,
+ j_parent_start                      = 1,     25,    30,
  parent_grid_ratio                   = 1,     3,     3,
  parent_time_step_ratio              = 1,     3,     3,
 /
+```
 
-确保域的日期和维度与WPS中设置的日期和维度匹配。 如果仅使用一个域，则其他列中的条目将被忽略。
-用于协助&domains中的垂直插值的其他选项包括：
+确保区域的日期和维度与WPS中设置的一致。如果只使用一个区域，则只读取第一列中的条目，而忽略其他列。
+
+在`&domains`中用于辅助垂直插值的其他选项包括：
+
+```
 interp_type                         = 2
- extrap_type                         = 2
- t_extrap_type                       = 2
- lowest_lev_from_sfc                 = .false.
- use_levels_below_ground             = .true.
- use_surface                         = .true.
- lagrange_order                      = 1
- force_sfc_in_vinterp                = 1
- zap_close_levels                    = 500
- sfcp_to_sfcp                        = .false.
- adjust_heights                      = .false.
- smooth_cg_topo                      = .false.
-要运行使用串行或OpenMP（smpar）选项进行编译的实数据初始化程序，请键入
-./real.exe >& real.out
-成功完成工作后，应在real.out文件的末尾打印“ real_em：SUCCESS EM_REAL INIT”。 它还应产生wrfinput_d01和wrfbdy_d01文件。 在实际数据情况下，两个文件都是必需的。
+extrap_type                         = 2
+t_extrap_type                       = 2
+lowest_lev_from_sfc                 = .false.
+use_levels_below_ground             = .true.
+use_surface                         = .true.
+lagrange_order                      = 1
+force_sfc_in_vinterp                = 1
+zap_close_levels                    = 500
+sfcp_to_sfcp                        = .false.
+adjust_heights                      = .false.
+smooth_cg_topo                      = .false.
+```
+
+real.exe程序是针对real-data案例的初始化程序。它获取WPS程序的二维输出（在`met_em*`文件中），对三维气象场和地下土壤数据执行垂直插值，并创建边界和初始条件文件以输入到wrf.exe程序。
+
+要运行使用串行或OpenMP（smpar）选项进行编译的real-data初始化程序，请键入：
+
+`./real.exe >& real.out
+
+成功完成工作后，应在`real.out`文件的末尾打印`real_em: SUCCESS EM_REAL INIT`。它还应产生`wrfinput_d0*`（每个区域一个文件）和`wrfbdy_d01`文件，这个文件都是运行wrf.exe前必要的。
+
 运行WRF：
-./wrf.exe
-成功运行应产生一个或几个名称为wrfout_d <domain> _ <date>的输出文件（其中<domain>代表域ID，而<date>代表日期字符串，格式为yyyy-mm-dd_hh：mm：ss例如，如果您在2000年1月24日1200 UTC启动模型，则第一个输出文件应具有以下名称：
-wrfout_d01_2000-01-24_12:00:00
-文件名上的时间戳始终是第一次写入输出文件。键入以下命令检查写入输出文件的时间始终是一件好事：
-ncdump -v Times wrfout_d01_2000-01-24_12:00:00
-您可能还有其他wrfout文件，具体取决于名称列表选项（分割输出文件的频率由名称列表选项frames_per_outfile确定）。如果您在总积分时间内设置了重启频率（在namelist.input文件中为restart_interval），则也可以创建重启文件。重新启动文件应具有以下命名约定
-wrfrst_d<domain>_<date>
-重新启动文件上的时间戳记是该重新启动文件有效的时间。
-对于DM（分布式内存）并行系统，将需要某种形式的mpirun命令来运行可执行文件。例如，在Linux群集上，使用4个处理器运行MPI代码的命令可能类似于：
+
+`./wrf.exe >& wrf.out
+
+成功运行后，应产生一个或几个名称为`wrfout_d<domain>_<date>`的输出文件，其中<domain>代表区域ID，<date>代表日期字符串，格式为yyyy-mm-dd_hh:mm:ss。例如，如果您在UTC时间2000年1月24日12：00启动模型，则第一个输出文件应具有以下名称：
+
+`wrfout_d01_2000-01-24_12:00:00
+
+文件名上的时间戳始终是第一次写入输出文件的时间。键入以下命令检查写入输出文件的时间：
+
+`ncdump -v Times wrfout_d01_2000-01-24_12:00:00
+
+您可能还有其他wrfout文件，具体取决于namelist选项（分割输出文件的频率由namelist选项`frames_per_outfile`来确定）。如果您在总积分时间内设置了重启动文件频率（在namelist.input中的`restart_interval`选项），则也可以创建重启动文件。重启动文件应具有以下命名：
+
+`wrfrst_d<domain>_<date>
+
+重启动文件上的时间戳记是该重新启动文件的时刻。
+
+对于DM（分布式内存）并行系统，将需要某种形式的`mpirun`命令来运行可执行文件。例如，在Linux群集上，使用4个处理器运行MPI代码的命令可能类似于：
+
+```
 mpirun -np 4 ./real.exe
 mpirun -np 4 ./wrf.exe
-or
-mpiexec_mpt ./wrf.exe (on NCAR’s cheyenne)  
+```
+
+或者
+
+`mpiexec_mpt ./wrf.exe`（在NCAR的cheyenne上）  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <a id=Restart_Run></a>
 
