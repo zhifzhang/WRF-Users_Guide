@@ -12,21 +12,21 @@
 
 	3.2 [real-data案例](#Real_Data_Case)
 	
-	3.3 [重启动运行](#Restart_Run)
+	3.3 [重启动](#Restart_Run)
 	
-	3.4 [双向反馈嵌套运行](#Two_Way_Nested)
+	3.4 [双向反馈嵌套](#Two_Way_Nested)
 	
-	3.5 [使用ndown的单向嵌套运行](#One_Way_ndown)
+	3.5 [使用ndown的单向嵌套](#One_Way_ndown)
 	
-	3.6 [移动嵌套运行](#Moving_Nested)
+	3.6 [移动嵌套](#Moving_Nested)
 	
-	3.7 [分析数据推动运行](#Analysis_Nudging)
+	3.7 [分析微调](#Analysis_Nudging)
 	
-	3.8 [观测数据推动运行](#Observation_Nudging)
+	3.8 [观测微调](#Observation_Nudging)
 	
 	3.9 [全球范围运行](#Global_Run)
 	
-	3.10 [DFI运行](#DFI_Run)
+	3.10 [使用数字滤波器初始化（DFI）](#DFI_Run)
 	
 	3.11 [使用sst_update选项](#SST_Update)
 	
@@ -499,7 +499,7 @@ mpirun -np 4 ./wrf.exe
 
 <a id=Restart_Run></a>
 
-### 重启动运行
+### 重启动
 
 重启动运行允许您如果因为某些原因不能一次完成运行时（例如，运行超出了可用的挂钟时间），也可以将运行延长到更长的模拟周期。它实际上是由多个较短的运行组成的连续运行。因此，一个或多个重新启动运行结束时的结果应与没有任何重新启动的单个运行结果相同。
 
@@ -522,7 +522,7 @@ restart：用于指示运行是否为重新启动的开关
 
 <a id=Two_Way_Nested></a>
 
-### 双向反馈嵌套运行
+### 双向反馈嵌套
 
 双向反馈嵌套运行是指同时运行具有不同网格分辨率的多个区域并彼此相互通信。较粗的（父）域为嵌套（子）域提供边界值，嵌套将其计算反馈给较粗的域。模型可以在同一嵌套级别（无重叠嵌套）或多个嵌套级别（伸缩）处理多个域。
 
@@ -614,7 +614,7 @@ wrfout_d02_2000-01-24_12:00:00
 
 <a id=One_Way_ndown></a>
 
-### 使用ndown的单向嵌套运行
+### 使用ndown的单向嵌套
 
 WRF支持两个独立的单向嵌套选项。在本节中，单向嵌套定义为：粗糙网格首先运行，其中运行ndown程序，最后运行嵌套的精细网格。精细网格运行的初始和横向边界条件是从粗网格运行获得的，同时再输入高分辨率的地面场（例如地形、土地利用等）和遮罩的地面场（例如土壤温度和湿度）。执行此任务的程序就是`ndown.exe`。
 
@@ -728,7 +728,7 @@ WRF支持两个独立的单向嵌套选项。在本节中，单向嵌套定义�
 
 <a id=Moving_Nested></a>
 
-### 移动嵌套运行
+### 移动嵌套
 
 WRF中有两种类型的移动嵌套选项。在第一种选项中，由用户在namelist中指定嵌套移动。第二种选项则允许嵌套根据自动涡流跟踪算法（跟踪最低压力）来自动移动。这一方案的目的是跟踪确定的热带气旋的移动。
 
@@ -785,290 +785,473 @@ rsmas_data_path		= “terrain_and_landuse_data_directory”
 
 注意：此选项将覆盖嵌套域的`input_from_file`选项。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <a id=Analysis_Nudging></a>
 
-### 分析数据推动运行（空中和/或地面）
+### 分析微调（高空和/或地面）
 
-照常使用WPS准备输入数据到WRF。如果需要在嵌套域中进行微调，请确保在WPS中处理了所有域的所有时间段。对于表面分析微调（版本3.1中的新增功能），需要在METGRID之后运行OBSGRID，并且它将输出wrfsfdda_d01 文件，WRF模型将为该选项读取该文件。
+分析微调是一种将模型向数据分析微调的方法，适用于粗分辨率。模型运行时附加了水平风、温度和水汽微调项。这些项目逐点微调三维空间和时间插值的分析场。
+
+照常使用WPS准备WRF的输入数据。如果需要在嵌套域中进行分析微调，请确保在WPS中处理了所有域的所有时间段。对于地表分析微调，需要在METGRID之后运行OBSGRID（详见第7章），它将输出一个`wrfsfdda_d01`文件，WRF模型将读取该文件。
  
-除了前面描述的其他选项外，在运行real.exe 之前，请设置以下选项（有关指导，请参见test / em_real / 目录中examples.namelist 中的名称列表）：
- 
+除了前面描述的其他选项外，在运行real.exe之前，请设置以下选项（有关指导，请参见`test/em_real/`目录中的`examples.namelist`文件）：
+
+```
 grid_fdda = 1
 grid_sfdda = 1
- 
-像以前一样运行real.exe，这将除了创建wrfinput_d0*he wrfbdy_d01文件之外，还将创建名为'wrffdda_d0*' 的文件。其他网轻推名称列表在此阶段被忽略，但它是很好的做法，以填补他们都在一个运行前实际。特别是设定
+```
+
+像以前一样运行real.exe，但除了会创建`wrfinput_d0*`和`wrfbdy_d01`文件之外，还将创建名为`wrffdda_d0*`的文件。其他网格微调的namelist选项在此阶段被忽略，但最好是在运行real.exe前将所有相关的选项一次设置好，特别是如下设置：
+
+```
 gfdda_inname   =  “wrffdda_d<domain>”
-gfdda_interval =  time interval of input data in minutes
-gfdda_end_h    =  end time of grid-nudging in hours
+gfdda_interval =  输入数据的时间间隔（分钟）
+gfdda_end_h    =  网格微调的结束时间（小时）
 
 sgfdda_inname   =  “wrfsfdda_d<domain>”
-sgfdda_interval =  time interval of input data in minutes
-sgfdda_end_h    =  end time of surface grid-nudging in hours
+sgfdda_interval =  输入数据的时间间隔（分钟）
+sgfdda_end_h    =  地面网格微调的结束时间（小时）
+```
 
-请浏览 http://www2.mmm.ucar.edu/wrf/users/wrfv3.1/How_to_run_grid_fdda.html 和 README.grid_fdda in WRF/test/em_real/以获得更多信息. 
-V3.8中添加了不同的表面数据微调选项，并通过设置激活。
+请浏览[此网页](http://www2.mmm.ucar.edu/wrf/users/docs/How_to_run_grid_fdda.html )和`WRF/test/em_real`目录下的`README.grid_fdda`文件以获得更多信息。
+
+采用如下设置将激活另一种地面数据微调选项：
  
-grid_sfdda = 2
+`grid_sfdda = 2`
  
-该选项与选项1相似，可微调地表空气温度和水蒸气的混合比，但利用直接微动方法生成的趋势来限制表面感热和潜热通量，从而确保大气层与陆地表面之间的热力学一致性。这适用于YSU PBL和Noah LSM。（Alapaty等人，JAMC，2008年）
+该选项与选项1相似，可微调地表空气温度和水蒸气的混合比，但是方法有所不同，本选项是利用直接微调方法生成的趋势来限制表面感热和潜热通量，从而确保大气层与陆地表面之间的热力学一致性。这适用于`YSU PBL`和`Noah LSM`物理方案（Alapaty等人，JAMC，2008年）。
  
-频谱微动是另一个高空微动选项。这只会有选择地微调较粗的比例，否则将以与网格微调相同的方式进行设置。此选项还会微调地理势高度。此处定义的波数是域中包含的波数，该数是被轻推的最大波数。
- 
+光谱微调是另一个高空微调选项，该选项只会有选择地微调较粗的尺度，其设置类似于网格微调，但会额外微调位势高度。此处定义的波数是区域中包含的波数，该波数是被微调的最大波数。
+
+```
 grid_fdda = 2
 xwavenum = 3
 ywavenum = 3
+```
 
 <a id=Observation_Nudging></a>
 
-### 观测数据推动运行
+### 观测微调
 
-除了使用WPS进行常规输入数据准备外，还需要站点观测文件。有关详细信息，请参见《观察轻推用户指南》和http://www2.mmm.ucar.edu/wrf/users/wrfv3.1/How_to_run_obs_fdda.html。WRF期望的观察文件名称对于域1 是OBS_DOMAIN101，对于域2 是OBS_DOMAIN201，依此类推。
-通过＆fdda中的以下名称列表在模型中激活观察微调：
- 
+观测微调是一种将模型向观测微调的方法。与分析微调一样，模型运行时带有额外的水平风、温度和水汽微调项。然而，在观测微调中，对观测站点附近的点的微调是基于观测站点处的模型误差。此选项适用于细比例尺度或不对称观测。有关以下内容的其他详细信息，请参阅[《观测微调用户指南》](http://www2.mmm.ucar.edu/wrf/users/docs/ObsNudgingGuide.pdf )、[实验性微调选项](https://www2.mmm.ucar.edu/wrf/users/docs/How_to_run_obs_fdda.html )以及`WRF/test/em_real/`目录中`README.obs_fdda`文件。
+
+除了使用WPS准备常规输入数据外，还需要站点的观测文件。WRF对观测文件名称要求如下：对于区域1是`OBS_DOMAIN101`，对于区域2是`OBS_DOMAIN201`，依此类推。
+
+通过设置`&fdda`中的以下namelist，可在模型中激活观测微调：
+
+```
 obs_nudge_opt= 1 
-fdda_start= 0（以分钟为单位的obs起始时间）
-fdda_end= 360（以分钟为单位的obss 结束时间） 
- 
-并在＆time_control中
-auxinput11_interval_s = 180、180、180，（将间隔设置得足够小，这样将检查所有观察结果）
-在test/em_real/目录中的examples.namelists 文件中寻找一个示例来设置其他讨厌的namelist变量。见该观察轻推用户指南，http://www2.mmm.ucar.edu/wrf/users/wrfv3.1/How_to_run_obs_fdda.html，并README.obs_fdda 在WRF /测试/ em_real / 获取更多信息。
+fdda_start= 0（观测微调起始时间，以分钟为单位）
+fdda_end= 360（观测微调结束时间，以分钟为单位） 
+```
+
+并在`&time_control`中设置：
+
+`auxinput11_interval_s = 180,180,180,（应将间隔设置得足够小以检查所有观测结果）`
+
+在`test/em_real/`目录中的`examples.namelists`文件中可查找其他的微调namelist参数示例。
 
 <a id=Global_Run></a>
 
 ### 全球范围运行
 
-WRF支持全局功能。要进行全局运行，请从名称列表模板namelist.wps.gloabl 开始运行WPS 。设置map_proj ='lat-lon' 并设置网格尺寸e_we 和e_sn，而无需在namelist.wps中设置dx 和dy 。该土工格栅程序将计算网格距离，和它们的值可以的全局属性节中找到geo_em.d01.nc 文件。键入ncdump –h geo_em.d01.nc 来查找网格距离，这是填写WRF的namelist.input 文件所必需的。x和y方向上的网格距离可能不同，但是最好将它们设置为相似或相同。WRF和WPS假定地球是一个球体，其半径为6370公里。对于网格尺寸使用什么没有限制，但是为了有效地使用WRF中的极点滤波器，东西方向的尺寸应设置为2 P * 3 Q * 5 R +1（其中P，Q和R是任何整数，包括0）。
-照常运行其余WPS程序，但只能运行一个时间段。这是因为该域覆盖了整个地球，并且不再需要横向边界条件。 
-照常运行程序real.exe ，并且只运行一个时间段。不需要横向边界文件wrfbdy_d01 。
-将namelist.input.global 复制到namelist.input ，然后进行编辑。照常运行模型。
-注意：由于这不是模型中的常用配置，因此请谨慎使用。并非所有的物理和扩散选项都已通过测试，某些选项可能不适用于极光滤镜。同样，正定和单调对流选项在全局运行中不适用于极坐标滤波器，因为极坐标滤波器会生成标量的负值。这也意味着，WRF-Chem不能在全局WRF设置中以正定和单调选项运行。
-作为对全球lat-lon网格的扩展，还可以使用lat-lon网格来设置区域范围。为此，需要同时设置网格尺寸和网格距离（以度为单位）。假设地球是一个球体且半径为6370 km，土工格栅将再次计算出网格距离。在netCDF文件中找到以米为单位的网格距离，并将该值用于WRF的namelist.input 文件。
+WRF支持全球范围运行的功能，但首先要注意，这不是模型中常用的配置，所以应该谨慎使用。并不是所有的物理和扩散选项都进行了全球范围运行的测试，有些选项可能无法很好地与极点过滤器配合使用。正定和单调平流选项不适用于全球范围运行中的极点过滤器，这是因为极点过滤器可以生成负的标量值。这也意味着，WRF-Chem不能在全球范围的WRF中使用正定和单调平流选项运行。全球代码在一段时间内没有被修改，并且已知会导致一些不合理的结果。建议采用[NCAR MPAS模型](https://mpas-dev.github.io/ )来进行全球模拟。
+
+* 要进行全球范围运行，请采用namelsit模板文件`namelist.wps.gloabl`来运行WPS。
+
+	* 设置`map_proj = ‘lat-lon’`、网格尺寸`e_we`和`e_sn`。
+	
+	* 无需设置`dx`和`dy`。geogrid程序将计算网格距离，其值可以在`geo_em.d01.nc`文件的全局属性部分中找到。
+
+* 键入`ncdump –h geo_em.d01.nc`来查看网格距离，这是填写WRF的namelist.input文件所必需的。x和y方向上的网格距离可能不同，但是最好将它们设置为相似或相同。WRF和WPS假定地球是一个半径为6370km的球体。对于使用的网格尺寸什么没有限制，但为了有效地使用WRF中的极点滤波器，应将东西方向的尺寸设置为2P×3Q×5R+1（其中P、Q和R可以是任意整数，包括0）。
+
+* 照常运行其余WPS程序，但只需运行一个时间段。这是因为模拟区域覆盖了整个地球，不再需要横向边界条件。
+
+* 照常运行real.exe程序，并且只需运行一个时间段，因为不需要横向边界文件`wrfbdy_d01`。
+
+* 将namelist.input.global复制为namelist.input，然后按需要的设置进行编辑。之后照常运行模型。
+
+作为对全球lat-lon网格的扩展，进行局部区域范围的模拟也可以使用lat-lon网格。为此，需要同时设置网格尺寸和网格距离（以度为单位）。geogrid程序将计算出网格距离（同样假设地球是一个半径为6370km的球体）。然后可以采用上述方法在netCDF文件中找到以米为单位的网格距离，并将该值用于WRF的namelist.input文件。
 
 <a id=DFI_Run></a>
 
-### 使用数字滤波器初始化（Digital Filter Initialization）运行
+### 使用数字滤波器初始化（Digital Filter Initialization）
 
-数字滤波器初始化（DFI）是V3中的新选项。这是一种消除初始模型不平衡的方法，例如通过表面压力趋势来衡量。当人们对0到6小时的模拟/预测感兴趣时，这可能很重要。在短期模型集成过程中（向前和向后）运行数字滤波器，然后开始预测。在WRF实施中，所有这些都在一个工作中完成。在V3.3版本中，DFI可用于具有并发嵌套且禁用反馈的多个域。
-数据准备没有特殊要求。
-从test / em_real /目录中的example.namelist 文件开始，查找以DFI的名称列表记录开头的部分：＆dfi_control，然后将其剪切并粘贴到namelist.input 文件中。编辑它以匹配您的案例配置（例如日期）。对于典型的应用程序，使用以下选项：
-dfi_opt = 3（注意：如果要重新启动，则必须将其更改为0）
-dfi_nfilter = 7（过滤器选项：Dolph）
-dfi_cutoff_seconds = 3600（不应长于过滤器窗口）
-对于时间规格，通常需要向后积分0.5到1小时，并向前积分一半时间。
-如果选项dfi_write_filtered_input 设置为true，过滤wrfinput文件，wrfinput_initialized_d01 ，当您运行WRF会产生。
-在版本3.2中，为DFI引入了恒定边界条件选项。要使用它，请在＆bdy_control中设置constant_bc = 1
-如果DFI使用不同的时间步长，则可以使用time_step_dfi 进行设置。
+数字滤波器初始化（DFI）是一种消除初始模型不平衡的方法，例如通过地表压力趋势来衡量。当对模型最开始的0到6个小时的模拟/预测感兴趣时，这个方法可能很重要。这个方法可以在短期模型积分过程中（向前和向后）运行数字滤波器，然后再开始预测。在WRF实施中，所有这些都在一个工作中完成。DFI可用于具有并发嵌套且禁用反馈的多个区域。
+
+本方法对输入数据没有特殊要求。
+
+* 在`test/em_real/`目录中的example.namelist文件中，查找DFI的namelist部分（&dfi_control)，将此部分复制到namelist.input文件中。编辑这部分内容以匹配您的案例配置（例如日期）。对于典型的应用，可以使用以下选项：
+
+	```
+	dfi_opt = 3（注意：如果正在运行重新启动，则必须将其更改为0）
+	dfi_nfilter = 7（过滤器选项：Dolph）
+	dfi_cutoff_seconds = 3600（不应长于过滤器窗口）
+	```
+	
+	对于时间规格，通常需要向后积分0.5到1小时，并向前积分相应一半的时间。
+
+* 如果选项`dfi_write_filtered_input`设置为`true`，当运行WRF时会生成一个过滤wrfinput文件，即`wrfinput_initialized_d01`。
+
+* 如果要使用恒定边界条件选项，请在`&bdy_control`中设置`constant_bc = 1`。
+
+* 如果DFI使用与主设置不同的时间步长，可以使用`time_step_dfi`选项进行设置。
 
 <a id=SST_Update></a>
 
 ### 使用sst_update选项
 
-WRF模型物理学无法预测海面温度，植被比例，反照率或海冰。对于长时间的仿真，该模型提供了一种替代方法，可以读取随时间变化的数据并更新这些字段。为了使用此选项，必须访问随时间变化的SST和海冰场。土工格栅程序可提供十二个月的植被分数和反照率值。通过WPS处理完这些字段后，可以在运行程序real.exe 和wrf.exe 之前激活名称列表记录＆time_control中的以下选项：
-io_form_auxinput4 	= 2
-auxinput4_inname 	= “wrflowinp_d<domain>” (created by real.exe)
-auxinput4_interval 	= 360, 360, 360,
+WRF模型物理学无法预测海面温度、植被比例、反照率或海冰。对于长时间的模拟，WRF模型提供了一种替代方法，可以读取随时间变化的数据并更新这些字段。为了使用此选项，必须有随时间变化的SST和海冰场文件。然后用geogrid程序生成十二个月的月均植被分数和反照率值。通过WPS处理完这些字段后，在运行real.exe和wrf.exe之前激活namelist中`&time_control`部分的以下选项：
 
-and in &physics
+```
+io_form_auxinput4   = 2 
+auxinput4_inname    = “wrflowinp_d<domain>” (created by real.exe) 
+auxinput4_interval = 360, 360, 360,
+```
 
-sst_update = 1
+以及在`&physics`部分的如下选项：
 
-请注意，此选项不适用于sf_ocean_physics选项。
+`sst_update = 1`
+
+*请注意，此选项不能与`sf_ocean_physics`选项同时使用。*
 
 <a id=bucket_mm_and_J></a>
 
 ### 使用bucket_mm和bucket_J选项
 
-这些选项适用于长时间的模拟降雨累积和辐射预算累积项（RAINC，RAINNC，ACSWUPT，ACLWDNBC等）。由于具有32位精度，因此将小数加到非常大的数会随着累加项的增加而降低精度。对于几天到几周的模拟，通常可以进行累加，但是对于几个月到几年的累加，则具有截断加法的效果，尤其是小的量可能会被清零。
-激活这些选项后，该术语的一部分将以整数存储，每次达到存储桶值时，该整数将递增1，因此我们有两个术语-RAINNC和I_RAINNC，其中RAINNC现在仅包含余数。从总计= RAINNC + bucket_mm * I_RAINNC的输出中检索总计。合理的铲斗值可以基于每月累积量（例如100毫米）。总降水等于RAINC + RAINNC，其中
-Total RAINNC = RAINNC+bucket_mm*I_RAINNC
-Total RAINC = RAINC+bucket_mm*I_RAINC
-辐射累积项（例如ACSWUPT）以焦耳/ m ^ 2为单位，因此模拟周期内的平均值是差除以时间之间的差，得出W / m ^ 2。
-bucket_J选项适用于这些术语，基于月累积量的典型值为1.e9J。此处的总和由（ACSWUPT示例-其他辐射项遵循相同的方程式概念）给出：
-总计= ACSWUPT + bucket_J * I_ACSWUPT
+这些选项适用于长时间的模拟降雨累积和辐射bucket累积项（RAINC、RAINNC、ACSWUPT、ACLWDNBC等）。对于32位精度的数据，在非常大的数字中添加小的数字会随着累积项的增加而导致精度的损失。对于几天到几周的模拟，这种累积误差通常是可以接收的，但是对于几个月到几年的模拟，这种累积会产生截断加法的效果（特别是小的增加量可能会被归零）。
+
+激活这些选项后，以上累积项的一部分将以整数存储，每次达到bucket值时，该整数将递增1。这样我们就把一个累积项RAINNC分成了两个项——RAINNC和I_RAINNC，其中RAINNC现在仅包含余数。最终输出的合计数据=RAINNC+bucket_mm×I_RAINNC。合理的bucket值可以基于月均累积量（例如100mm）。总降水量等于RAINC+RAINNC，其中：
+
+Total RAINNC = RAINNC + bucket_mm × I_RAINNC
+
+Total RAINC = RAINC + bucket_mm × I_RAINC
+
+辐射累积项（例如ACSWUPT）以J/m^2为单位，因此一个模拟周期内的平均值是输入输出辐射的差值除以模拟时间之间的差，单位为W/m^2。
+
+bucket_J选项适用于本累计项，基于月均累积量的典型值为1.e9J。该项的总和采用如下方式得出（下为ACSWUPT示例——其他辐射项遵循相同的方程式概念）：
+
+Total = ACSWUPT + bucket_J × I_ACSWUPT
 
 <a id=Adaptive_Time_Stepping></a>
 
 ### 使用自适应时间步长
 
-自适应时间步长是一种最大化模型可以使用的时间步长，同时保持模型数值稳定的方法。基于整个域的水平和垂直稳定性标准（称为Courant-Friedrichs-Lewy（CFL）条件）调整模型时间步长。以下一组值通常会很好地工作。
- 
-use_adaptive_time_step = .true.
-step_to_output_time = .true。（但嵌套域可能仍会在所需时间写入输出。请尝试使用adjust_output_times = .true.来弥补这一点。）
-target_cfl = 1.2、1.2、1.2 ，
-max_step_increase_pct = 5、51、51 （很大的百分比值）对于嵌套，允许嵌套的时间步长具有更大的调整自由）
-starting_time_step = 实际值或-1（表示开始时为4 * DX）
-max_time_step：对所有域使用固定值，例如8 * DX
-min_time_step：对所有域使用固定值，例如3 * DX
-Adaptation_domain ：哪个域正在驱动自适应时间步长
- 
-也查看描述these options，在名称列表清单5-43页。
+自适应时间步长是一种最大化模型可用时间步长，同时保持模型数值稳定的方法。本方法基于整个域内的水平和垂直稳定性标准（称为Courant-Friedrichs-Lewy（CFL）条件）来调整模型时间步长。使用自适应时间步长，可按照以下设置：
+
+`use_adaptive_time_step = .true.`
+`step_to_output_time = .true.`（但嵌套域可能仍会在所需时间写入输出，请尝试使用`adjust_output_times = .true.`来弥补这一点）
+`target_cfl = 1.2, 1.2, 1.2, `
+`max_step_increase_pct = 5, 51, 51,`（为嵌套设置较大百分比值允许嵌套的时间步长具有更大的调整自由度）
+`starting_time_step =` 实际值或-1（表示开始时间是4×DX）
+`max_time_step`：对所有域使用固定值，例如8×DX
+`min_time_step`：对所有域使用固定值，例如3×DX
+`Adaptation_domain`：哪个域驱动自适应时间步长（整数）
+
+有关这些选项的更多信息，请参见[namelist变量描述](#Namelist_Variables)部分。
 
 <a id=Stochastic_Parameterization_Schemes></a>
 
 ### 随机参数化方案
 
-随机参数化套件包括许多随机参数化方案，其中一些已被广泛使用，有些是为非常特定的应用开发的。通过在每个时间步长上对每个成员施加较小的扰动，可将其用于表示集成仿真中的模型不确定性。这些方案中的每一个都生成其自己的随机扰动场，其特征在于空间和时间相关性以及在名称列表记录和存储（自版本3.6起）中定义的总体扰动幅度。
-随机扰动会在每个时间步在父域上生成，并且默认情况下会插值到嵌套域。名称列表设置确定这些扰动在哪些域上应用。通过设置例如sppt = 0,1,1，扰动将仅应用于嵌套域。
-由于该方案使用库FFTPACK中提供的快速傅立叶变换（FFT），因此我们建议每个方向上的网格点数量应为小质数的乘积。如果网格点的数量在至少一个方向上是大素数，则计算成本可能会大大增加。
-随机扰动字段（rand_perturb = 1） 
-此选项为用户实现的应用程序生成3-D高斯随机扰动字段。扰动字段在历史文件中保存为  rand_pert （从3.7版开始可用）。
-随机扰动的物理趋势（SPPT）（sppt = 1）
-随机模式用于扰动潜在温度，风和湿度的累积物理趋势（微物理除外）。有关WRF实施的详细信息，请参见Berner等人，2015（http://journals.ametsoc.org/doi/abs/10.1175/MWR-D-14-00091.1）。扰动字段以rstoch的形式保存在历史记录文件中（从3.9版开始可用）。
-随机动能反向散射方案（SKEBS）（skebs = 1）
-使用随机模式来扰动潜在温度和旋转风分量。扰动字段分别在u，v和θ 的历史文件中另存为ru_tendf_stoch，rv_tendf_stoch和rt_tendf_stoc h 。  有关WRF实施的详细信息，请参见Berner等人，2011 http://journals.ametsoc.org/doi/abs/10.1175/2010MWR3595.1）和http://www2.mmm.ucar.edu/wrf/users/ docs / skebs_in_wrf.pdf。风的扰动与动能反向散射率的平方根成正比，温度的扰动与势能反向散射率成正比（详见http://www2.mmm.ucar.edu/wrf/users/docs/skebs_in_wrf .pdf。
-默认参数用于中纬度的天气尺度尺度扰动。Romine等人讨论了调整策略。2014（http://journals.ametsoc.org/doi/citedby/10.1175/MWR-D-14-00100.1）和Ha等。2015（http://journals.ametsoc.org/doi/10.1175/MWR-D-14-00395.1）
-随机扰动参数方案（SPP = 1）
-随机模式用于扰动所选物理软件包中的参数，即GF对流方案，MYNN边界层方案和RUC LSM。可以通过设置spp_conv = 1，spp_pbl = 1 或spp_lsm = 1 来实现对单个物理包的参数摄动。有关实现的详细信息，请参见Jankov等。（http://journals.ametsoc.org/doi/abs/10.1175/MWR-D-16-0160.1）。扰动字段在历史文件中另存为  pattern_spp_conv，pattern_spp_pbl，pattern_spp_lsm 。（从3.9版开始可用）。
+随机参数化套件包括许多随机参数化方案，其中一些已被广泛使用，还有一些是为非常特定的应用开发的。通过在每个时间步长上对每个成员施加较小的扰动，可将其用来表示集成模拟中的模型不确定性。这些方案中的每一个都产生自己的随机扰动场，其特征是空间和时间相关性以及namelist中`&stoch`部分定义的整体扰动幅度。
 
-n.边界条件的随机扰动（perturb_bdy） 
-对于perturb_bdy = 1 ，随机随机场用于扰动风和潜在温度的边界趋势。所述perturb_bdy 独立的SKEBS和作为这样的选项运行可能具有或不具有SKEB方案，该方案仅在内部网格操作运行。但是，选择perturb_bdy = 1 将需要生成域大小的随机数组，因此计算时间可能会增加。    
-对于perturb_bdy = 2 ，使用用户提供的模式来扰动边界趋势。数组被初始化并调用：field_u_tend_perturb，field_v_tend_perturb，field_t_tend_perturb 。这些数组将需要在share / module_bc.F的spec_bdytend_perturb或dyn_em / module_bc_em.F的spec_bdy_dry_perturb中填充所需的模式 
+随机扰动默认会在每个时间步长在父域上生成，并插值到嵌套域。namelist设置确定这些扰动在哪些域上应用。通过设置例如`sppt = 0,1,1`，扰动将仅应用于嵌套域。
 
-对WRF-CHEM中边界趋势的随机扰动（perturb_chem_bdy）
-由选项rand_perturb = 1 （请参见上文）创建的随机模式用于扰动WRF-CHEM中的化学边界趋势。对于此应用程序，应在WRF编译时编译WRF-Chem。
-所述perturb_chem_bdy 独立的选项运行rand_perturb 并且因此可以具有或不具有运行rand_perturb 方案，该方案仅在内部网格操作。但是，选择perturb_bdy_chem = 1 将需要生成域大小的随机数组以在横向边界区域中应用扰动，因此计算时间可能会增加。使用have_bcs_chem = 运行WRF-Chem时。是的。在＆chem中，从wrfbdy_d01读取的化学LBC被rand_perturb = 1 （从3.7版开始）创建的随机模式干扰。   
+由于该方案使用FFTPACK库中提供的快速傅立叶变换（Fast Fourier Transforms，FFT），因此我们建议每个方向上的网格点数量应为小素数的乘积。如果至少一个方向上的网格点数量是大素数，则计算成本可能会大大增加。
+
+#### 随机扰动字段（rand_perturb=1） 
+
+此选项为用户指定的应用生成3-D高斯随机扰动字段。扰动字段在历史文件中保存为`rand_pert`。
+
+#### 随机扰动物理趋势（SPPT）（sppt=1）
+
+此随机模式用于扰动潜在温度、风和湿度的累积物理趋势（微物理除外）。有关WRF实施的详细信息，请参见[Berner等人，2015](http://journals.ametsoc.org/doi/abs/10.1175/MWR-D-14-00091.1 )。扰动字段在历史文件中保存为`rstoch`。
+
+#### 随机动能反向散射方案（SKEBS）（skebs=1）
+
+此随机模式用来扰动潜在温度和旋转风分量。u，v和θ的扰动字段在历史文件中分别保存为`ru_tendf_stoch`、`rv_tendf_stoch`和`rt_tendf_stoch`。有关WRF实施的详细信息，请参见[Berner等人，2011](http://journals.ametsoc.org/doi/abs/10.1175/2010MWR3595.1 )和[此文档](http://www2.mmm.ucar.edu/wrf/users/docs/skebs_in_wrf.pdf )。风的扰动与动能反向散射率的平方根成正比，温度的扰动与势能反向散射率成正比（详见[此文档](http://www2.mmm.ucar.edu/wrf/users/docs/skebs_in_wrf.pdf )）。默认参数用于中纬度的天气尺度扰动。在[Romine et al. 2014](http://journals.ametsoc.org/doi/citedby/10.1175/MWR-D-14-00100.1 )和[Ha et al. 2015](http://journals.ametsoc.org/doi/10.1175/MWR-D-14-00395.1 )中讨论了调整策略。
+
+#### 随机扰动参数方案（SPP）（SPP=1）
+
+此随机模式用于扰动所选物理包中的参数，即GF对流方案、MYNN边界层方案和RUC LSM。可以通过设置`spp_conv = 1`、`spp_pbl = 1`或`spp_lsm = 1`来实现对单个物理包的参数扰动。有关实现的详细信息，请参见[Jankov等](http://journals.ametsoc.org/doi/abs/10.1175/MWR-D-16-0160.1 )。扰动字段在历史文件中保存为`pattern_spp_conv`、`pattern_spp_pbl`、`pattern_spp_lsm`。
+
+#### 边界条件的随机扰动（perturb_bdy） 
+
+对于`perturb_bdy = 1`，随机场用于扰动风和潜在温度的边界趋势。此`perturb_bdy`选项独立于SKEBS运行，因此可以与SKEB方案一起运行，也可以不与SKEB方案一起运行（SKEB方案仅在内部网格上运行）。但是，设置`perturb_bdy = 1`将需要生成域大小的随机数组，因此计算时间可能会增加。
+
+对于`perturb_bdy = 2`，使用用户提供的方式来扰动边界趋势。数组被初始化并命名为：`field_u_tend_perturb`、`field_v_tend_perturb`、`field_t_tend_perturb`。这些数组需要在`share/module_bc.F`的`spec_bdytend_perturb`或`dyn_em/module_bc_em.F`的`spec_bdy_dry_perturb`中填充所需的扰动方式。一旦这些文件被修改，WRF将需要重新编译（但不需要`clean-a`或重新配置）。
+
+#### 对WRF-CHEM中边界趋势的随机扰动（perturb_chem_bdy）
+
+由选项`rand_perturb = 1`（请参见上文）创建的随机方式用于扰动WRF-CHEM中的化学边界趋势。对于此应用，应在WRF编译时同时编译WRF-Chem。
+
+`perturb_chem_bdy`选项的运行独立于`rand_perturb`选项，并且因此可以与`rand_perturb`方案一同运行，也可以不与`rand_perturb`方案一同运行（该方案仅在内部网格上运行）。但是，设置`perturb_bdy_chem = 1`将需要生成域大小的随机数组以在横向边界区域中应用扰动，因此计算时间可能会增加。当在`&chem`部分使用`have_bcs_chem = .true.`来运行WRF-Chem时，从`wrfbdy_d01`读取的化学LBCs会被`rand_perturb = 1`创建的随机方式干扰。
 
 <a id=Run_Time_IO></a>
 
 ### Run-time IO
 
-随着WRF 3.2版的发布, IO决策现在可以作为运行时run-time选项进行更新。以前，对IO的任何修改（例如，哪个变量与哪个流相关联）都是通过注册表进行处理的，而对注册表的更改总是需要一个clean –a, configure, h和compile循环。这种编译时机制仍然可用，这是定义大多数WRF IO的方式。但是，如果用户希望从各种流中添加（或删除）变量，则可以选择使用该功能。
-首先，用户让WRF模型知道IO的运行时修改信息所在的位置。这是一个文本文件（my_file_d01.txt），用于每个域，在time_control 名称列表记录中的namelist.input 文件中定义。
-&time_control
-iofields_filename = “my_file_d01.txt”, “my_file_d02.txt”
-ignore_iofields_warning = .true.,
-/
+输入/输出（IO）决策（例如输出哪些变量，哪些变量与哪个stream相关联）可以作为Run-time选项进行更新。而对Registry的任何更改都构成了一个`clean–a`、配置和编译的循环。这种编译时机制仍然可用，并且是大多数WRF IO的定义方式。但是，如果希望在不必重新编译代码的情况下从各种流中添加（或删除）变量，可以使用Run-time IO选项。
+
+* 首先为每个域创建一个文本文件（例如`my_file_d0X.txt`），并在namelist.input的`&time_control`部分中定义该文件的名称，如下所示：
+
+	```
+	&time_control
+	iofields_filename = “my_file_d01.txt”, “my_file_d02.txt”
+	ignore_iofields_warning = .true.,
+	/
+	```
+
+* 文本文件的内容将stream ID（0为默认的历史记录和输入文件）与变量以及是否要添加或删除字段相关联。以下是一些示例：
+
+	`-:h:0:RAINC,RAINNC`
+	
+	将从标准历史记录文件中删除字段RAINC和RAINNC。
  
-文本文件的内容将流ID（0为默认历史记录和输入）与变量以及是否要添加或删除字段相关联。状态变量必须已经在注册表文件中定义。以下是一些示例：
--：h：0：RAINC，RAINNC
-将从标准历史记录文件中删除字段RAINC和RAINNC。
- 
-+：h：7：RAINC，RAINNC
-将字段RAINC和RAINNC添加到输出流＃7。
-可用的选项有：
-              + 或- ，添加或删除变量
-              0-24 ，整数，哪个流
-              i 或h ，输入或历史
-   注册表中的字段名称-这是引号中的第一个字符串。注意：不包括字段名称之间的任何空格。
-不必从一个流中删除字段以将其插入到另一个流中。可以在多个流中具有相同的字段。
-如果您有兴趣将变量输出到新流中（即不是默认的历史记录流0），那么以下名称列表变量也将是必需的（流7的示例）：
-auxhist7_outname =“您的流名称_d <domain> _ <date>”
-auxhist7_interval = 360、360，
-frame_per_auxhist7 = 1，1，
-io_form_auxhist7 = 2
-名称列表变量ignore_iofields_warning 告诉程序如果在这些用户指定的文件中遇到错误，该怎么办。默认值.TRUE。是打印警告消息，但继续运行。如果设置为.FALSE。，如果这些用户指定的文件中有错误，程序将中止。
-请注意，必须是可选IO一部分（输入或输出流）的任何字段，都必须已在注册表中声明为状态变量。指定为运行时IO选择的变量的名称时，应格外小心。在文本文件（在namelist.input文件中定义）中使用的变量的“名称”是注册表文件中带引号的字符串。大多数WRF变量具有与WRF源代码内使用的变量名称相同的字符串（注册表文件中的第3列，未加引号，而不是要使用的字符串），并且该变量的名称与netCDF文件（注册表文件中第9列，带引号，这是要使用的字符串）。  
+	`+:h:7:RAINC,RAINNC`
+	
+	将字段RAINC和RAINNC添加到输出stream #7，它将从`wrfout*`文件中创建一个单独的文件。
+	
+	可用的选项有：
+	
+		+或-，添加或删除变量
+		
+		0-24，整数，指哪个stream
+		
+		i或h，指输入或历史记录文件
+		
+		Registry中的字段名称——这是引号中的第一个字符串。注意：不包括字段名称之间的任何空格。
+		
+* 如果您有兴趣将变量输出到新的stream中（即不是默认的历史记录stream 0），那么以下namelist变量也将是必需的（stream 7的示例）：
+
+	```
+	auxhist7_outname = “yourstreamname_d<domain>_<date>”       
+	auxhist7_interval = 360, 360,       
+	frames_per_auxhist7 = 1, 1,       
+	io_form_auxhist7 = 2
+	```
+
+* 在.txt文件的字段之间不要包含任何空格。
+
+* 在.txt文件中的变量名必须与Registry文件（第9列）中引用的字符串名相同。
+
+* 不需要将字段从一个stream中删除，再添加到另一个stream中。
+
+* 可以在多个stream中有相同的字段。
+
+* 避免使用stream 1、2、6和23作为输出变量的新stream。
+
+* 任何可以作为可选IO（输入或输出stream）一部分的字段都必须在Registry中声明为状态变量。
+
+* namelist变量`ignore_iofields_warning`告诉程序如果在这些用户指定的文件中遇到错误时，该怎么办。默认值（.true.）是打印警告消息（warning），但继续运行。如果设置为`.false.`，当这些用户指定的文件中有错误时，程序将中止运行。
 
 <a id=Output_Diagnostics></a>
 
 ### 输出诊断
 
-1.时间序列输出。要激活该选项，必须在WRF运行目录中存在一个名为“ tslist ” 的文件。该tslist 文件包含由他们的纬度和经度一个简短的描述，并为每个位置的缩写一起定义位置的列表。示例文件如下所示：
-  
-＃-----------------------------------------------＃
-名称的＃24个字符| pfx | 拉特| LON |
-＃-----------------------------------------------＃
-哈雷特角哈特-72.330 170.250
-麦克默多站mcm -77.851 166.713
+1. 时间序列输出
+
+在域中的特定位置输出时间序列数据的选项对于跟踪特定变量的进程非常有用。
+
+	* 要激活时间序列输出选项，WRF运行目录中必须存在一个名为`tslist`的文件。该文件包含由纬度和经度定义的位置列表，以及每个位置的简短描述和缩写。示例文件如下所示：
+	
+	```
+	#-----------------------------------------------#
+    # 24 characters for name | pfx |  LAT  |   LON  |
+    #-----------------------------------------------#
+    Cape Hallett              hallt -72.330  170.250
+    McMurdo Station           mcm   -77.851  166.713
+	```
  
-文件中的前三行被视为标题信息，并被忽略。给定tslist 文件，对于模型域内的每个位置（粗略或嵌套），将在每个模型时间步长包含时间序列变量的文件写入名称pfx.d <domain> .TS ，其中pfx是指定的前缀tslist文件中的位置。时间序列位置的最大数量由名称列表记录＆domains 中的名称列表变量max_ts_locs 控制。默认值为5。时间序列输出包含表面上的选定变量，包括2米温度，蒸汽混合比，10米风分量，u和v，旋转到地球坐标等。有关时间的更多信息系列输出可以在WRF / run / README.tslist中找到。
+	文件中的前三行被视为标题信息，并被忽略。
+
+	* 对于模型（粗略或嵌套）域内的每个位置，包含每个模型时间步长的时间序列变量的文件都用名称`pfx.d<domain>.TS`写入，其中`pfx`是`tslist`文件中位置的指定前缀。时间序列输出文件包含选定的地表变量，包括2米温度、蒸汽混合比、10米风分量、u和v、旋转到地球坐标等。地球相对u和v、潜在温度、水汽和位势高度的垂直剖面数据将输出附加文件。
+	
+	* `max_ts_locs`:namelist中`&domains`部分的选项，用于控制输出的时间序列位置的最大数（默认值为5）。
+	
+	* `max_ts_level`：namelist中`&domains`部分的选项，用于控制层数（默认值为15）。
+	
+	其他详细信息可参见`WRF/run/README.tslist`文件。 
  
-从V3.5开始，除表面变量外，还将输出相对于地球的U和V的垂直剖面，势能温度，水蒸气和地势高度。输出中的默认级别数为15，但可以使用名称列表变量max_ts_level 进行更改。
- 
-2.压力水平输出。这可以通过添加名称列表记录＆diags 并设置p_lev_diags = 1 来激活。该选项可以在多个压力水平下输出U，V，风速，T，露点T，RH和地势高度。
- 
-＆diags
+2. 压力层输出
+
+该选项可以输出多个压力层的如下额外字段：
+
+* U、V风速
+
+* 温度
+
+* 露点温度
+
+* 相对湿度RH
+
+* 位势高度
+
+这可以通过在namelist中`&diags`部分中设置如下参数来激活：
+
+```
+&diags
 p_lev_diags = 1
-num_press_levels = 4
-press_levels = 85000，70000，50000，20000 ，
- 
-输出进入辅助输出流23，因此应在＆time_control中设置以下内容：
- 
-auxhist23_interval = 360、360，
-frames_per_auxhist23 = 100、100，
+num_press_levels = 4,
+press_levels = 85000,70000,50000,20000,
+```
+
+如果要将数据输出到辅助输出stream 23，应在`&time_control`中设置以下内容：
+
+```
+auxhist23_interval = 360,360,
+frames_per_auxhist23 = 100,100,
 io_form_auxhist23 = 2
+```
+
+3. 对流风暴诊断
+
+此选项在历史文件`wrfout*`中输出以下额外字段：
+
+* 最大10m风速
+
+* 在2-5km层中的最大螺旋度
+
+* 在400mb以下的上下气流中的最大垂直速度
+
+* 在2-5km层中的平均垂直速度
+
+* 历史输出时间之间的时间窗口中的最大列抓取
+
+如要采用此选项，需要在namelist中添加以下设置：
+
+	```
+	nwp_diagnostics = 1 (&time_control)       
+	do_radar_ref = 1 (&physics)
+	```
  
-3. nwp_diagnostics = 1 ＆time_control 。对流风暴诊断。此选项可输出最大10 m的风速，在2-5 km层中的最大螺旋度，在400 mb以下的上下气流中的最大垂直速度，在2-5 km层中的平均垂直速度以及在历史记录之间的时间窗口中的最大列级输出时间。多余的字段将打印在历史记录文件中。还应该打开do_radar_ref 。
+4. 气候诊断
+
+此选项输出48个表面诊断变量——对于T2、Q2、TSK、U10、V10、10 m wind speed、RAINCV、RAINNCV，计算如下变量：
+
+* 最大值和最小值
+
+* 出现最大值和最小值的时间
+
+* 平均值
+
+* 平均值的标准偏差
+
+如果要将数据输出到辅助输出stream3，需要在namelist的`&time_control`部分中添加以下内容：
  
-4. output_diagnostics = 1在＆time_control中。气候诊断。此选项输出36个表面诊断变量：最大值和最小值，出现最大值和最小值的时间，平均值，T2，Q2，TSK，U10，V10、10 m风速，RAINCV，RAINNCV的平均值的标准偏差（最后两个是时差雨）。输出进入辅助输出流3，因此需要以下内容：
+	```
+    output_diagnostics = 1
+    auxhist3_outname = “wrfxtrm_d<domain>_<date>”
+    auxhist3_interval = 1440, 1440,
+    frames_per_auxhist3 = 100, 100,
+    io_form_auxhist3 = 2
+	```
+
+*注意：由于此选项计算每日的最大值和最小值等数据，因此建议仅以`auxhist3_intervals`的倍数重新启动。*
  
-auxhist3_outname =“ wrfxtrm_d <域> _ <日期>”
-auxhist3_interval = 1440，1440，
-frames_per_auxhist3 = 100、100，
-io_form_auxhist3 = 2
+5. 在`&dyanmics`部分设置`do_avgflx_em = 1`
+
+此选项为下游传输模型输出历史时间的平均数据，包括柱压耦合的U、V和W。如果使用Grell型方案，设置`do_avg_cugd = 1`将输出时间平均的对流质量通量。
  
-由于此选项计算每日的最大值和最小值等，因此建议以每日间隔重新启动。
+6. AFWA提供的天气诊断
+
+此选项将诊断变量输出到辅助stream 2，请参阅[此文档](http://www2.mmm.ucar.edu/wrf/users/docs/AFWA_Diagnostics_in_WRF.pdf )。
+
+要使用此选项，请在namelist添加`&afwa`部分并设置如下：
+
+`afwa_diag_opt = 1`
+
+然后为特定字段设置以下任一选项：
  
-5. do_avgflx_em = 1 ＆DYANMICS 。此选项为下游传输模型输出历史时间平均，柱压耦合的U，V和W。如果使用Grell型方案，则do_avg_cugd = 1 将输出时间平均对流质量通量。
+`afwa_ptype_opt = 1` 降水类型
+
+`afwa_severe_opt = 1` 恶劣天气诊断
+           
+`afwa_vil_opt = 1` 垂直积分液体
+
+`afwa_radar_opt = 1` 雷达
+
+`afwa_icing_opt = 1` 结冰
+
+`afwa_vis_opt = 1` 可见度
+
+`afwa_cloud_opt = 1` 云
+
+`afwa_therm_opt = 1` 热指数
+
+`afwa_turb_opt = 1` 湍流
+
+`afwa_buoy_opt = 1` 浮力             
+
+* 注意：此选项不能与OpenMP一起使用。*
+
+7. 太阳预报诊断
+
+此选项将以下变量输出到`wrfout*`文件：
+
+* 太阳天顶角
+
+* 净度指数
+
+* 2-D最大云量
+
+* 水蒸气、液体水、冰水、雪水路径
+
+* 液体云、冰、雪有效半径
+
+* 液体云、结、雪光学厚度
+
+* 云底高度和云顶高度
+
+* 对于液体和冰的变量，计算“总（液体+冰+雪）”水路、有效半径和光学厚度，其中“总”变量用于计算亚网格大气水文现象。
+
+要使用此选项，请在namelist的`&diags`部分设置：
+
+`solar_diagnostics = 1`
+
+*注意：如果同时存在tslist，则将这些相同的变量写入各自的时间序列文件。*
  
-6. ＆afwa中的afwa_diag_opt = 1 。用于打开AFWA提供的天气诊断的主要控制选项。输出进入辅助流2。（请参见http://www2.mmm.ucar.edu/wrf/users/docs/AFWA_Diagnostics_in_WRF.pdf的完整文档）。注意：这些选项不能与OpenMP一起使用。
+8. `&physics`部分的其他诊断
+
+	`do_radar_ref = 1`：使用模型中微物理学的特定参数来计算雷达反射率。适用于`mp_physics = 2,4,6,7,8,10,14,16`。
  
-afwa_ptype_opt = 1 降水类型              
-afwa_severe_opt = 1 恶劣天气诊断             
-afwa_vil_opt = 1 垂直积分液体                           
-afwa_radar_opt = 1 雷达             
-afwa_icing_opt = 1 糖衣             
-afwa_vis_opt = 1 可见度                           
-afwa_cloud_opt = 1 云             
-afwa_therm_opt = 1 热指数             
-afwa_turb_opt = 1 湍流             
-afwa_buoy_opt = 1 浮力             
- 
-7. solar_diagnostics = 1 in ＆diags 。太阳预报诊断。此选项输出太阳天顶角，净度指数，2-D最大云量，水蒸气路径，液体水路径，冰水路径，雪水路径，总水路（液体+冰+雪），液体云有效半径，冰有效半径，积雪有效半径，液态云光学厚度，结冰光学厚度，积雪光学厚度，云底高度和云顶高度。对于液体和冰的变量，计算了“总”水路，有效半径和光学厚度，其中“总”变量说明了亚网格水凝物。如果激活了solar_diagnostics，并且存在tslist，则将这些相同的变量写入各自的时间序列文件。
- 
-8.其他&physics
-do_radar_ref = 1：使用模型中特定于微物理学的参数来计算雷达反射率。适用于mp_physics = 2,4,6,7,8,10,14,16。
- 
-prec_acc_dt = 60：输出降水量的时间间隔（从积云和微物理学方案中降雨，从微物理学方案中积雪）（以分钟为单位）。
+	`prec_acc_dt = 60`：输出降水量的时间间隔（来自积云和微物理方案的雨，以及来自微物理方案的雪），以分钟为单位。
 
 <a id=Hydro></a>
 
 ### WRF-Hydro
 
-这是V3.5中的一项新功能。它将WRF模型与水文过程（例如路由和航道）耦合在一起。使用WRF-Hydro需要使用环境变量WRF_HYDRO 进行单独的编译。在c-shell环境中
-setenv WRF_HYDRO 1
-在进行“ 配置”和“ 编译”之前。编译完WRF后，将文件从hydro / Run / 目录复制到您的工作目录（例如test / em_real /）。还需要单独准备的土工格栅文件。请参考以下网站以获取详细信息：http : //www.ral.ucar.edu/projects/wrf_hydro/。（来自于伟）
+本功能将WRF模型与水文学过程（例如路由和渠化）耦合在一起。使用WRF-Hydro需要使用环境变量`WRF_HYDRO`进行单独的编译。在c-shell环境中，在进行配置和编译之前输入：
+
+`setenv WRF_HYDRO 1`
+
+编译完WRF后，将文件从`hydro/Run/`目录复制到您的工作目录（例如`test/em_real/`）。还需要准备单独的geogrid文件。请参考[此网站](http://www.ral.ucar.edu/projects/wrf_hydro/ )以获取详细信息。
 
 <a id=IO_Quilting></a>
 
 ### 使用IO Quilting
 
-此选项允许留出几个处理器以仅负责输出。如果域大小很大，和/或与在输出时间之间集成模型所花费的时间相比，写输出时间所花费的时间变得很重要，那么它可能是有用且性能友好的。设置选项有两个变量：
+此选项允许留出几个处理器以仅负责输出。如果域的尺寸很大，和/或与在输出时间之间集成模型所花费的时间相比，写入输出时间所花费的时间是重要的，那么本功能可能是有助于提升性能。设置选项有两个变量：
  
-nio_tasks_per_group ：每个IO组使用多少处理器进行IO缝。             
-通常，为此目的一个或两个处理器就足够了。
-nio_groups ：IO的多少个IO组。默认值为1。                           
+`nio_tasks_per_group`：每个IO组使用多少处理器进行IO Quilting。通常一、两个处理器就足够了。
+
+`nio_groups`：有多少个IO组，默认值为1。
  
-*注意：此选项仅用于wrf.exe。它不适用于real或ndown。
+*注意：此选项仅用于wrf.exe，不适用于real或ndown。*
 
 <a id=Physics_Suites></a>
 
 ### 使用物理套件
 
-从3.9版开始，引入了使用物理套件的选项。当前有2个可用的已批准套件（“ CONUS”和“ tropical”），它们需要在namelist.input中使用单行规范，其中包含一组经过严格测试并显示出良好且合理的结果的物理选项。 
+目前有两个可用的已批准的物理套件选项（`CONUS`和`tropical`），在namelist.input文件中仅需一行命令即可使用。此物理套件采用经过高度测试并显示合理结果的物理选项组合而已。
+
+要使用这些选项之一，只需在namelist.input的`&physics`部分中设置如下`physics_suite`参数（例子）：
+
+`physics_suite ='CONUS'`
  
-要使用这些选项之一，只需在＆physics名称列表记录中的namelist.input中设置“ physics_suite”参数，例如，
- 
-physics_suite ='CONUS'
- 
-并将为所选套件设置打包的物理选项（特别是mp_physics，cu_physics，ra_lw_physics，ra_sw_physics，bl_pbl_physics，sf_sfclay_physics和sf_surface_physics）。在运行时，模型向rsl文件打印将在仿真中使用的物理方案的摘要，如下所示（注意：这是2域运行的示例。假定所有嵌套都使用相同的物理原理）除非用户明确地覆盖了这些选项，否则请参见下面的示例）：
- 
+这将为所选套件设置打包的物理选项。模拟中使用的物理方案的摘要被打印到rsl文件中。下面是两个已批准的套件包（注意：这是一个2个域运行的示例。所有嵌套都将使用相同的物理选项，除非用户特别重写这些选项，请参见下面的示例）：
+
+```
 physics_suite = 'tropical'        physics_suite = 'CONUS'
 mp_physics =         6,  6        mp_physics =         8, 8
 cu_physics =        16, 16        cu_physics =         6, 6
@@ -1077,64 +1260,87 @@ ra_sw_physics =      4,  4        ra_sw_physics =      4, 4
 bl_pbl_physics =     1,  1        bl_pbl_physics =     2, 2
 sf_sfclay_physics = 91, 91        sf_sfclay_physics =  2, 2
 sf_surface_physics = 2,  2        sf_surface_physics = 2, 2  
- 
-只需将特定参数添加到名称列表中，即可覆盖上述任何选项。例如，如果您想使用CONUS套件，但想为域3关闭cu_physics：
- 
+```
+
+如果需要覆盖上述的任何选项，只需将特定参数添加到namelist中即可。例如，如果您想使用`CONUS`套件的同时，为域3关闭`cu_physics`选项（注：`-1`表示使用默认设置）：
+
+```
 physics_suite ='CONUS'
-cu_physics = -1，-1、0
- 
-如果您想使用CONUS套件，但想使用其他cu_physics选项，并为域3关闭cu_physics：
- 
+cu_physics = -1,-1,0
+```
+
+如果您想使用`CONUS`套件的同时，使用其他`cu_physics`选项，并为域3关闭`cu_physics`的话：
+
+```
 physics_suite ='CONUS'
-cu_physics = 2，2，0
- 
+cu_physics = 2,2,0
+```
+
 <a id=HVC></a>
 
 ### 混合垂直坐标
 
-从版本3.9开始，该选项可用于使用地形跟随（TF）垂直坐标（自最初发布以来已用于欧拉质量模型的WRF模型中的垂直坐标）或混合垂直坐标（HVC） 。在此，HVC是在地面附近跟随地形并在预定义用户级别变为等压的坐标。通过选择混合垂直坐标，干压力现在定义为： 
-P DRY （i，j，k）= B（k）（P DRY SFC （i，j）– P TOP ）+（（k）– B（k））（P 0 – P TOP ）+ P TOP
-其中B（k）字段是内部计算的一维加权数组。
-当B（k）≡ （k）时，此定义为当前TF坐标。
-当B（k）≡ ，该定义为等压的坐标系。
- 
-垂直值，其中B（k）的阵列转换到同量异序，Ç ，确定有多少的层（向下从模型盖）是同量异位的。ETAC的默认值是在注册表文件中设置的，可以在全球范围内安全使用。图5.1显示了在ETAC的多个值下，坐标面从TF到HVC的过渡。
- 
-图5.1坐标曲面从地形跟踪（TF）到等压线的过渡是the临界值的函数，在该临界值下，用户要求实现等压线曲面。 当从“加权项B（）”轴上的任何值跟踪一条水平线时，就可以看出TF与HVC系统的基本属性。 例如，在= 0.2时，TF系统中的模型坐标“平坦度”与在VCC = 0.4时，当H = 0.6的近似值时，HVC系统中的模型坐标相同。
+从4.0版本开始，混合垂直坐标（HVC）作为默认值替换了地形跟随（TF）垂直坐标（该坐标自初始版本以来一直用于欧拉质量模型）。在这里，HVC坐标是地面附近采用地形跟随，并且在用户预定义的层变为等压。选择HVC坐标后，干压力现在定义为：
 
-给出了等压坐标（图5.2a），地形坐标（图5.2b）和混合坐标（图5.2c）的表面的垂直位置，并带有简单的2d横截面。显示的是大气高度（m）和压力。
+PDRY(i,j,k) = B(k) (PDRY SFC(i,j) – PTOP) + (h(k) – B(k)) (P0 – PTOP) + PTOP  
+
+其中B(k)字段是内部计算的一维加权数组。
+
+当B(k) ≡ h(k)时，此坐标就简化为TF坐标。
+当B(k) ≡ 0时，此坐标就简化为等压坐标。
+
+B(k)数组过渡到等压的垂直值——hC——决定了有多少h层（从模型顶向下）是等压的。ETAC的默认值在`Registry/registry.hyb_coord`文件中设置，并可在全球范围内安全使用。图5.1显示了在几个ETAC值下，坐标面从TF到HVC的过渡。
+
+![TF_to_HVC](images/chap5_TF_to_HVC.png)
+
+图5.1 从地形跟随（TF）到等压的h坐标表面的转换是h的临界值的函数，在该临界值处，用户请求获得等压表面。当从“加权项B(h)”轴上的任何值追踪水平线时，可以看到TF与HVC系统的基本特性。例如，TF系统中h=0.2的模型坐标“平坦度”与HVC系统中hC=0.4（当h的近似值=0.6时）的模型坐标“平坦度”相同。
+
+下面采用简单的2d横截面图的方式给出了等压坐标（图5.2a）、地形跟随坐标（图5.2b）和混合坐标（图5.2c）的h表面垂直位置的描述。图上显示了大气层高度（m）和压力。
+
+![Isobaric](images/chap5_Isobaric.png)
+
+![TF](images/chap5_TF.png)
+
+![HVC](images/chap5_HVC.png)
    
-图5.2三本横截面图显示的垂直位置表面，用于一个给定的模型盖（25公里大约为25帕斯卡）和用于给定Ç = 0.2。
+图5.2 三个横截面图显示了给定模型顶（25km约为25hPa）和给定hC=0.2时h表面的垂直位置。
 
-在V4.0中，此选项成为默认选项。设置hybrid_opt = 0 选项将使模型返回到原始的地形跟随坐标。
-重要的是real.exe 和wrf.exe 程序都必须以相同的hybrid_opt值运行。
-将HVC数据发送到后处理器时，用户必须小心。后处理器必须知道干压的新定义。最好将静水压力（P_HYD）或总压力（PB + P）用于诊断和垂直插值。
+如果希望恢复使用TF坐标选项，则需要在namelist的`&dynamics`部分中设置`hybrid_opt=0`。且real.exe以及wrf.exe两个程序必须以相同的`hybrid_opt`值运行。
+
+向后处理器发送HVC数据时要小心，因为后处理器必须知道干压力的新定义。建议使用静水压力（P_HYD）或总压力（PB+P）进行诊断和垂直插值。
  
 <a id=Multiple_Lateral_Condition></a>
 
 ### 使用多个横向条件文件
 
-为了在实时场景中加快对横向边界条件的预处理，该模型可以创建多个横向条件文件，但是可以通过编译选项来完成（在configure.wrf文件的ARCH_LOCAL宏中添加-D_MULTI_BDY_FILES_）。这样就可以在周围时间段可用时立即创建边界条件文件，因此可以使模型更快地开始仿真。从V4.2开始，可以通过运行时选项来实现。要使用此选项，需要在namelist.input文件中添加以下选项： 
-＆time_control
-bdy_inname =“ wrfbdy_d <域> _ <日期>”
- 
-和
- 
-＆bdy_control
-multi_bdy_files = .true。
+为了在real-time场景中加快对横向边界条件的预处理，新的模型提供了一个创建多个横向边界条件文件的选项，以前是通过编译选项完成的（在`configure.wrf`文件的`ARCH_LOCAL`中添加`-D_MULTI_BDY_FILES_`）。这允许在周围时间段可用时立即创建边界条件文件，从而允许模型更快地开始模拟。从V4.2版本开始，这可以通过运行时选项来实现，将以下内容添加到namelist.input文件：
+
+```
+&time_control       
+bdy_inname      = "wrfbdy_d<domain>_<date>"
+
+&bdy_control       
+multi_bdy_files = .true.
+```
 
 生成的文件将如下所示（每6小时一次的数据间隔）：
-wrfbdy_d01_2000-01-24_12：00：00
-wrfbdy_d01_2000-01-24_18：00：00
-wrfbdy_d01_2000-01-25_00：00：00
-wrfbdy_d01_2000-01-25_06：00：00
- 
+
+```
+wrfbdy_d01_2000-01-24_12:00:00       
+wrfbdy_d01_2000-01-24_18:00:00       
+wrfbdy_d01_2000-01-25_00:00:00       
+wrfbdy_d01_2000-01-25_06:00:00
+```
+
 <a id=Examples_namelists></a>
 
 ### 各种应用的namelist示例
 
-这里提供了一些物理选项集（加上模型顶部和垂直级别的数量）以供参考。它们可以为在您的应用程序中测试模型提供一个很好的起点。另请注意，其他因素也会影响结果；例如，域设置，垂直模型级别的分布以及输入数据。
-a.1-4公里的网格距离，需要运行1至3天（用于2013年美国NCAR春季实时对流预报以及2015年至2017年3 km合奏，这就是“圆锥曲线” （不含积算方案的物理套件）：
+这里提供了一些物理选项集（包括模型顶部和垂直层的数量）以供参考。它们可以为在您的应用程序中测试模型提供一个很好的起点。另请注意，其他因素也会影响结果；例如区域设置、模型垂直层的分布以及输入数据。
+
+1. 网格尺寸为1~4km，允许对流运行，1-3天（即用于2013年美国NCAR春季实时对流预报和2015-2017年3km集合，这是没有积云方案的`CONUS`物理套件）：
+
+```
 mp_physics                          = 8,
 ra_lw_physics                       = 4,
 ra_sw_physics                       = 4,
@@ -1144,115 +1350,177 @@ sf_surface_physics                  = 2,
 bl_pbl_physics                      = 2,
 bldt                                = 0,
 cu_physics                          = 0,
+
 ptop_requested                      = 5000,
 e_vert                              = 40,
+```
 
-b．网格距离为10 – 20 km，运行1至3天（例如，美国NCAR每日实时运行）：
-mp_physics = 8，
-ra_lw_physics = 4，
-ra_sw_physics = 4，
-radt = 15，
-sf_sfclay_physics = 1，
-sf_surface_physics = 2，
-bl_pbl_physics = 1，
-bldt = 0，
-cu_physics = 3，
-cudt = 0，
-ptop_requested = 5000，
-e_vert = 39，
+2. 网格尺寸为10~20km，运行1至3天（例如，美国NCAR每日实时运行）：
 
-C。寒冷地区10 – 30 km的网格尺寸（例如，在NCAR的南极中尺度预测系统中使用）：
-mp_physics = 4，
-ra_lw_physics = 4，
-ra_sw_physics = 2，
-radt = 15，
-sf_sfclay_physics = 2，
-sf_surface_physics = 2，
-bl_pbl_physics = 2，
-bldt = 0，
-cu_physics = 1，
-cudt = 5，
-fractional_seaice = 1，
-seaice_threshold = 0.0，
-ptop_requested = 1000，
-e_vert = 44，
+```
+mp_physics                          = 8,
+ra_lw_physics                       = 4,
+ra_sw_physics                       = 4,
+radt                                = 15,
+sf_sfclay_physics                   = 1,
+sf_surface_physics                  = 2,
+bl_pbl_physics                      = 1,
+bldt                                = 0,
+cu_physics                          = 3,
+cudt                                = 0,
 
-d。飓风应用（例如NCAR的实时飓风在2012年使用的36、12和4 km嵌套）：mp_physics = 6，
-ra_lw_physics = 4，
-ra_sw_physics = 4，
-radt = 10，
-sf_sfclay_physics = 1，
-sf_surface_physics = 2，
-bl_pbl_physics = 1，
-bldt = 0，
-cu_physics = 6，（仅在36/12 km网格上）
-cudt = 0，
-isftcflx = 2
-ptop_requested = 2000，
-e_vert = 36，
+ptop_requested                      = 5000,
+e_vert                              = 39,
+```
 
-e．10 – 30 km网格大小的区域气候案例（例如用于NCAR的区域气候运行）：
-mp_physics = 6，
-ra_lw_physics = 3，
-ra_sw_physics = 3，
-radt = 30，
-sf_sfclay_physics = 1，
-sf_surface_physics = 2，
-bl_pbl_physics = 1，
-bldt = 0，
-cu_physics = 1，
-cudt = 5，
-sst_update = 1，
-tmn_update = 1，
-sst_skin = 1，
-bucket_mm = 100.0，
-bucket_J = 1.e9，
-ptop_requested = 1000，
-e_vert = 51，
-spec_bdy_width = 10，
-spec_zone = 1，
-relax_zone = 9，
-spec_exp = 0.33，
+3. 寒冷地区，网格尺寸为10~30km（例如，在NCAR的南极中尺度预测系统中使用）：
+
+```
+mp_physics                          = 4,
+ra_lw_physics                       = 4,
+ra_sw_physics                       = 2,
+radt                                = 15,
+sf_sfclay_physics                   = 2,
+sf_surface_physics                  = 2,
+bl_pbl_physics                      = 2,
+bldt                                = 0,
+cu_physics                          = 1,
+cudt                                = 5,
+fractional_seaice                   = 1,
+seaice_threshold                    = 0.0,
+
+ptop_requested                      = 1000,
+e_vert                              = 44,
+```
+
+4. 飓风应用（例如NCAR在2012年使用36、12和4km嵌套的实时飓风运行）：
+
+```
+mp_physics                          = 6,
+ra_lw_physics                       = 4,
+ra_sw_physics                       = 4,
+radt                                = 10,
+sf_sfclay_physics                   = 1,
+sf_surface_physics                  = 2,
+bl_pbl_physics                      = 1,
+bldt                                = 0,
+cu_physics                          = 6, (only on 36/12 km grid)
+cudt                                = 0,
+isftcflx                            = 2,
+
+ptop_requested                      = 2000,
+e_vert                              = 36,
+```
+
+5. 网格尺寸为10~30km，区域气候案例（例如用于NCAR的区域气候运行）：
+
+```
+mp_physics                          = 6,
+ra_lw_physics                       = 3,
+ra_sw_physics                       = 3,
+radt                                = 30,
+sf_sfclay_physics                   = 1,
+sf_surface_physics                  = 2,
+bl_pbl_physics                      = 1,
+bldt                                = 0,
+cu_physics                          = 1,
+cudt                                = 5,
+sst_update                          = 1,
+tmn_update                          = 1,
+sst_skin                            = 1,
+bucket_mm                           = 100.0,
+bucket_J                            = 1.e9,
+ptop_requested                      = 1000,
+e_vert                              = 51,
+
+spec_bdy_width                      = 10,
+spec_zone                           = 1,
+relax_zone                          = 9,
+spec_exp                            = 0.33,
+```
 
 <a id=Check_Output></a>
 
 ### 检查输出文件
 
-模型运行完成后，优良作法是快速检查几件事。
-如果使用MPI在多个处理器上运行模型，则应该有多个rsl.out。* 和rsl.error。* 文件。
-输入“ tail rsl.out.0000 ”以查看是否获得“ SUCCESS COMPLETE WRF ”。这很好地表明该模型已成功运行。
-名称列表选项将写入一个单独的文件：namelist.output 。
-使用netCDF命令检查写入wrfout * 文件的输出时间：
-  ncdump –v时间wrfout_d01_yyyy-mm-dd_hh：00：00
-查看rsl.out.0000 文件或其他标准输出文件。此文件记录了为一个模型时间步进行计算并写入一个历史记录并重新启动输出文件所花费的时间：
+模型运行完成后，最好的作法是快速检查几件事。
+
+如果您使用分布式内存（dmpar）构建模型，应该每个处理器都有一个`rsl.out.*`和`rsl.error.*`文件。输入`tail rsl.out.0000`以查看是否有`SUCCESS COMPLETE WRF`，这表示模型已成功运行。
+
+Namelist选项将写入一个单独的文件`namelist.output`。
+
+使用如下netCDF命令检查写入`wrfout*`文件的输出时间：
+
+`ncdump –v Times wrfout_d01_yyyy-mm-dd_hh:00:00`
+
+查看`rsl.out.0000`文件或其他标准输出文件，此文件记录了为一个模型时间步长进行计算的时间，以及写入一个历史记录和重新启动输出文件所花费的时间：
+
+```
 Timing for main: time 2006-01-21_23:55:00 on domain  2:    4.91110 elapsed seconds.
 Timing for main: time 2006-01-21_23:56:00 on domain  2:    4.73350 elapsed seconds.
 Timing for main: time 2006-01-21_23:57:00 on domain  2:    4.72360 elapsed seconds.
 Timing for main: time 2006-01-21_23:57:00 on domain  1:   19.55880 elapsed seconds.
-and
+
 Timing for Writing wrfout_d02_2006-01-22_00:00:00 for domain 2: 1.17970 elapsed seconds.
 Timing for main: time 2006-01-22_00:00:00 on domain 1: 27.66230 elapsed seconds.
 Timing for Writing wrfout_d01_2006-01-22_00:00:00 for domain 1: 0.60250 elapsed seconds.
+```
 
 <a id=Trouble_Shooting></a>
 
 ### 故障排除
 
-- 如果模型很快中止，则可能是计算机内存不足以运行特定配置，或者输入数据存在严重问题。对于第一个潜在问题，请尝试输入' unlimit '或' ulimit -s unlimited '，以查看是否可以获得更多的内存和/或堆栈大小。         
-- 对于OpenMP（Smpar编译的代码），需要将堆栈大小设置为大，但不限制为无限。无限的堆栈大小可能会使计算机崩溃。         
-- 要检查输入数据是否有问题，请使用ncview或其他netCDF文件浏览器检查wrfinput文件中的字段。         
-- 看到的另一个常见错误是“ module_configure：initial_config：读取名称列表时出错”。这是来自模型的错误消息，说namelist.input 文件中存在错误和错别字。谨慎编辑namelist.input 文件。如果不确定，请始终从可用的模板开始。V3错误消息中提供了发生名称列表读取错误的名称列表记录，它应有助于识别错误。         
-- 如果模型不能完成运行，一种可能性是该模型可能在数值上变得不稳定，这意味着用于及时求解模型的时间步长太大，无法获得稳定的解决方案。即使遵守设置模型时间步长的标准规则（在物理空间中以千米为单位约为6 * DX），模型域的其他配置也可能会影响结果。例如，如果一个模型层很薄，或者使用很大的区域，并且该区域的角可能具有非常大的地图比例因子，则这会使等效地球距离减小到比模型网格大小小得多。可以通过在标准输出/错误文件（例如rsl文件）中搜索CFL打印来找出是否是这种情况：         
-grep cfl rsl.error。* 或grep cfl wrf.out
+* 如果模型很快中止运行，则可能是计算机内存不足以运行特定配置，或者输入数据存在严重问题。对于第一个问题，请尝试输入`unlimit`或`ulimit -s unlimited`（在配置和编译之前），以查看是否可以获得更多的内存和/或堆栈大小。   
+      
+* 对于OpenMP（Smpar编译的代码），需要将堆栈大小设置为大，但不是无限。无限的堆栈大小可能会使计算机崩溃。         
+
+* 要检查输入数据是否有问题，请使用ncview或其他netCDF文件浏览器检查wrfinput文件中的字段。
+
+* 另一个常见的错误是`ERRORS while reading one or more namelists from namelist.input`。这是来自模型的错误消息，说namelist.input 文件中存在错误和错别字。在错误消息上方，模型尝试确定namelist出现问题的位置。检查并修改上述行。小心编辑namelist.input。如果不确定时，请始终从可用的默认模板开始。
+
+* 如果模型不能完成运行，一种可能性是模型可能在数值上变得不稳定，这意味着用于及时求解模型的时间步长太大，无法获得稳定的解决方案。即使遵守设置模型时间步长的标准规则（在物理空间中以千米为单位，不超过6 ×DX），模型域的其他配置也可能会影响结果。例如，如果模型层很薄，或者使用很大的区域并且该区域的角可能具有非常大的地图比例因子，这会使等效地球距离减小到比模型网格大小小得多。检查`rsl.error.*`文件中是否存在cfl错误。
+
+`grep cfl rsl.error.*`
+
+或者
+
+`grep cfl wrf.out`
 
 你可能会看到以下内容：
-5 points exceeded cfl=2 in domain            1 at time   4.200000  
-  MAX AT i,j,k:          123          48          3 cfl,w,d(eta)= 4.165821 
-21 points exceeded cfl=2 in domain            1 at time   4.200000  
-  MAX AT i,j,k:          123          49          4 cfl,w,d(eta)= 10.66290
 
-     i，j，k的最大值：123 49 4 cfl，w，d（eta）= 10.66290 发生这种情况时，请考虑使用名称列表选项w_damping 和/或减少时间步长。  
-	 
+```
+5 points exceeded cfl=2 in domain            1 at time   4.200000 
+  MAX AT i,j,k:          123          48          3 cfl,w,d(eta)= 4.165821
+21 points exceeded cfl=2 in domain            1 at time   4.200000 
+  MAX AT i,j,k:          123          49          4 cfl,w,d(eta)= 10.66290
+```
+
+当发生这种情况时，请考虑使用namelist选项`w_damping`和/或减少时间步长。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <a id=Physics_Dynamics></a>
 
 ### 物理与动力学选项
