@@ -1516,13 +1516,13 @@ WRF提供了多种物理选项，可以以任何方式进行组合。这些选�
 
 #### 1. 微物理方案（mp_physics）
 
-1.2 Kessler scheme（`mp_physics = 1`）：理想化云模拟研究中常用的暖雨降水（即无冰）方案。
+	1.2 Kessler scheme（`mp_physics = 1`）：理想化云模拟研究中常用的暖雨降水（即无冰）方案。
 
-1.2 Purdue Lin scheme（`mp_physics = 2`）：具有冰、雪和霰过程的复杂方案，适用于real-data的高分辨率模拟。
+	1.2 Purdue Lin scheme（`mp_physics = 2`）：具有冰、雪和霰过程的复杂方案，适用于real-data的高分辨率模拟。
 
-1.3 WRF Single-Moment 3-class scheme（`mp_physics = 3`）：一种简单有效的方案，具有适用于中尺度网格大小的冰雪过程。
+	1.3 WRF Single-Moment 3-class scheme（`mp_physics = 3`）：一种简单有效的方案，具有适用于中尺度网格大小的冰雪过程。
 
-1.4 WRF Single-Moment 5-class scheme（`mp_physics = 4`）：WRF Single-Moment 3-class scheme的稍微复杂一些的版本，它允许进行混合相过程和过冷的水。
+	1.4 WRF Single-Moment 5-class scheme（`mp_physics = 4`）：WRF Single-Moment 3-class scheme的稍微复杂一些的版本，它允许进行混合相过程和过冷的水。
 
 1.5 Ferrier Eta microphysics（`mp_physics = 5,95`）：NCEP模型中的操作微物理。一种简单有效的混合相过程诊断方案。对于精细分辨率（<5km），使用选项（5），对于粗分辨率，使用选项（95）。
 
