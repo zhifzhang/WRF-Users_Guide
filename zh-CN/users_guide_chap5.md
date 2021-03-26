@@ -2060,147 +2060,186 @@ ra_lw_physics|Scheme|Cores+Chem|Microphysics Interaction|Cloud Fraction|Ozone|GH
 
 **变量名称**|**输入选项**|**描述**
 -------------|------------|--------
-&time_control|-|时间控制选项
+**&time_control**|-|**时间控制选项**
 run_days|0|模拟运行时间（天）
 run_hours|0|模拟运行时间（小时）
--|-|*注意：如果运行时间超过1天，可以同时设置run_days和run_hours，也可以只设置run_hours。比如运行时间为36h，可以设置run_days=1和run_hours=12，或者设置run_days=0和run_hours=36*
+-|-|**注意：如果运行时间超过1天，可以同时设置run_days和run_hours，也可以只设置run_hours。比如运行时间为36h，可以设置run_days=1和run_hours=12，或者设置run_days=0和run_hours=36**
 run_minutes|0|模拟运行时间（分钟）
 run_seconds|0|模拟运行时间（秒）
--|-|*注意：以下的开始时间用于命名第一个wrfout文件。它还控制嵌套域的开始时间和重新启动的时间。*
+-|-|**注意：以下的开始时间用于命名第一个wrfout文件。它还控制嵌套域的开始时间和重新启动的时间。**
 start_year (max_dom)|2019|开始时间的4位数年
 start_month (max_dom)|09|开始时间的2位数月
 start_day (max_dom)|04|开始时间的2位数日
-start_hour (max_dom)|12|开始时间的2位数小时
-start_minute (max_dom)|00|开始时间的2位数分钟
+start_hour (max_dom)|12|开始时间的2位数时
+start_minute (max_dom)|00|开始时间的2位数分
 start_second (max_dom)|00|开始时间的2位数秒
-*Note:  all end times also control when the nest domain integrations end. All start and end times are used by real.exe. You may use either run_days/run_hours/etc. or end_year/month/day/hour/etc. to control the length of model integration; but run_days/run_hours takes precedence over the end times. real.exe uses start and end times only
-end_year (max_dom)|2019|4 digit year of ending time
-end_month (max_dom)|09|2 digit month of ending time
-end_day (max_dom)|06|2 digit day of ending time
-end_hour (max_dom)|00|2 digit hour of ending time
-end_minute (max_dom)|00|2 digit minute of ending time
-end_second (max_dom_|00|2 digit second of ending time 
-interval_seconds|10800|time interval between incoming real data, which is the interval between times in the lateral boundary condition file (in seconds) (for real only)
-input_from_file (max_dom)|.true.|(logical); whether the nested run will use input files for domains other than domain 1
-fine_input_stream (max_dom)| |Option to select fields to use from nest input for initialization
- |0|all fields from nest input are used (default)
- |2|only nest input specified from input stream 2 (defined in the Registry) are used. This requires setting io_form_auxinput2
-history_interval (max_dom)|60|Frequency (in simulation minutes) that data is written/recorded to history output file(s) (wrfout_d0*) (integer only)
-history_interval_d history_interval_h history_interval_m history_interval_s (max_dom)|1|Same as above, but the frequency is in days, hours, minutes, and seconds, respectively. Used as an alternative to history_interval
-history_begin (max_dom)|0|Number of minutes from the start of the run in which the history output file is written
-history_begin_y  history_begin_d history_begin_h history_begin_m history_begin_s (max_dom)|0|Same as above, but number of years, days, hours, minutes, and seconds, respectively. Used as an alternative to history_begin
-frames_per_outfile (max_dom)|1|number of history output times bulked into each history file; used to split output files into smaller pieces
-restart|.false.|whether this run is a restart
-restart_interval|1440|restart output file interval in minutes
-override_restart_timers|.false.|uses all output intervals (including history) given by the wrfrst files
- |.true.|uses restart output intervals given by the namelist
-write_hist_at_0h_rst|.false.|does not give a history file at the initial time of restart (prevents overwriting original history file at this time)
- |.true.|gives a history file at the initial time of restart
-output_ready_flag|.true.|asks the model to write-out an empty file with the name 'wrfoutReady_d<domain>_<date>; Useful in production runs so that post-processing code can check on the completeness of this file.
-force_use_old_data|.false.|(default) stop when WRF model detects Version 3 input data
- |.true.|Allow WRF version 3 input data
-reset_simulation_start|.false.|whether to overwrite the simulation start date with the forecast start time
-auxinput1_inname|"met_em.d<domain><date>"|name of input file from WPS; only needs to be added if not using the default file names
-auxinput4_inname|"wrflowinp_d<domain>"|name of input file for lower boundary file; works with sst_update = 1
-auxinput4_interval (max_dom)|360|file interval in minutes for lower boundary file; works with sst_update = 1
-io_form_auxinput4|2|IO format for wrflowinp files; works with sst_update = 1
-io_form_history| |the format for the history output file(s)
- |2|netCDF
- |102|split netCDF files, one per processor  *NOTE:  no supported post-processing software for split files
- |1|binary format *NOTE:  no supported post-processing software available
- |4|PHDF5 format *NOTE:  no supported post-processing software available
- |5|GRIB1
- |10|GRIB2
- |11|parallel netCDF
-io_form_restart| |the format for restart output file(s) (wrfrst*)
- |2|nedCDF
- |102|split netCDF files, one per processor (must restart with the same number of processors)
-io_form_input| |the format of the input files
- |2|netCDF
- |102|allows the program real.exe to read in split met_em* files, and write split wrfinput files. There is no split file for the wrfbdy file.
-io_form_boundary| |the format for the wrfbdy file
- |2|netCDF format
- |4|PHD5 format
- |5|GRIB1 format
- |10|GRIB2 format
- |11|pnetCDF format
-ncd_nofill|.true.|Option for handling of netcdf writes. If set to .true., it could potentially improve IO speed. (default) only a single write, not the write/read/write sequence
-io_form_auxinput2| |IO format for input stream 2 data
- |2|netCDF format
- |4|PHD5 format
- |5|GRIB1 format
- |10|GRIB2 format
- |11|pnetCDF format
-diag_print|1|Allows output of domain-averaged 3-hourly hydrostatic surface pressure tendency (Dpsfc/Dt), and dry-hydrostatic column pressure tendency (Dmu/Dt). This is in stdout file.
- |2|in addition to those listed above, domain-averaged rainfall, surface evaporation, and sensible and latent heat fluxes are output in stdout file.
-debug_level|0|giving this a larger value (50, 100, 200, etc.) increases the debugging print-outs when running WRF. NOTE: this option was removed from default namelists because it rarely provides any useful information and adds a lot of junk to the standard error/output files, making them difficult to read and sometimes too large to write – causing runtime crashes.
-auxhist2_outname|"rainfall_d<domain>"|file name to write additional output to a different unit or output stream.. If not specified, “auxhist2_d<domain>_<date>” is used. NOTE: to write variables in output other than the history file requires either a change in the Registry.EM_COMMON file, or the use of the option iofields_filename option.
-auxhist2_interval (max_dom)|10|the interval in minutes for the output when using auxhist2
-io_form_auxhist2| |output format for using auxhist2
- |2|netCDF format
- |4|PHD5 format
- |5|GRIB1 format
- |10|GRIB2 format
- |11|pnetCDF format
-frames_per_auxhist2 (max_dom)|1000|how many output times are in each output file
-auxinput11_interval (max_dom)|10|interval in minutes for obs nudging input. It should be set as the same (or greater) frequency as obs_ionf (with the unit of the coarse domain time step)
-auxinput11_end_h (max_dom)|6|end of the observation time (in hours), when using the obs nudging option
-nocolons|.false.|when set to .true. this replaces the colons with underscores in the output file names
-write_input|.true.|write input-formatted data as output for 3DVAR application
-inputout_interval (max_dom)|180|interval in minutes when using the write_input option
-input_outname|"wrf_3dvar_input_d<domain>_<date>"|Output file name from 3DVAR
-inputout_begin_y inputout_begin_d inputout_begin_h inputout_begin_m inputout_begin_s (max_dom)|0|beginning year, day, hour, minute, and second (respectively) to write 3DVAR data
-inputout_end_y inputout_end_d inputout_end_h inputout_end_m inputout_end_s (max_dom)|0|ending year, day, hour, minute, second (respectively) to write 3DVAR data
-all_ic_times|.true.|when set to .true., allows you to output a wrfinput file for all time periods
-adjust_output_times|.true.|adjust output times to the nearest hour
-output_ready_flag|.true.|(default = .false.); when turned on, the model will write out an empty file with the name wrfoutReady_d<domain>_<date>. Useful in production runs so post-processing code can check on the existence of this file to start doing processing.
-output_diagnostics|1|set to =1 to add 48 surface diagnostic arrays (max/min/mean/std) in the time interval specified.  See details in section “p” earlier in this chapter.
-nwp_diagnostics|1|set to =1 to add history_interval max diagnostic fields  (10m wind speed, max helicity in 2-5km layer, max vertical velocity in updraft and downdraft below 400mb, mean vertical velocity in 2-5km layer, max column graupel)
-**also turn on do_radar_ref
-Options for automatic moving nests
-input_from_hires (max_dom)|.true.|When set to .true., high-resolution terrain and landuse are used in the nests (requires special input data), and environment variable TERRAIN_AND_LANDUSE set at compile time). See section “f” earlier in this chapter for details.
-rsmas_data_path|“high-res-data-directory”|Path to directory where the high-res data resides
-iofields_filename (max_dom)|"my_iofields_list.txt"|option to output additional variables, or to remove variables from output if you do not want them to.  You must also create a text file (my_iofields_list.txt) in which you will declare the variables to be output. See details earlier in this chapter.
-ignore_iofields_warning|.true.|tells the model to continue if an error is encountered in the user-specified files, when using the iofields_filename option. If set to .false., the model will abort if an error is encountered in the files.
-&domains| |dimensions, nesting, parameters
-time_step|60|time step for integration seconds (no more than 6*dx in km for a typical case)
-time_step_fract_num|0|numerator for fractional time step
-time_step_fract_den|1|denominator for fractional time step.  E.g., if you want to use 60.3 sec as your time step, set time_step = 60, time_step_fract_num = 3, and time_step_fract_den = 10.
-time_step_dfi|60|time step when setting dfi_opt = 1, may be different from the regular time step
-max_dom|1|the number of domains you are running
-s_we (max_dom)|1|start index in x (west-east) direction (do not change this)
-e_we (max_dom)|91|end index in x (west_east) direction (staggered dimension)
-s_sn (max_dom)|1|start index in y (south-north) direction (do not change this)
-e_sn (max_dom)|82|end index in y (south-north) direction (staggered dimension)
-s_vert (max_dom)|1|start index in z (vertical) direction (do not change this)
-e_vert (max_dom)|30|end index in z (vertical) direction (staggered dimension -- this refers to full levels).  Most variables are on unstaggered levels. *Note:  vertical dimensions must be the same for all nests
-dx (max_dom)|30000|grid length in x-direction (in meters)
-dy (max_dom)|30000|grid length in y-direction (in meters)
-ztop (max_dom)|19000|height in meters; used to define model top for idealized cases
-grid_id (max_dom)|1|domain identifier
-parent_id (max_dom)|1|ID of the domain’s parent domain
-i_parent_start (max_dom)|1|the starting lower-left corner i-indice from the parent domain
-j_parent_start (max_dom)|1|the starting lower-left corner j_indice from the parent domain
-parent_grid_ratio (max_dom)|1|parent-to-nest domain grid size ratio. *Note:  recommend odd ratios (3:1 or 5:1). Ratio can be even if feedback=0
-parent_time_step_ratio (max_dom)|1|parent-to-nest time step ratio; this can be different from the parent_grid_ratio
-feedback|1|Set to 1 for feedback from nest to its parent domain. Set to 0 for no feedback.
-smooth_option| |smoothing option for parent domain; used only with feedback
- |0|turned off
- |1|1-2-1 smoothing option for parent domain; used only with feedback=1
- |2|(default) smoothing-desmoothing option for parent domain; used only with feedback=1
-hypsometric_opt|2
- |(default) computes height in real.exe and pressure in the model (ARW only) by using the hypsometric equation (less biased when compared against input data)
- |1|original method – based on a form of the hydrostatic equation that depends on air density           
-max_ts_locs|5|maximum number of time series locations
-max_ts_level|15|highest model level for profile output when using time series option
-wif_input_opt|1|Option to process the Water Ice Friendly Aerosol input from metgrid used for mp_physics=28; see run/README.namelist for additional information (default is 0=off)
-num_wif_levels|27|number of levels in the Thompson Water Ice Friendly Aerosols (mp_physics = 28); see run/README.namelist for additional information
+-|-|**注意：以下的所有结束时间还控制嵌套区域积分何时结束。所有开始和结束时间都被real.exe程序读取。您可以使用run_days/run_hours/等，也可以使用end_year/month/day/hour/等来控制WRF模型的运行时间；在同时设置的情况下，run_days/run_hours优先于以下结束时间的设置。但real.exe程序仅使用开始和结束时间**
+end_year (max_dom)|2019|结束时间的4位数年
+end_month (max_dom)|09|结束时间的2位数月
+end_day (max_dom)|06|结束时间的2位数日
+end_hour (max_dom)|00|结束时间的2位数时
+end_minute (max_dom)|00|结束时间的2位数分
+end_second (max_dom_|00|结束时间的2位数秒
+interval_seconds|10800|输入数据的时间间隔，即横向边界条件文件中的时间间隔（以秒为单位），仅适用于real
+input_from_file (max_dom)|.true.|逻辑开关选项；嵌套运行中是否将输入文件用于域1以外的域
+fine_input_stream (max_dom)| |从嵌套输入中选择要用于初始化字段的选项
+-|0|使用嵌套输入中的所有字段（默认值）
+-|2|只使用在输入stream 2（在Registry中定义）中指定的嵌套输入。需要同时设置io_form_auxinput2
+history_interval (max_dom)|60|将数据写入/记录到历史输出文件（`wrfout_d0*`）的频率（以模拟分钟为单位，仅限整数）
+history_interval_d (max_dom)|1|同上，但单位为天，可代替history_interval
+history_interval_h (max_dom)|1|同上，但单位为时，可代替history_interval
+history_interval_m (max_dom)|1|同上，但单位为分，可代替history_interval
+history_interval_s (max_dom)|1|同上，但单位为秒，可代替history_interval
+history_begin (max_dom)|0|从开始运行到写入历史输出文件的分钟数
+history_begin_y (max_dom)|0|同上，但单位为年，可代替history_begin
+history_begin_d (max_dom)|0|同上，但单位为天，可代替history_begin
+history_begin_h (max_dom)|0|同上，但单位为时，可代替history_begin
+history_begin_m (max_dom)|0|同上，但单位为分，可代替history_begin
+history_begin_s (max_dom)|0|同上，但单位为秒，可代替history_begin
+frames_per_outfile (max_dom)|1|写入到每个历史文件中的历史输出次数；本选项可用于将输出文件分割成更小的部分
+restart|.false.|此次运行是否为重新启动
+restart_interval|1440|重新启动输出文件的时间间隔（分钟）
+override_restart_timers|.false.|使用wrfrst文件给定的所有输出时间间隔（包括历史记录）
+-|.true.|使用namelist给定的重新启动输出time间隔
+write_hist_at_0h_rst|.false.|在重新启动的初始时间不输出历史文件（防止此时覆盖原始历史文件）
+-|.true.|在重新启动的初始时间输出历史文件
+output_ready_flag|.true.|要求模型输出一个名为`wrfoutReady_d<domain>_<date>`的空文件，该文件在生产运行中很有用，以便后处理代码可以检查此文件的完整性
+force_use_old_data|.false.|（默认值）当WRF模型检测到版本3的输入数据时停止运行
+-|.true.|允许使用WRF版本3的输入数据
+reset_simulation_start|.false.|是否用预测开始时间覆盖模拟开始日期
+auxinput1_inname|"met_em.d<domain><date>"|WPS中输入文件的名称；仅当不使用默认文件名时才需要添加本选项
+auxinput4_inname|"wrflowinp_d<domain>"|下边界文件的输入文件名，与`sst_update = 1`选项一起使用
+auxinput4_interval (max_dom)|360|下边界文件的时间间隔（分钟），与`sst_update = 1`选项一起使用
+io_form_auxinput4|2|wrflowinp文件的IO格式，与`sst_update = 1`选项一起使用
+io_form_history|-|历史输出文件的格式
+-|2|netCDF
+-|102|split netCDF files, one per processor  **注意：本格式没有可支持的后处理软件**
+-|1|binary format  **注意：本格式没有可支持的后处理软件**
+-|4|PHDF5 format  **注意：本格式没有可支持的后处理软件**
+-|5|GRIB1
+-|10|GRIB2
+-|11|parallel netCDF
+io_form_restart|-|重新启动文件（wrfrst*）的输出格式
+-|2|nedCDF
+-|102|split netCDF files, one per processor（必须使用相同数量的处理器重新启动）
+io_form_input|-|输入文件的格式
+-|2|netCDF
+-|102|允许real.exe程序读取拆分的met_em*文件，并写入拆分的wrfinput文件。wrfbdy文件没有拆分文件。
+io_form_boundary|-|wrfbdy文件的格式
+-|2|netCDF format
+-|4|PHD5 format
+-|5|GRIB1 format
+-|10|GRIB2 format
+-|11|pnetCDF format
+ncd_nofill|.true.|用于处理netcdf写入的选项。如果设置为.true.（默认值），可能会提高IO速度。只有一次写入，而不是写入/读取/写入序列
+io_form_auxinput2|-|输入stream 2数据的IO格式
+-|2|netCDF format
+-|4|PHD5 format
+-|5|GRIB1 format
+-|10|GRIB2 format
+-|11|pnetCDF format
+diag_print|1|允许输出区域平均的3小时均值静水压力趋势（Dpsfc/Dt）和干静水压柱压力趋势（Dmu/Dt）。写入标准输出文件中。
+-|2|除了上面列出的那些外，还可以将区域平均降雨量、表面蒸发、显热通量和潜热通量写入标准输出文件中。
+debug_level|0|当运行WRF时，给它一个较大的值（50、100、200等）会增加输出的调试信息。注意：此选项已从默认namelist中删除，因为它很少提供任何有用的信息，并向标准error/output文件中添加了大量垃圾，使其难以读取，有时甚至太大而无法写入，从而导致运行崩溃
+auxhist2_outname|"rainfall_d<domain>"|将更多输出信息写入不同单元或输出stream的文件名。如果未指定，则使用`auxhist2_d<domain>_<date>`。注意：要在输出中写入历史文件中以外的变量，需要更改`Registry.EM_COMMON`文件，或使用`iofields_filename`选项。
+auxhist2_interval (max_dom)|10|使用auxhist2时输出的时间间隔（以分钟为单位）
+io_form_auxhist2|-|使用auxhist2时的输出格式
+-|2|netCDF format
+-|4|PHD5 format
+-|5|GRIB1 format
+-|10|GRIB2 format
+-|11|pnetCDF format
+frames_per_auxhist2 (max_dom)|1000|每个输出文件中有多少次输出
+auxinput11_interval (max_dom)|10|obs微调输入的时间间隔（分钟）。它应该设置为与`obs_ionf`相同（或更高）的频率（以粗域时间步长为单位）
+auxinput11_end_h (max_dom)|6|使用obs微调选项时，观测结束的时间（小时）
+nocolons|.false.|当设置为.true.时，将在输出文件名中用下划线替换冒号
+write_input|.true.|将输入格式化数据写入输出，用于3DVAR程序
+inputout_interval (max_dom)|180|使用write_input选项时的时间间隔（分钟）
+input_outname|"wrf_3dvar_input_d<domain>_<date>"|从3DVAR输出的文件名
+inputout_begin_y (max_dom)|0|写入3DVAR数据的开始时间，年
+inputout_begin_d (max_dom)|0|写入3DVAR数据的开始时间，天
+inputout_begin_h (max_dom)|0|写入3DVAR数据的开始时间，时
+inputout_begin_m (max_dom)|0|写入3DVAR数据的开始时间，分
+inputout_begin_s (max_dom)|0|写入3DVAR数据的开始时间，秒
+inputout_end_y (max_dom)|0|写入3DVAR数据的结束时间，年
+inputout_end_d (max_dom)|0|写入3DVAR数据的结束时间，天
+inputout_end_h (max_dom)|0|写入3DVAR数据的结束时间，时
+inputout_end_m (max_dom)|0|写入3DVAR数据的结束时间，分
+inputout_end_s (max_dom)|0|写入3DVAR数据的结束时间，秒
+all_ic_times|.true.|当设置为.true.时，输出一个包含所有时间段的wrfinput文件
+adjust_output_times|.true.|将输出时间调整到最接近的小时
+output_ready_flag|.true.|打开时，模型将写出一个名为`wrfoutReady_d<domain>_<date>`的空文件。在生产运行中非常有用，因为后处理代码可以检查此文件是否存在以开始处理
+output_diagnostics|1|设置为1可在指定的时间间隔内添加48个地表诊断数组（max/min/mean/std）。有关详细信息，请参阅[输出诊断](#Output_Diagnostics)
+nwp_diagnostics|1|设置为1可添加history_interval最大诊断字段（10m风速、2-5km层中的最大螺旋度、400mb以下的上升气流和下降气流中的最大垂直速度、2-5km层中的平均垂直速度、最大柱重力）**需要同时打开do_radar_ref**
+**自动移动嵌套的选项**|-|-
+input_from_hires (max_dom)|.true.|当设置为.true时，在嵌套中使用高分辨率地形和土地利用数据（需要特殊的输入数据，并在编译时设置TERRAIN_AND_LANDUSE环境变量）。有关详细信息，请参阅[移动嵌套](#Moving_Nested)
+rsmas_data_path|“high-res-data-directory”|高分辨率数据所在目录的路径
+iofields_filename (max_dom)|"my_iofields_list.txt"|输出其他变量或者从输出中删除变量的选项。您必须创建一个文本文件`my_iofields_list.txt`，在文件中声明要输出的变量。详见本章上文。
+ignore_iofields_warning|.true.|当使用`iofields_filename`选项时，如果在用户指定的文件中遇到错误，则通知模型继续。如果设置为.false.，则如果文件中遇到错误，模型将中止运行
+**&domains**|-|**尺寸、嵌套、参数**
+time_step|60|积分时间步长，单位：秒，典型情况下不超过6×dx（dx单位为km时）
+time_step_fract_num|0|分数时间步长中的分子
+time_step_fract_den|1|分数时间步长中的分母
+-|-|例如，要将时间步长设置为60.3秒，请将`time_step`设置为60，`time_step_fract_num`设置为3，`time_step_fract_den`设置为10
+time_step_dfi|60|设置`dfi_opt = 1`时的时间步长，可以与常规时间步长不同
+max_dom|1|模拟运行的区域数
+s_we (max_dom)|1|在x（西-东）方向上的开始位置（默认为1，不要更改此项）
+e_we (max_dom)|91|在x（西-东）方向上的结束位置（staggered dimension）
+s_sn (max_dom)|1|在y（南-北）方向上的开始位置（默认为1，不要更改此项）
+e_sn (max_dom)|82|在y（南-北）方向上的结束位置（staggered dimension）
+s_vert (max_dom)|1|在z（垂直）方向上的开始位置（默认为1，不要更改此项）
+e_vert (max_dom)|30|在z（垂直）方向上的结束位置（staggered dimension），代表了总层数。大多数变量都在unstaggered层上。**注意：所有嵌套的垂直尺寸必须相同**
+dx (max_dom)|30000|x方向的网格长度（米）
+dy (max_dom)|30000|y方向网格长度（米）
+ztop (max_dom)|19000|高度（米），用于定义ideal情况下的模型顶部
+grid_id (max_dom)|1|区域ID
+parent_id (max_dom)|1|区域的父域ID
+i_parent_start (max_dom)|1|从父域左下角开始点的i指示位置
+j_parent_start (max_dom)|1|从父域左下角开始点的j指示位置
+parent_grid_ratio (max_dom)|1|父域与嵌套域网格大小的比率，**注：建议采用奇数比（3:1或5:1）**
+parent_time_step_ratio (max_dom)|1|父域到嵌套域的时间步长比率，可以与parent_grid_ratio不同
+feedback|1|设置为1代表从嵌套到其父域进行反馈，设置为0表示无反馈
+smooth_option|-|父域的平滑选项，仅用于进行反馈时
+-|0|关闭平滑
+-|1|父域的1-2-1平滑选项，仅用于`feedback = 1`
+-|2|（默认值）父域的平滑去平滑选项，仅用于`feedback = 1`
+hypsometric_opt|2|（默认值）通过使用测高方程在real.exe程序中计算高度以及在模型中计算压力（仅适用于ARW）（与输入数据相比偏差较小）
+-|1|原始方法-基于一种取决于空气密度的静水压方程式
+max_ts_locs|5|时间序列位置的最大数量
+max_ts_level|15|使用时间序列选项时配置文件输出的最高模型层
+wif_input_opt|1|处理来自metgrid程序的水-冰友好气溶胶输入的选项，用于`mp_physics=28`；参见`run/README.namelist`查阅有关其他信息（默认值为0=关闭选项）
+num_wif_levels|27|汤普森水冰友好气溶胶中的层数（`mp_physics=28`）；参见`run/README.namelist`查阅有关其他信息
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Options for program real.exe
 num_metgrid_levels|40|number of vertical levels in input data (type “ncdump -h” on one of the met_em* files to find out this number)
 num_metgrid_soil_levels|4|number of soil levels or layers in WPS output (type ncdump -h on one of the met_em* files to find out this number)
 eta_levels|1.0, 0.99, ...0.0|model eta levels from 1 to 0.  If not given, real will provide a set of levels
 auto_levels_opt|2|(default) set dzstretch_s, dzstretch_u, dzbot, and max_dz to stretch levels according to logP up to where it reaches the max thickness (max_dz) and starting from thickness dzbot
- |1|Old option  - assumes a known first several layers, then generates equi-height spaced levels up to the top of the model
+-|1|Old option  - assumes a known first several layers, then generates equi-height spaced levels up to the top of the model
 max_dz|1000.|max level thickness allowed (m)
 dzbot|50.|thickness of lowest layer (m) for auto_levels_opt = 2
 dzstretch_s|1.3|surface stretch factor for auto_levels_opt = 2
