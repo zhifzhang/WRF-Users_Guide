@@ -1562,22 +1562,47 @@ WRF提供了多种物理选项，可以以任何方式进行组合。这些选�
  
 #### 2.1 长波辐射方案（ra_lw_physics）
 
-2.1.1 RRTM scheme（`ra_lw_physics = 1`）：快速辐射传输模型。使用查找表来提高效率的准确方案。计算了多个波段和微物理学物种。对于示踪气体，
+2.1.1 **RRTM scheme（`ra_lw_physics = 1`）**：快速辐射传输模型。使用查找表来提高效率的准确方案。计算了多个波段和微物理学物种。对于示踪气体，
 CO2的体积混合比值为379e-6，N2O为319e-9，CH4为1774e-9。有关随时间变化的选项，请参见下述章节。
 
-2.1.2 CAM scheme（`ra_lw_physics = 3`）：来自CCSM中使用的CAM 3气候模型。允许气溶胶和示踪气体。它使用的CO2为年均值，使用的N2O（311e-9）和CH4（1714e-9）为常数。有关随时间变化的选项，请参见下述章节。
+2.1.2 **CAM scheme（`ra_lw_physics = 3`）**：来自CCSM中使用的CAM 3气候模型。允许气溶胶和示踪气体。它使用的CO2为年均值，使用的N2O（311e-9）和CH4（1714e-9）为常数。有关随时间变化的选项，请参见下述章节。
 
-2.3 RRTMG scheme（`ra_lw_physics = 4`）：RRTM的更新版本。它包括随机云重叠的MCICA方法。对于主要示踪气体，CO2=379e-6（2005年有效），N2O=319e-9，CH4=1774e-9。有关随时间变化的选项，请参见下述章节。从V4.2开始，CO2值被年份函数代替：CO2（ppm）=280+90exp（0.02×（year-2000）），计算结果与观测值相比，1920年代和1960年代的误差约为4%，2000年后的误差约为1%。
+2.1.3 **RRTMG scheme（`ra_lw_physics = 4`）**：RRTM的更新版本。它包括随机云重叠的MCICA方法。对于主要示踪气体，CO2=379e-6（2005年有效），N2O=319e-9，CH4=1774e-9。有关随时间变化的选项，请参见下述章节。从V4.2开始，CO2值被年份函数代替：CO2（ppm）=280+90exp（0.02×（year-2000）），计算结果与观测值相比，1920年代和1960年代的误差约为4%，2000年后的误差约为1%。
 
-2.4 Goddard scheme（`ra_lw_physics = 5`）。高效的，多波段，臭氧来自简单的气候学。设计用于运行Goddard微物理粒子半径信息。已在V4.1中更新。
+2.1.4 **Goddard scheme（`ra_lw_physics = 5`）**：高效的，多波段，臭氧来自简单的气候学。设计用于运行Goddard微物理粒子半径信息。已在V4.1中更新。
 
-2.5 Fu-Liou-Gu scheme（`ra_lw_physics = 7`）。多波段，云和云分数效应，气候和示踪气体产生的臭氧剖面。CO2＝345e-6。
+2.1.5 **Fu-Liou-Gu scheme（`ra_lw_physics = 7`）**：多波段，云和云分数效应，气候和示踪气体产生的臭氧剖面。CO2＝345e-6。
 
-2.6 RRTMG-K scheme（`ra_lw_physics = 14`）：改进的RRTMG方案版本，Baek (2017), A revised radiation package of G-packed McICA and two-stream approximation: Performance evaluation in a global weather forecasting model, J. Adv. Model. Earth Syst., 9, doi:10.1002/2017MS000994)。
+2.1.6 **RRTMG-K scheme（`ra_lw_physics = 14`）**：改进的RRTMG方案版本，Baek (2017), A revised radiation package of G-packed McICA and two-stream approximation: Performance evaluation in a global weather forecasting model, J. Adv. Model. Earth Syst., 9, doi:10.1002/2017MS000994)。
 
-2.7 RRTMG-fast scheme（`ra_lw_physics = 24`）：RRTMG方案的快速版本。
+2.1.7 **RRTMG-fast scheme（`ra_lw_physics = 24`）**：RRTMG方案的快速版本。
 
-2.8 GFDL scheme（`ra_lw_physics = 99`）：Eta运行辐射方案。一个较老的具有二氧化碳、臭氧和微物理效应的多波段方案。
+2.1.8 **GFDL scheme（`ra_lw_physics = 99`）**：Eta运行辐射方案。一个较老的具有二氧化碳、臭氧和微物理效应的多波段方案。
+
+
+
+
+
+
+
+
+```
+以下尚未整理
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 2.2短波辐射（ra_sw_physics）
 a.	Dudhia方案：简单的向下积分，可以有效地吸收云层，以及晴朗的天空吸收和散射（ra_sw_physics = 1）。
@@ -1823,125 +1848,46 @@ c.	对称（symmetric_xs，symmetric_xe，symmetric_ys，symmetric_ye ）：用�
 d.	指定（指定）：用于实际数据案例。第一行和第一列由外部模型值指定（spec_zone = 1，并且不应更改）。Relax_zone中的行和列具有来自外部模型和WRF的混合值。只要spec_bdy_width = spec_zone + Relax_zone ，就可以更改Relax_zone 的值。可以在热带通道模拟中与periodic_x 一起使用。
 spec_exp ：松弛带斜坡的指数乘数，用于指定的边界条件。0。=线性斜坡，默认值；0.33 =〜3 * dx exp衰减因子。这对于长时间的仿真可能很有用。
 
+
+
+以上尚未整理
+```
+
 <a id=PBL_Physics></a>
 
 ## PBL物理选项摘要
 
-bl_pbl_physics	Scheme	Reference	Added
-1	YSU	Hong, Noh and Dudhia (2006, MWR)
-2004
-2	MYJ	Janjic (1994, MWR)
-2000
-3	GFS	Hong and Pan (1996, MWR)
-2005
-4	QNSE	Sukoriansky, Galperin and Perov (2005, BLM)
-2009
-5	MYNN2	Nakanishi and Niino (2006, BLM)
-2009
-6	MYNN3	Nakanishi and Niino (2006, BLM)
-2009
-7	ACM2	Pleim (2007, JAMC)
-2008
-8	BouLac	Bougeault and Lacarrere (1989, MWR)
-2009
-9	UW	Bretherton and Park (2009, JC)
-2011
-10	TEMF	Angevine, Jiang and Mauriten (2010, MWR)
-2011
-11	Shin-Hong	Shin and Hong (2015, MWR)
-2015
-12	GBM	Grenier and Bretherton (2001, MWR)
-2013
-99	MRF	Hong and Pan (1996, MWR)
-2000
+bl_pbl_physics|Scheme|Reference|Added
+--------------|------|---------|-----
+1|YSU|[Hong, Noh and Dudhia(2006, MWR)](https://doi.org/10.1175/MWR3199.1 )|2004
+2|MYJ|[Janjic (1994, MWR)](https://doi.org/10.1175/1520-0493(1994)122%3c0927:TSMECM%3e2.0.CO;2 ) and [Messinger, 1993](https://www2.mmm.ucar.edu/wrf/users/phys_refs/PBL/MYJ_part2.pdf )|2000
+3|GFS|[Hong and Pan (1996, MWR)](https://doi.org/10.1175/1520-0493(1996)124%3c2322:NBLVDI%3e2.0.CO;2 )|2005
+4|QNSE|[Sukoriansky, Galperin and Perov (2005, BLM)](https://doi.org/10.1007/s10546-004-6848-4 )|2009
+5|MYNN2|[Nakanishi and Niino (2006, BLM)](https://doi.org/10.1007/s10546-005-9030-8 )|2009
+6|MYNN3|[Nakanishi and Niino (2006, BLM)](https://doi.org/10.2151/jmsj.87.895 )|2009
+7|ACM2|[Pleim (2007, JAMC)](https://doi.org/10.1175/JAM2539.1 )|2008
+8|BouLac|[Bougeault and Lacarrere (1989, MWR)](https://doi.org/10.1175/1520-0493(1989)117%3c1872:POOITI%3e2.0.CO;2 )|2009
+9|UW|[Bretherton and Park (2009, JC)](https://doi.org/10.1175/2008JCLI2556.1 )|2011
+10|TEMF|[Angevine, Jiang and Mauriten (2010, MWR)](https://doi.org/10.1175/2010MWR3142.1 )|2011
+11|Shin-Hong|[Shin and Hong (2015, MWR)](https://doi.org/10.1175/MWR-D-14-00116.1 )|2015
+12|GBM|[Grenier and Bretherton (2001, MWR)](https://doi.org/10.1175/1520-0493(2001)129%3c0357:AMPPFL%3e2.0.CO;2 )|2013
+99|MRF|[Hong and Pan (1996, MWR)](https://doi.org/10.1175/1520-0493(1996)124%3c1480:CONNRW%3e2.0.CO;2 )|2000
 
-bl_pbl_
-physics
-	Scheme
-方案	Cores
-	sf_sfclay_
-physics
-	Prognostic variables
-预后变量	Diagnostic variables
-诊断变量	Cloud mixing
-云混合
-1
-	YSU
-	ARW/ NMM
-	1, (91)*
-	
-	exch_h
-	QC,QI
-
-2
-	MYJ
-	ARW/ NMM
-	2
-	TKE_PBL
-	el_myj, exch_h
-	QC,QI
-
-3
-	GFS
-(hwrf)
-	NMM
-	3
-	
-	
-	QC,QI
-
-4
-	QNSE-EDMF
-	ARW/ NMM
-	4
-	TKE_PBL
-	el_pbl, exch_h, exch_m	QC,QI
-
-5
-	MYNN2
-	ARW
-	1,2,5,(91)
-	QKE
-	Tsq, Qsq, Cov, exch_h, exch_m
-	QC
-
-6
-	MYNN3
-	ARW
-	1,2,5,(91)
-	QKE, Tsq, Qsq, Cov
-	exch_h, exch_m
-	QC
-
-7
-	ACM2
-	ARW
-	1,7,(91)
-	
-	
-	QC,QI
-
-8
-	BouLac
-	ARW
-	1,2,(91)
-	TKE_PBL
-	el_pbl, exch_h, exch_m, wu_tur, wv_tur, wt_tur, wq_tur	QC
-
-9	UW	ARW	1,2,(91)	TKE_PBL	exch_h, exch_m	QC
-10	TEMF	ARW	10	TE_TEMF	*_temf	QC, QI
-11	Shin-Hong	ARW	1,(91)		 exch_h, tke_diag	QC, QI
-12	GBM	ARW	1,(91)	TKE_PBL	el_pbl, exch_tke
-	QC, QI
-99
-	MRF
-	ARW/ NMM
-	1,(91)
-	
-	
-	QC, QI
-
-* 在版本3.6中，sfclay选项11重命名为1，原始选项1重命名为91。
+bl_pbl_physics|Scheme方案|Cores|sf_sfclay_physics|Prognostic variables预测变量|Diagnostic variables诊断变量|Cloud mixing云混合
+--------------|----------|-----|-----------------|----------------------------|----------------------------|------------------
+1|YSU|ARW/NMM|1, (91)| |exch_h|QC,QI
+2|MYJ|ARW/NMM|2|TKE_PBL|el_myj, exch_h|QC,QI
+3|GFS(hwrf)|NMM|3| | |QC,QI
+4|QNSE-EDMF|ARW/NMM|4|TKE_PBL|el_pbl, exch_h, exch_m|QC,QI
+5|MYNN2|ARW|1,2,5,(91)|QKE|Tsq, Qsq, Cov, exch_h, exch_m|QC
+6|MYNN3|ARW|1,2,5,(91)|QKE, Tsq, Qsq, Cov|exch_h, exch_m|QC
+7|ACM2|ARW|1,7,(91)| | ||QC,QI
+8|BouLac|ARW|1,2,(91)|TKE_PBL|el_pbl, exch_h, exch_m, wu_tur, wv_tur, wt_tur, wq_tur|QC
+9|UW|ARW|1,2,(91)|TKE_PBL|exch_h, exch_m|QC
+10|TEMF|ARW|10|TE_TEMF|*_temf|QC, QI
+11|Shin-Hong|ARW|1,(91)| |exch_h, tke_diag|QC, QI
+12|GBM|ARW|1,(91)|TKE_PBL|el_pbl, exch_tke|QC, QI
+99|MRF|ARW/ NMM|1,(91)| | |QC, QI
 
 <a id=Microphysics></a>
 
@@ -2159,682 +2105,700 @@ physics	Scheme	Cores+Chem	Microphysics Interaction	Cloud Fraction	Ozone	GHG
 在下面的namelist变量的说明。嵌套函数的变量由变量后的（max_dom）表示。另请参阅WRF /中的Registry / Registry.EM 和run / README.namelist 文件以获取更多详细信息。
 可以参考别的资料，表超级长。
 
-
 <a id=Output_Fields></a>
 
 ## WRF输出字段
 
-fields清单
-以下是netCDF命令'ncdump -h'的已编辑输出列表。请注意，有效的输出字段将取决于所使用的模型选项。如果字段具有零值，则不会通过所选的模型选项来计算字段。
+### 字段清单
+
+以下是netCDF命令`ncdump -h`的编辑输出列表。请注意，有效的输出字段取决于使用的模型选项。如果字段具有零值，则不会通过所选的模型选项计算。
+
+```
 ncdump -h wrfout_d<domain>_<date>
  
    netcdf wrfout_d01_2018-07-14_12:00:00
 
-维度dimensions:
-	Time = UNLIMITED ; // (1 currently)
-	DateStrLen = 19 ;
-	west_east = 500 ;
-	south_north = 500 ;
-	bottom_top = 55 ;
-	bottom_top_stag = 56 ;
-	soil_layers_stag = 4 ;
-	west_east_stag = 501 ;
-	south_north_stag = 501 ;
+dimensions:
 
-变量variables:
-		float XLAT(Time, south_north, west_east) ;
-		XLAT:description = "LATITUDE, SOUTH IS NEGATIVE" ;
-		XLAT:units = "degree_north" ;
-	float XLONG(Time, south_north, west_east) ;
-		XLONG:description = "LONGITUDE, WEST IS NEGATIVE" ;
-		XLONG:units = "degree_east" ;
-	float LU_INDEX(Time, south_north, west_east) ;
-		LU_INDEX:description = "LAND USE CATEGORY" ;
-		LU_INDEX:units = "" ;
-	float ZNU(Time, bottom_top) ;
-		ZNU:description = "eta values on half (mass) levels" ;
-		ZNU:units = "" ;
-	float ZNW(Time, bottom_top_stag) ;
-		ZNW:description = "eta values on full (w) levels" ;
-		ZNW:units = "" ;
-	float ZS(Time, soil_layers_stag) ;
-		ZS:description = "DEPTHS OF CENTERS OF SOIL LAYERS" ;
-		ZS:units = "m" ;
-	float DZS(Time, soil_layers_stag) ;
-		DZS:description = "THICKNESSES OF SOIL LAYERS" ;
-		DZS:units = "m" ;
-	float VAR_SSO(Time, south_north, west_east) ;
-		VAR_SSO:description = "variance of subgrid-scale orography" ;
-		VAR_SSO:units = "m2" ;
-	float U(Time, bottom_top, south_north, west_east_stag) ;
-		U:description = "x-wind component" ;
-		U:units = "m s-1" ;
-	float V(Time, bottom_top, south_north_stag, west_east) ;
-		V:description = "y-wind component" ;
-		V:units = "m s-1" ;
-	float W(Time, bottom_top_stag, south_north, west_east) ;
-		W:description = "z-wind component" ;
-		W:units = "m s-1" ;
-	float PH(Time, bottom_top_stag, south_north, west_east) ;
-		PH:description = "perturbation geopotential" ;
-		PH:units = "m2 s-2" ;
-	float PHB(Time, bottom_top_stag, south_north, west_east) ;
-		PHB:description = "base-state geopotential" ;
-		PHB:units = "m2 s-2" ;
-	float T(Time, bottom_top, south_north, west_east) ;
-		T:description = "perturbation potential temperature theta-t0" ;
-		T:units = "K" ;
-	float THM(Time, bottom_top, south_north, west_east) ;
-		THM:description = "either 1) pert moist pot temp=(1+Rv/Rd Qv)*(theta)-T0,
-                              or 2) pert dry pot temp=t" ;
-		THM:units = "K" ;
-	float MU(Time, south_north, west_east) ;
-		MU:description = "perturbation dry air mass in column" ;
-		MU:units = "Pa" ;
-	float MUB(Time, south_north, west_east) ;
-		MUB:description = "base state dry air mass in column" ;
-		MUB:units = "Pa" ;
-	float P(Time, bottom_top, south_north, west_east) ;
-		P:description = "perturbation pressure" ;
-		P:units = "Pa" ;
-	float PB(Time, bottom_top, south_north, west_east) ;
-		PB:description = "BASE STATE PRESSURE" ;
-		PB:units = "Pa" ;
-	float FNM(Time, bottom_top) ;
-		FNM:description = "upper weight for vertical stretching" ;
-		FNM:units = "" ;
-	float FNP(Time, bottom_top) ;
-		FNP:description = "lower weight for vertical stretching" ;
-		FNP:units = "" ;
-	float RDNW(Time, bottom_top) ;
-		RDNW:description = "inverse d(eta) values between full (w) levels" ;
-		RDNW:units = "" ;
-	float RDN(Time, bottom_top) ;
-		RDN:description = "inverse d(eta) values between half (mass) levels" ;
-		RDN:units = "" ;
-	float DNW(Time, bottom_top) ;
-		DNW:description = "d(eta) values between full (w) levels" ;
-		DNW:units = "" ;
-	float DN(Time, bottom_top) ;
-		DN:description = "d(eta) values between half (mass) levels" ;
-		DN:units = "" ;
-	float CFN(Time) ;
-		CFN:description = "extrapolation constant" ;
-		CFN:units = "" ;
-	float CFN1(Time) ;
-		CFN1:description = "extrapolation constant" ;
-		CFN1:units = "" ;
-	int THIS_IS_AN_IDEAL_RUN(Time) ;
-		THIS_IS_AN_IDEAL_RUN:description = "T/F flag: this is an ARW ideal simulation" ;
-		THIS_IS_AN_IDEAL_RUN:units = "-" ;
-	float P_HYD(Time, bottom_top, south_north, west_east) ;
-		P_HYD:description = "hydrostatic pressure" ;
-		P_HYD:units = "Pa" ;
-	float Q2(Time, south_north, west_east) ;
-		Q2:description = "QV at 2 M" ;
-		Q2:units = "kg kg-1" ;
-	float T2(Time, south_north, west_east) ;
-		T2:description = "TEMP at 2 M" ;
-		T2:units = "K" ;
-	float TH2(Time, south_north, west_east) ;
-		TH2:description = "POT TEMP at 2 M" ;
-		TH2:units = "K" ;
-	float PSFC(Time, south_north, west_east) ;
-		PSFC:description = "SFC PRESSURE" ;
-		PSFC:units = "Pa" ;
-	float U10(Time, south_north, west_east) ;
-		U10:description = "U at 10 M" ;
-		U10:units = "m s-1" ;
-	float V10(Time, south_north, west_east) ;
-		V10:description = "V at 10 M" ;
-		V10:units = "m s-1" ;
-	float RDX(Time) ;
-		RDX:description = "INVERSE X GRID LENGTH" ;
-		RDX:units = "" ;
-	float RDY(Time) ;
-		RDY:description = "INVERSE Y GRID LENGTH" ;
-		RDY:units = "" ;
-	float RESM(Time) ;
-		RESM:description = "TIME WEIGHT CONSTANT FOR SMALL STEPS" ;
-		RESM:units = "" ;
-	float CF1(Time) ;
-		CF1:description = "2nd order extrapolation constant" ;
-		CF1:units = "" ;
-	float CF2(Time) ;
-		CF2:description = "2nd order extrapolation constant" ;
-		CF2:units = "" ;
-	float CF3(Time) ;
-		CF3:description = "2nd order extrapolation constant" ;
-		CF3:units = "" ;
-	int ITIMESTEP(Time) ;
-		ITIMESTEP:description = "" ;
-		ITIMESTEP:units = "" ;
-	float XTIME(Time) ;
-		XTIME:description = "minutes since 2018-07-14 00:00:00" ;
-		XTIME:units = "minutes since 2018-07-14 00:00:00" ;
-	float QVAPOR(Time, bottom_top, south_north, west_east) ;
-		QVAPOR:description = "Water vapor mixing ratio" ;
-		QVAPOR:units = "kg kg-1" ;
-	float QCLOUD(Time, bottom_top, south_north, west_east) ;
-		QCLOUD:description = "Cloud water mixing ratio" ;
-		QCLOUD:units = "kg kg-1" ;
-	float QRAIN(Time, bottom_top, south_north, west_east) ;
-		QRAIN:description = "Rain water mixing ratio" ;
-		QRAIN:units = "kg kg-1" ;
-	float QICE(Time, bottom_top, south_north, west_east) ;
-		QICE:description = "Ice mixing ratio" ;
-		QICE:units = "kg kg-1" ;
-	float QSNOW(Time, bottom_top, south_north, west_east) ;
-		QSNOW:description = "Snow mixing ratio" ;
-		QSNOW:units = "kg kg-1" ;
-	float QGRAUP(Time, bottom_top, south_north, west_east) ;
-		QGRAUP:description = "Graupel mixing ratio" ;
-		QGRAUP:units = "kg kg-1" ;
-	float SHDMAX(Time, south_north, west_east) ;
-		SHDMAX:description = "ANNUAL MAX VEG FRACTION" ;
-		SHDMAX:units = "" ;
-	float SHDMIN(Time, south_north, west_east) ;
-		SHDMIN:description = "ANNUAL MIN VEG FRACTION" ;
-		SHDMIN:units = "" ;
-	float SNOALB(Time, south_north, west_east) ;
-		SNOALB:description = "ANNUAL MAX SNOW ALBEDO IN FRACTION" ;
-		SNOALB:units = "" ;
-	float TSLB(Time, soil_layers_stag, south_north, west_east) ;
-		TSLB:description = "SOIL TEMPERATURE" ;
-		TSLB:units = "K" ;
-	float SMOIS(Time, soil_layers_stag, south_north, west_east) ;
-		SMOIS:description = "SOIL MOISTURE" ;
-		SMOIS:units = "m3 m-3" ;
-	float SH2O(Time, soil_layers_stag, south_north, west_east) ;
-		SH2O:description = "SOIL LIQUID WATER" ;
-		SH2O:units = "m3 m-3" ;
-	float SMCREL(Time, soil_layers_stag, south_north, west_east) ;
-		SMCREL:description = "RELATIVE SOIL MOISTURE" ;
-		SMCREL:units = "" ;
-	float SEAICE(Time, south_north, west_east) ;
-		SEAICE:description = "SEA ICE FLAG" ;
-		SEAICE:units = "" ;
-	float XICEM(Time, south_north, west_east) ;
-		XICEM:description = "SEA ICE FLAG (PREVIOUS STEP)" ;
-		XICEM:units = "" ;
-	float SFROFF(Time, south_north, west_east) ;
-		SFROFF:description = "SURFACE RUNOFF" ;
-		SFROFF:units = "mm" ;
-	float UDROFF(Time, south_north, west_east) ;
-		UDROFF:description = "UNDERGROUND RUNOFF" ;
-		UDROFF:units = "mm" ;
-	int IVGTYP(Time, south_north, west_east) ;
-		IVGTYP:description = "DOMINANT VEGETATION CATEGORY" ;
-		IVGTYP:units = "" ;
-	int ISLTYP(Time, south_north, west_east) ;
-		ISLTYP:description = "DOMINANT SOIL CATEGORY" ;
-		ISLTYP:units = "" ;
-	float VEGFRA(Time, south_north, west_east) ;
-		VEGFRA:description = "VEGETATION FRACTION" ;
-		VEGFRA:units = "" ;
-	float GRDFLX(Time, south_north, west_east) ;
-		GRDFLX:description = "GROUND HEAT FLUX" ;
-		GRDFLX:units = "W m-2" ;
-	float ACGRDFLX(Time, south_north, west_east) ;
-		ACGRDFLX:description = "ACCUMULATED GROUND HEAT FLUX" ;
-		ACGRDFLX:units = "J m-2" ;
-	float ACSNOM(Time, south_north, west_east) ;
-		ACSNOM:description = "ACCUMULATED MELTED SNOW" ;
-		ACSNOM:units = "kg m-2" ;
-	float SNOW(Time, south_north, west_east) ;
-		SNOW:description = "SNOW WATER EQUIVALENT" ;
-		SNOW:units = "kg m-2" ;
-	float SNOWH(Time, south_north, west_east) ;
-		SNOWH:description = "PHYSICAL SNOW DEPTH" ;
-		SNOWH:units = "m" ;
-	float CANWAT(Time, south_north, west_east) ;
-		CANWAT:description = "CANOPY WATER" ;
-		CANWAT:units = "kg m-2" ;
-	float SSTSK(Time, south_north, west_east) ;
-		SSTSK:description = "SKIN SEA SURFACE TEMPERATURE" ;
-		SSTSK:units = "K" ;
-	float COSZEN(Time, south_north, west_east) ;
-		COSZEN:description = "COS of SOLAR ZENITH ANGLE" ;
-		COSZEN:units = "dimensionless" ;
-	float LAI(Time, south_north, west_east) ;
-		LAI:description = "LEAF AREA INDEX" ;
-		LAI:units = "m-2/m-2" ;
-	float VAR(Time, south_north, west_east) ;
-		VAR:description = "OROGRAPHIC VARIANCE" ;
-		VAR:units = "" ;
-	float MAPFAC_M(Time, south_north, west_east) ;
-		MAPFAC_M:description = "Map scale factor on mass grid" ;
-		MAPFAC_M:units = "" ;
-	float MAPFAC_U(Time, south_north, west_east_stag) ;
-		MAPFAC_U:description = "Map scale factor on u-grid" ;
-		MAPFAC_U:units = "" ;
-	float MAPFAC_V(Time, south_north_stag, west_east) ;
-		MAPFAC_V:description = "Map scale factor on v-grid" ;
-		MAPFAC_V:units = "" ;
-	float F(Time, south_north, west_east) ;
-		F:description = "Coriolis sine latitude term" ;
-		F:units = "s-1" ;
-	float E(Time, south_north, west_east) ;
-		E:description = "Coriolis cosine latitude term" ;
-		E:units = "s-1" ;
-	float SINALPHA(Time, south_north, west_east) ;
-		SINALPHA:description = "Local sine of map rotation" ;
-		SINALPHA:units = "" ;
-	float COSALPHA(Time, south_north, west_east) ;
-		COSALPHA:description = "Local cosine of map rotation" ;
-		COSALPHA:units = "" ;
-	float HGT(Time, south_north, west_east) ;
-		HGT:description = "Terrain Height" ;
-		HGT:units = "m" ;
-	float TSK(Time, south_north, west_east) ;
-		TSK:description = "SURFACE SKIN TEMPERATURE" ;
-		TSK:units = "K" ;
-	float P_TOP(Time) ;
-		P_TOP:description = "PRESSURE TOP OF THE MODEL" ;
-		P_TOP:units = "Pa" ;
-	float T00(Time) ;
-		T00:description = "BASE STATE TEMPERATURE" ;
-		T00:units = "K" ;
-	float P00(Time) ;
-		P00:description = "BASE STATE PRESURE" ;
-		P00:units = "Pa" ;
-	float TLP(Time) ;
-		TLP:description = "BASE STATE LAPSE RATE" ;
-		TLP:units = "" ;
-	float TISO(Time) ;
-		TISO:description = "TEMP AT WHICH THE BASE T TURNS CONST" ;
-		TISO:units = "K" ;
-	float TLP_STRAT(Time) ;
-		TLP_STRAT:description = "BASE STATE LAPSE RATE (DT/D(LN(P)) IN STRATOSPHERE" ;
-		TLP_STRAT:units = "K" ;
-	float P_STRAT(Time) ;
-		P_STRAT:description = "BASE STATE PRESSURE AT BOTTOM OF STRATOSPHERE" ;
-		P_STRAT:units = "Pa" ;
-	float MAX_MSTFX(Time) ;
-		MAX_MSTFX:description = "Max map factor in domain" ;
-		MAX_MSTFX:units = "" ;
-	float MAX_MSTFY(Time) ;
-		MAX_MSTFY:description = "Max map factor in domain" ;
-		MAX_MSTFY:units = "" ;
-	float RAINC(Time, south_north, west_east) ;
-		RAINC:description = "ACCUMULATED TOTAL CUMULUS PRECIPITATION" ;
-		RAINC:units = "mm" ;
-	float RAINSH(Time, south_north, west_east) ;
-		RAINSH:description = "ACCUMULATED SHALLOW CUMULUS PRECIPITATION" ;
-		RAINSH:units = "mm" ;
-	float RAINNC(Time, south_north, west_east) ;
-		RAINNC:description = "ACCUMULATED TOTAL GRID SCALE PRECIPITATION" ;
-		RAINNC:units = "mm" ;
-	float SNOWNC(Time, south_north, west_east) ;
-		SNOWNC:description = "ACCUMULATED TOTAL GRID SCALE SNOW AND ICE" ;
-		SNOWNC:units = "mm" ;
-	float GRAUPELNC(Time, south_north, west_east) ;
-		GRAUPELNC:description = "ACCUMULATED TOTAL GRID SCALE GRAUPEL" ;
-		GRAUPELNC:units = "mm" ;
-	float HAILNC(Time, south_north, west_east) ;
-		HAILNC:description = "ACCUMULATED TOTAL GRID SCALE HAIL" ;
-		HAILNC:units = "mm" ;
-	float REFL_10CM(Time, bottom_top, south_north, west_east) ;
-		REFL_10CM:description = "Radar reflectivity (lamda = 10 cm)" ;
-		REFL_10CM:units = "dBZ" ;
-	float CLDFRA(Time, bottom_top, south_north, west_east) ;
-		CLDFRA:description = "CLOUD FRACTION" ;
-		CLDFRA:units = "" ;
-	float SWDOWN(Time, south_north, west_east) ;
-		SWDOWN:description = "DOWNWARD SHORT WAVE FLUX AT GROUND SURFACE" ;
-		SWDOWN:units = "W m-2" ;
-	float GLW(Time, south_north, west_east) ;
-		GLW:description = "DOWNWARD LONG WAVE FLUX AT GROUND SURFACE" ;
-		GLW:units = "W m-2" ;
-	float SWNORM(Time, south_north, west_east) ;
-		SWNORM:description = "NORMAL SHORT WAVE FLUX AT GROUND SURFACE (SLOPE-DEPENDENT)" ;
-		SWNORM:units = "W m-2" ;
-	float ACSWUPT(Time, south_north, west_east) ;
-		ACSWUPT:description = "ACCUMULATED UPWELLING SHORTWAVE FLUX AT TOP" ;
-		ACSWUPT:units = "J m-2" ;
-	float ACSWUPTC(Time, south_north, west_east) ;
-		ACSWUPTC:description = "ACCUMULATED UPWELLING CLEAR SKY SHORTWAVE FLUX AT TOP" ;
-		ACSWUPTC:units = "J m-2" ;
-	float ACSWDNT(Time, south_north, west_east) ;
-		ACSWDNT:description = "ACCUMULATED DOWNWELLING SHORTWAVE FLUX AT TOP" ;
-		ACSWDNT:units = "J m-2" ;
-	float ACSWDNTC(Time, south_north, west_east) ;
-		ACSWDNTC:description = "ACCUMULATED DOWNWELLING CLEAR SKY SHORTWAVE FLUX AT TOP" ;
-		ACSWDNTC:units = "J m-2" ;
-	float ACSWUPB(Time, south_north, west_east) ;
-		ACSWUPB:description = "ACCUMULATED UPWELLING SHORTWAVE FLUX AT BOTTOM" ;
-		ACSWUPB:units = "J m-2" ;
-	float ACSWUPBC(Time, south_north, west_east) ;
-		ACSWUPBC:description = "ACCUMULATED UPWELLING CLEAR SKY SHORTWAVE FLUX AT BOTTOM" ;
-		ACSWUPBC:units = "J m-2" ;
-	float ACSWDNB(Time, south_north, west_east) ;
-		ACSWDNB:description = "ACCUMULATED DOWNWELLING SHORTWAVE FLUX AT BOTTOM" ;
-		ACSWDNB:units = "J m-2" ;
-	float ACSWDNBC(Time, south_north, west_east) ;
-		ACSWDNBC:description = "ACCUMULATED DOWNWELLING CLEAR SKY SHORTWAVE FLUX AT BOTTOM" ;
-		ACSWDNBC:units = "J m-2" ;
-	float ACLWUPT(Time, south_north, west_east) ;
-		ACLWUPT:description = "ACCUMULATED UPWELLING LONGWAVE FLUX AT TOP" ;
-		ACLWUPT:units = "J m-2" ;
-	float ACLWUPTC(Time, south_north, west_east) ;
-		ACLWUPTC:description = "ACCUMULATED UPWELLING CLEAR SKY LONGWAVE FLUX AT TOP" ;
-		ACLWUPTC:units = "J m-2" ;
-	float ACLWDNT(Time, south_north, west_east) ;
-		ACLWDNT:description = "ACCUMULATED DOWNWELLING LONGWAVE FLUX AT TOP" ;
-		ACLWDNT:units = "J m-2" ;
-	float ACLWDNTC(Time, south_north, west_east) ;
-		ACLWDNTC:description = "ACCUMULATED DOWNWELLING CLEAR SKY LONGWAVE FLUX AT TOP" ;
-		ACLWDNTC:units = "J m-2" ;
-	float ACLWUPB(Time, south_north, west_east) ;
-		ACLWUPB:description = "ACCUMULATED UPWELLING LONGWAVE FLUX AT BOTTOM" ;
-		ACLWUPB:units = "J m-2" ;
-	float ACLWUPBC(Time, south_north, west_east) ;
-		ACLWUPBC:description = "ACCUMULATED UPWELLING CLEAR SKY LONGWAVE FLUX AT BOTTOM" ;
-		ACLWUPBC:units = "J m-2" ;
-	float ACLWDNB(Time, south_north, west_east) ;
-		ACLWDNB:description = "ACCUMULATED DOWNWELLING LONGWAVE FLUX AT BOTTOM" ;
-		ACLWDNB:units = "J m-2" ;
-	float ACLWDNBC(Time, south_north, west_east) ;
-		ACLWDNBC:description = "ACCUMULATED DOWNWELLING CLEAR SKY LONGWAVE FLUX AT BOTTOM" ;
-		ACLWDNBC:units = "J m-2" ;
-	float SWUPT(Time, south_north, west_east) ;
-		SWUPT:description = "INSTANTANEOUS UPWELLING SHORTWAVE FLUX AT TOP" ;
-		SWUPT:units = "W m-2" ;
-	float SWUPTC(Time, south_north, west_east) ;
-		SWUPTC:description = "INSTANTANEOUS UPWELLING CLEAR SKY SHORTWAVE FLUX AT TOP" ;
-		SWUPTC:units = "W m-2" ;
-	float SWDNT(Time, south_north, west_east) ;
-		SWDNT:description = "INSTANTANEOUS DOWNWELLING SHORTWAVE FLUX AT TOP" ;
-		SWDNT:units = "W m-2" ;
-	float SWDNTC(Time, south_north, west_east) ;
-		SWDNTC:description = "INSTANTANEOUS DOWNWELLING CLEAR SKY SHORTWAVE FLUX AT TOP" ;
-		SWDNTC:units = "W m-2" ;
-	float SWUPB(Time, south_north, west_east) ;
-		SWUPB:description = "INSTANTANEOUS UPWELLING SHORTWAVE FLUX AT BOTTOM" ;
-		SWUPB:units = "W m-2" ;
-	float SWUPBC(Time, south_north, west_east) ;
-		SWUPBC:description = "INSTANTANEOUS UPWELLING CLEAR SKY SHORTWAVE FLUX AT BOTTOM" ;
-		SWUPBC:units = "W m-2" ;
-	float SWDNB(Time, south_north, west_east) ;
-		SWDNB:description = "INSTANTANEOUS DOWNWELLING SHORTWAVE FLUX AT BOTTOM" ;
-		SWDNB:units = "W m-2" ;
-	float SWDNBC(Time, south_north, west_east) ;
-		SWDNBC:description = "INSTANTANEOUS DOWNWELLING CLEAR SKY SHORTWAVE FLUX AT BOTTOM" ;
-		SWDNBC:units = "W m-2" ;
-	float LWUPT(Time, south_north, west_east) ;
-		LWUPT:description = "INSTANTANEOUS UPWELLING LONGWAVE FLUX AT TOP" ;
-		LWUPT:units = "W m-2" ;
-	float LWUPTC(Time, south_north, west_east) ;
-		LWUPTC:description = "INSTANTANEOUS UPWELLING CLEAR SKY LONGWAVE FLUX AT TOP" ;
-		LWUPTC:units = "W m-2" ;
-	float LWDNT(Time, south_north, west_east) ;
-		LWDNT:description = "INSTANTANEOUS DOWNWELLING LONGWAVE FLUX AT TOP" ;
-		LWDNT:units = "W m-2" ;
-	float LWDNTC(Time, south_north, west_east) ;
-		LWDNTC:description = "INSTANTANEOUS DOWNWELLING CLEAR SKY LONGWAVE FLUX AT TOP" ;
-		LWDNTC:units = "W m-2" ;
-	float LWUPB(Time, south_north, west_east) ;
-		LWUPB:description = "INSTANTANEOUS UPWELLING LONGWAVE FLUX AT BOTTOM" ;
-		LWUPB:units = "W m-2" ;
-	float LWUPBC(Time, south_north, west_east) ;
-		LWUPBC:description = "INSTANTANEOUS UPWELLING CLEAR SKY LONGWAVE FLUX AT BOTTOM" ;
-		LWUPBC:units = "W m-2" ;
-	float LWDNB(Time, south_north, west_east) ;
-		LWDNB:description = "INSTANTANEOUS DOWNWELLING LONGWAVE FLUX AT BOTTOM" ;
-		LWDNB:units = "W m-2" ;
-	float LWDNBC(Time, south_north, west_east) ;
-		LWDNBC:description = "INSTANTANEOUS DOWNWELLING CLEAR SKY LONGWAVE FLUX AT BOTTOM" ;
-		LWDNBC:units = "W m-2" ;
-	float OLR(Time, south_north, west_east) ;
-		OLR:description = "TOA OUTGOING LONG WAVE" ;
-		OLR:units = "W m-2" ;
-	float XLAT_U(Time, south_north, west_east_stag) ;
-		XLAT_U:description = "LATITUDE, SOUTH IS NEGATIVE" ;
-		XLAT_U:units = "degree_north" ;
-	float XLONG_U(Time, south_north, west_east_stag) ;
-		XLONG_U:description = "LONGITUDE, WEST IS NEGATIVE" ;
-		XLONG_U:units = "degree_east" ;
-	float XLAT_V(Time, south_north_stag, west_east) ;
-		XLAT_V:description = "LATITUDE, SOUTH IS NEGATIVE" ;
-		XLAT_V:units = "degree_north" ;
-	float XLONG_V(Time, south_north_stag, west_east) ;
-		XLONG_V:description = "LONGITUDE, WEST IS NEGATIVE" ;
-		XLONG_V:units = "degree_east" ;
-	float ALBEDO(Time, south_north, west_east) ;
-		ALBEDO:description = "ALBEDO" ;
-		ALBEDO:units = "-" ;
-	float CLAT(Time, south_north, west_east) ;
-		CLAT:description = "COMPUTATIONAL GRID LATITUDE, SOUTH IS NEGATIVE" ;
-		CLAT:units = "degree_north" ;
-	float ALBBCK(Time, south_north, west_east) ;
-		ALBBCK:description = "BACKGROUND ALBEDO" ;
-		ALBBCK:units = "" ;
-	float EMISS(Time, south_north, west_east) ;
-		EMISS:description = "SURFACE EMISSIVITY" ;
-		EMISS:units = "" ;
-	float NOAHRES(Time, south_north, west_east) ;
-		NOAHRES:description = "RESIDUAL OF THE NOAH SURFACE ENERGY BUDGET" ;
-		NOAHRES:units = "W m{-2}" ;
-	float TMN(Time, south_north, west_east) ;
-		TMN:description = "SOIL TEMPERATURE AT LOWER BOUNDARY" ;
-		TMN:units = "K" ;
-	float XLAND(Time, south_north, west_east) ;
-		XLAND:description = "LAND MASK (1 FOR LAND, 2 FOR WATER)" ;
-		XLAND:units = "" ;
-	float UST(Time, south_north, west_east) ;
-		UST:description = "U* IN SIMILARITY THEORY" ;
-		UST:units = "m s-1" ;
-	float PBLH(Time, south_north, west_east) ;
-		PBLH:description = "PBL HEIGHT" ;
-		PBLH:units = "m" ;
-	float HFX(Time, south_north, west_east) ;
-		HFX:description = "UPWARD HEAT FLUX AT THE SURFACE" ;
-		HFX:units = "W m-2" ;
-	float QFX(Time, south_north, west_east) ;
-		QFX:description = "UPWARD MOISTURE FLUX AT THE SURFACE" ;
-		QFX:units = "kg m-2 s-1" ;
-	float LH(Time, south_north, west_east) ;
-		LH:description = "LATENT HEAT FLUX AT THE SURFACE" ;
-		LH:units = "W m-2" ;
-	float ACHFX(Time, south_north, west_east) ;
-		ACHFX:description = "ACCUMULATED UPWARD HEAT FLUX AT THE SURFACE" ;
-		ACHFX:units = "J m-2" ;
-	float ACLHF(Time, south_north, west_east) ;
-		ACLHF:description = "ACCUMULATED UPWARD LATENT HEAT FLUX AT THE SURFACE" ;
-		ACLHF:units = "J m-2" ;
-	float SNOWC(Time, south_north, west_east) ;
-		SNOWC:description = "FLAG INDICATING SNOW COVERAGE (1 FOR SNOW COVER)" ;
-		SNOWC:units = "" ;
-	float SR(Time, south_north, west_east) ;
-		SR:description = "fraction of frozen precipitation" ;
-		SR:units = "-" ;
-	float C1H(Time, bottom_top) ;
-		C1H:description = "half levels, c1h = d bf / d eta, using znw" ;
-		C1H:units = "Dimensionless" ;
-	float C2H(Time, bottom_top) ;
-		C2H:description = "half levels, c2h = (1-c1h)*(p0-pt)" ;
-		C2H:units = "Pa" ;
-	float C1F(Time, bottom_top_stag) ;
-		C1F:description = "full levels, c1f = d bf / d eta, using znu" ;
-		C1F:units = "Dimensionless" ;
-	float C2F(Time, bottom_top_stag) ;
-		C2F:description = "full levels, c2f = (1-c1f)*(p0-pt)" ;
-		C2F:units = "Pa" ;
-	float C3H(Time, bottom_top) ;
-		C3H:description = "half levels, c3h = bh" ;
-		C3H:units = "Dimensionless" ;
-	float C4H(Time, bottom_top) ;
-		C4H:description = "half levels, c4h = (eta-bh)*(p0-pt)+pt, using znu" ;
-		C4H:units = "Pa" ;
-	float C3F(Time, bottom_top_stag) ;
-		C3F:description = "full levels, c3f = bf" ;
-		C3F:units = "Dimensionless" ;
-	float C4F(Time, bottom_top_stag) ;
-		C4F:description = "full levels, c4f = (eta-bf)*(p0-pt)+pt, using znw" ;
-		C4F:units = "Pa" ;
-	float PCB(Time, south_north, west_east) ;
-		PCB:description = "base state dry air mass in column" ;
-		PCB:units = "Pa" ;
-	float PC(Time, south_north, west_east) ;
-		PC:description = "perturbation dry air mass in column" ;
-		PC:units = "Pa" ;
-	float LANDMASK(Time, south_north, west_east) ;
-		LANDMASK:description = "LAND MASK (1 FOR LAND, 0 FOR WATER)" ;
-		LANDMASK:units = "" ;
-	float LAKEMASK(Time, south_north, west_east) ;
-		LAKEMASK:description = "LAKE MASK (1 FOR LAKE, 0 FOR NON-LAKE)" ;
-		LAKEMASK:units = "" ;
-	float SST(Time, south_north, west_east) ;
-		SST:description = "SEA SURFACE TEMPERATURE" ;
-		SST:units = "K" ;
+       Time = UNLIMITED ; // (1 currently)
+       DateStrLen = 19 ;
+       west_east = 500 ;
+       south_north = 500 ;
+       bottom_top = 55 ;
+       bottom_top_stag = 56 ;
+       soil_layers_stag = 4 ;
+       west_east_stag = 501 ;
+       south_north_stag = 501 ;
 
-全局属性列表 List of Global Attributes 
-		:TITLE = " OUTPUT FROM WRF V4.0.3 MODEL" ;
-		:START_DATE = "2018-07-14_00:00:00" ;
-		:SIMULATION_START_DATE = "2018-07-14_00:00:00" ;
-		:WEST-EAST_GRID_DIMENSION = 501 ;
-		:SOUTH-NORTH_GRID_DIMENSION = 501 ;
-		:BOTTOM-TOP_GRID_DIMENSION = 56 ;
-		:DX = 4000.f ;
-		:DY = 4000.f ;
-		:AERCU_OPT = 0 ;
-		:AERCU_FCT = 1.f ;
-		:IDEAL_CASE = 0 ;
-		:DIFF_6TH_SLOPEOPT = 0 ;
-		:AUTO_LEVELS_OPT = 2 ;
-		:DIFF_6TH_THRESH = 0.1f ;
-		:DZBOT = 50.f ;
-		:DZSTRETCH_S = 1.3f ;
-		:DZSTRETCH_U = 1.1f ;
-		:SKEBS_ON = 0 ;
-		:SPEC_BDY_FINAL_MU = 1 ;
-		:USE_Q_DIABATIC = 0 ;
-		:GRIDTYPE = "C" ;
-		:DIFF_OPT = 1 ;
-		:KM_OPT = 4 ;
-		:DAMP_OPT = 3 ;
-		:DAMPCOEF = 0.2f ;
-		:KHDIF = 0.f ;
-		:KVDIF = 0.f ;
-		:MP_PHYSICS = 6 ;
-		:RA_LW_PHYSICS = 4 ;
-		:RA_SW_PHYSICS = 4 ;
-		:SF_SFCLAY_PHYSICS = 1 ;
-		:SF_SURFACE_PHYSICS = 2 ;
-		:BL_PBL_PHYSICS = 1 ;
-		:CU_PHYSICS = 0 ;
-		:SF_LAKE_PHYSICS = 0 ;
-		:SURFACE_INPUT_SOURCE = 3 ;
-		:SST_UPDATE = 0 ;
-		:GRID_FDDA = 0 ;
-		:GFDDA_INTERVAL_M = 0 ;
-		:GFDDA_END_H = 0 ;
-		:GRID_SFDDA = 0 ;
-		:SGFDDA_INTERVAL_M = 0 ;
-		:SGFDDA_END_H = 0 ;
-		:HYPSOMETRIC_OPT = 2 ;
-		:USE_THETA_M = 1 ;
-		:GWD_OPT = 0 ;
-		:SF_URBAN_PHYSICS = 0 ;
-		:SF_SURFACE_MOSAIC = 0 ;
-		:SF_OCEAN_PHYSICS = 0 ;
-		:SHCU_PHYSICS = 0 ;
-		:MFSHCONV = 0 ;
-		:FEEDBACK = 1 ;
-		:SMOOTH_OPTION = 2 ;
-		:SWRAD_SCAT = 1.f ;
-		:W_DAMPING = 0 ;
-		:RADT = 15.f ;
-		:BLDT = 0.f ;
-		:CUDT = 0.f ;
-		:AER_OPT = 0 ;
-		:SWINT_OPT = 0 ;
-		:AER_TYPE = 1 ;
-		:AER_AOD550_OPT = 1 ;
-		:AER_ANGEXP_OPT = 1 ;
-		:AER_SSA_OPT = 1 ;
-		:AER_ASY_OPT = 1 ;
-		:AER_AOD550_VAL = 0.12f ;
-		:AER_ANGEXP_VAL = 1.3f ;
-		:AER_SSA_VAL = 0.85f ;
-		:AER_ASY_VAL = 0.9f ;
-		:MOIST_ADV_OPT = 1 ;
-		:SCALAR_ADV_OPT = 1 ;
-		:TKE_ADV_OPT = 1 ;
-		:DIFF_6TH_OPT = 0 ;
-		:DIFF_6TH_FACTOR = 0.12f ;
-		:OBS_NUDGE_OPT = 0 ;
-		:BUCKET_MM = -1.f ;
-		:BUCKET_J = -1.f ;
-		:PREC_ACC_DT = 0.f ;
-		:ISFTCFLX = 0 ;
-		:ISHALLOW = 0 ;
-		:ISFFLX = 1 ;
-		:ICLOUD = 1 ;
-		:ICLOUD_CU = 0 ;
-		:TRACER_PBLMIX = 1 ;
-		:SCALAR_PBLMIX = 0 ;
-		:YSU_TOPDOWN_PBLMIX = 0 ;
-		:GRAV_SETTLING = 0 ;
-		:DFI_OPT = 0 ;
-		:SIMULATION_INITIALIZATION_TYPE = "REAL-DATA CASE" ;
-		:WEST-EAST_PATCH_START_UNSTAG = 1 ;
-		:WEST-EAST_PATCH_END_UNSTAG = 500 ;
-		:WEST-EAST_PATCH_START_STAG = 1 ;
-		:WEST-EAST_PATCH_END_STAG = 501 ;
-		:SOUTH-NORTH_PATCH_START_UNSTAG = 1 ;
-		:SOUTH-NORTH_PATCH_END_UNSTAG = 500 ;
-		:SOUTH-NORTH_PATCH_START_STAG = 1 ;
-		:SOUTH-NORTH_PATCH_END_STAG = 501 ;
-		:BOTTOM-TOP_PATCH_START_UNSTAG = 1 ;
-		:BOTTOM-TOP_PATCH_END_UNSTAG = 55 ;
-		:BOTTOM-TOP_PATCH_START_STAG = 1 ;
-		:BOTTOM-TOP_PATCH_END_STAG = 56 ;
-		:GRID_ID = 1 ;
-		:PARENT_ID = 0 ;
-		:I_PARENT_START = 1 ;
-		:J_PARENT_START = 1 ;
-		:PARENT_GRID_RATIO = 1 ;
-		:DT = 20.f ;
-		:CEN_LAT = 39.00001f ;
-		:CEN_LON = -98.f ;
-		:TRUELAT1 = 30.f ;
-		:TRUELAT2 = 50.f ;
-		:MOAD_CEN_LAT = 39.00001f ;
-		:STAND_LON = -98.f ;
-		:POLE_LAT = 90.f ;
-		:POLE_LON = 0.f ;
-		:GMT = 0.f ;
-		:JULYR = 2018 ;
-		:JULDAY = 195 ;
-		:MAP_PROJ = 1 ;
-		:MAP_PROJ_CHAR = "Lambert Conformal" ;
-		:MMINLU = "MODIFIED_IGBP_MODIS_NOAH" ;
-		:NUM_LAND_CAT = 21 ;
-		:ISWATER = 17 ;
-		:ISLAKE = 21 ;
-		:ISICE = 15 ;
-		:ISURBAN = 13 ;
-		:ISOILWATER = 14 ;
-		:HYBRID_OPT = 2 ;
-		:ETAC = 0.2f ; 
+
+variables:
+
+float XLAT(Time, south_north, west_east) ;
+        XLAT:description = "LATITUDE, SOUTH IS NEGATIVE" ;
+        XLAT:units = "degree_north" ;
+float XLONG(Time, south_north, west_east) ;
+        XLONG:description = "LONGITUDE, WEST IS NEGATIVE" ;
+        XLONG:units = "degree_east" ;
+float LU_INDEX(Time, south_north, west_east) ;
+        LU_INDEX:description = "LAND USE CATEGORY" ;
+        LU_INDEX:units = "" ;
+float ZNU(Time, bottom_top) ;
+        ZNU:description = "eta values on half (mass) levels" ;
+        ZNU:units = "" ;
+float ZNW(Time, bottom_top_stag) ;
+        ZNW:description = "eta values on full (w) levels" ;
+        ZNW:units = "" ;
+float ZS(Time, soil_layers_stag) ;
+        ZS:description = "DEPTHS OF CENTERS OF SOIL LAYERS" ;
+        ZS:units = "m" ;
+float DZS(Time, soil_layers_stag) ;
+        DZS:description = "THICKNESSES OF SOIL LAYERS" ;
+        DZS:units = "m" ;
+float VAR_SSO(Time, south_north, west_east) ;
+        VAR_SSO:description = "variance of subgrid-scale orography" ;
+        VAR_SSO:units = "m2" ;
+float U(Time, bottom_top, south_north, west_east_stag) ;
+        U:description = "x-wind component" ;
+        U:units = "m s-1" ;
+float V(Time, bottom_top, south_north_stag, west_east) ;
+        V:description = "y-wind component" ;
+        V:units = "m s-1" ;
+float W(Time, bottom_top_stag, south_north, west_east) ;
+        W:description = "z-wind component" ;
+        W:units = "m s-1" ;
+float PH(Time, bottom_top_stag, south_north, west_east) ;
+        PH:description = "perturbation geopotential" ;
+        PH:units = "m2 s-2" ;
+float PHB(Time, bottom_top_stag, south_north, west_east) ;
+        PHB:description = "base-state geopotential" ;
+        PHB:units = "m2 s-2" ;
+float T(Time, bottom_top, south_north, west_east) ;
+        T:description = "perturbation potential temperature theta-t0" ;
+        T:units = "K" ;
+float THM(Time, bottom_top, south_north, west_east) ;
+        THM:description = "either 1) pert moist pot temp=(1+Rv/Rd Qv)*(theta)-T0,
+                               or 2) pert dry pot temp=t" ;
+        THM:units = "K" ;
+float MU(Time, south_north, west_east) ;
+        MU:description = "perturbation dry air mass in column" ;
+        MU:units = "Pa" ;
+float MUB(Time, south_north, west_east) ;
+        MUB:description = "base state dry air mass in column" ;
+        MUB:units = "Pa" ;
+float P(Time, bottom_top, south_north, west_east) ;
+        P:description = "perturbation pressure" ;
+        P:units = "Pa" ;
+float PB(Time, bottom_top, south_north, west_east) ;
+        PB:description = "BASE STATE PRESSURE" ;
+        PB:units = "Pa" ;
+float FNM(Time, bottom_top) ;
+        FNM:description = "upper weight for vertical stretching" ;
+        FNM:units = "" ;
+float FNP(Time, bottom_top) ;
+        FNP:description = "lower weight for vertical stretching" ;
+        FNP:units = "" ;
+float RDNW(Time, bottom_top) ;
+        RDNW:description = "inverse d(eta) values between full (w) levels" ;
+        RDNW:units = "" ;
+float RDN(Time, bottom_top) ;
+        RDN:description = "inverse d(eta) values between half (mass) levels" ;
+        RDN:units = "" ;
+float DNW(Time, bottom_top) ;
+        DNW:description = "d(eta) values between full (w) levels" ;
+        DNW:units = "" ;
+float DN(Time, bottom_top) ;
+        DN:description = "d(eta) values between half (mass) levels" ;
+        DN:units = "" ;
+float CFN(Time) ;
+        CFN:description = "extrapolation constant" ;
+        CFN:units = "" ;
+float CFN1(Time) ;
+        CFN1:description = "extrapolation constant" ;
+        CFN1:units = "" ;
+int THIS_IS_AN_IDEAL_RUN(Time) ;
+        THIS_IS_AN_IDEAL_RUN:description = "T/F flag: this is an ARW ideal simulation" ;
+        THIS_IS_AN_IDEAL_RUN:units = "-" ;
+float P_HYD(Time, bottom_top, south_north, west_east) ;
+        P_HYD:description = "hydrostatic pressure" ;
+        P_HYD:units = "Pa" ;
+float Q2(Time, south_north, west_east) ;
+        Q2:description = "QV at 2 M" ;
+        Q2:units = "kg kg-1" ;
+float T2(Time, south_north, west_east) ;
+        T2:description = "TEMP at 2 M" ;
+        T2:units = "K" ;
+float TH2(Time, south_north, west_east) ;
+        TH2:description = "POT TEMP at 2 M" ;
+        TH2:units = "K" ;
+float PSFC(Time, south_north, west_east) ;
+        PSFC:description = "SFC PRESSURE" ;
+        PSFC:units = "Pa" ;
+float U10(Time, south_north, west_east) ;
+        U10:description = "U at 10 M" ;
+        U10:units = "m s-1" ;
+float V10(Time, south_north, west_east) ;
+        V10:description = "V at 10 M" ;
+        V10:units = "m s-1" ;
+float RDX(Time) ;
+        RDX:description = "INVERSE X GRID LENGTH" ;
+        RDX:units = "" ;
+float RDY(Time) ;
+        RDY:description = "INVERSE Y GRID LENGTH" ;
+        RDY:units = "" ;
+float RESM(Time) ;
+        RESM:description = "TIME WEIGHT CONSTANT FOR SMALL STEPS" ;
+        RESM:units = "" ;
+float CF1(Time) ;
+        CF1:description = "2nd order extrapolation constant" ;
+        CF1:units = "" ;
+float CF2(Time) ;
+        CF2:description = "2nd order extrapolation constant" ;
+        CF2:units = "" ;
+float CF3(Time) ;
+        CF3:description = "2nd order extrapolation constant" ;
+        CF3:units = "" ;
+int ITIMESTEP(Time) ;
+        ITIMESTEP:description = "" ;
+        ITIMESTEP:units = "" ;
+float XTIME(Time) ;
+        XTIME:description = "minutes since 2018-07-14 00:00:00" ;
+        XTIME:units = "minutes since 2018-07-14 00:00:00" ;
+float QVAPOR(Time, bottom_top, south_north, west_east) ;
+        QVAPOR:description = "Water vapor mixing ratio" ;
+        QVAPOR:units = "kg kg-1" ;
+float QCLOUD(Time, bottom_top, south_north, west_east) ;
+        QCLOUD:description = "Cloud water mixing ratio" ;
+        QCLOUD:units = "kg kg-1" ;
+float QRAIN(Time, bottom_top, south_north, west_east) ;
+        QRAIN:description = "Rain water mixing ratio" ;
+        QRAIN:units = "kg kg-1" ;
+float QICE(Time, bottom_top, south_north, west_east) ;
+        QICE:description = "Ice mixing ratio" ;
+        QICE:units = "kg kg-1" ;
+float QSNOW(Time, bottom_top, south_north, west_east) ;
+        QSNOW:description = "Snow mixing ratio" ;
+        QSNOW:units = "kg kg-1" ;
+float QGRAUP(Time, bottom_top, south_north, west_east) ;
+        QGRAUP:description = "Graupel mixing ratio" ;
+        QGRAUP:units = "kg kg-1" ;
+float SHDMAX(Time, south_north, west_east) ;
+        SHDMAX:description = "ANNUAL MAX VEG FRACTION" ;
+        SHDMAX:units = "" ;
+float SHDMIN(Time, south_north, west_east) ;
+        SHDMIN:description = "ANNUAL MIN VEG FRACTION" ;
+        SHDMIN:units = "" ;
+float SNOALB(Time, south_north, west_east) ;
+        SNOALB:description = "ANNUAL MAX SNOW ALBEDO IN FRACTION" ;
+        SNOALB:units = "" ;
+float TSLB(Time, soil_layers_stag, south_north, west_east) ;
+        TSLB:description = "SOIL TEMPERATURE" ;
+        TSLB:units = "K" ;
+float SMOIS(Time, soil_layers_stag, south_north, west_east) ;
+        SMOIS:description = "SOIL MOISTURE" ;
+        SMOIS:units = "m3 m-3" ;
+float SH2O(Time, soil_layers_stag, south_north, west_east) ;
+        SH2O:description = "SOIL LIQUID WATER" ;
+        SH2O:units = "m3 m-3" ;
+float SMCREL(Time, soil_layers_stag, south_north, west_east) ;
+        SMCREL:description = "RELATIVE SOIL MOISTURE" ;
+        SMCREL:units = "" ;
+float SEAICE(Time, south_north, west_east) ;
+        SEAICE:description = "SEA ICE FLAG" ;
+        SEAICE:units = "" ;
+float XICEM(Time, south_north, west_east) ;
+        XICEM:description = "SEA ICE FLAG (PREVIOUS STEP)" ;
+        XICEM:units = "" ;
+float SFROFF(Time, south_north, west_east) ;
+        SFROFF:description = "SURFACE RUNOFF" ;
+        SFROFF:units = "mm" ;
+float UDROFF(Time, south_north, west_east) ;
+        UDROFF:description = "UNDERGROUND RUNOFF" ;
+        UDROFF:units = "mm" ;
+int IVGTYP(Time, south_north, west_east) ;
+        IVGTYP:description = "DOMINANT VEGETATION CATEGORY" ;
+        IVGTYP:units = "" ;
+int ISLTYP(Time, south_north, west_east) ;
+        ISLTYP:description = "DOMINANT SOIL CATEGORY" ;
+        ISLTYP:units = "" ;
+float VEGFRA(Time, south_north, west_east) ;
+        VEGFRA:description = "VEGETATION FRACTION" ;
+        VEGFRA:units = "" ;
+float GRDFLX(Time, south_north, west_east) ;
+        GRDFLX:description = "GROUND HEAT FLUX" ;
+        GRDFLX:units = "W m-2" ;
+float ACGRDFLX(Time, south_north, west_east) ;
+        ACGRDFLX:description = "ACCUMULATED GROUND HEAT FLUX" ;
+        ACGRDFLX:units = "J m-2" ;
+float ACSNOM(Time, south_north, west_east) ;
+        ACSNOM:description = "ACCUMULATED MELTED SNOW" ;
+        ACSNOM:units = "kg m-2" ;
+float SNOW(Time, south_north, west_east) ;
+        SNOW:description = "SNOW WATER EQUIVALENT" ;
+        SNOW:units = "kg m-2" ;
+float SNOWH(Time, south_north, west_east) ;
+        SNOWH:description = "PHYSICAL SNOW DEPTH" ;
+        SNOWH:units = "m" ;
+float CANWAT(Time, south_north, west_east) ;
+        CANWAT:description = "CANOPY WATER" ;
+        CANWAT:units = "kg m-2" ;
+float SSTSK(Time, south_north, west_east) ;
+        SSTSK:description = "SKIN SEA SURFACE TEMPERATURE" ;
+        SSTSK:units = "K" ;
+float COSZEN(Time, south_north, west_east) ;
+        COSZEN:description = "COS of SOLAR ZENITH ANGLE" ;
+        COSZEN:units = "dimensionless" ;
+float LAI(Time, south_north, west_east) ;
+        LAI:description = "LEAF AREA INDEX" ;
+        LAI:units = "m-2/m-2" ;
+float VAR(Time, south_north, west_east) ;
+        VAR:description = "OROGRAPHIC VARIANCE" ;
+        VAR:units = "" ;
+float MAPFAC_M(Time, south_north, west_east) ;
+        MAPFAC_M:description = "Map scale factor on mass grid" ;
+        MAPFAC_M:units = "" ;
+float MAPFAC_U(Time, south_north, west_east_stag) ;
+        MAPFAC_U:description = "Map scale factor on u-grid" ;
+        MAPFAC_U:units = "" ;
+float MAPFAC_V(Time, south_north_stag, west_east) ;
+        MAPFAC_V:description = "Map scale factor on v-grid" ;
+        MAPFAC_V:units = "" ;
+float F(Time, south_north, west_east) ;
+        F:description = "Coriolis sine latitude term" ;
+        F:units = "s-1" ;
+float E(Time, south_north, west_east) ;
+        E:description = "Coriolis cosine latitude term" ;
+        E:units = "s-1" ;
+float SINALPHA(Time, south_north, west_east) ;
+        SINALPHA:description = "Local sine of map rotation" ;
+        SINALPHA:units = "" ;
+float COSALPHA(Time, south_north, west_east) ;
+        COSALPHA:description = "Local cosine of map rotation" ;
+        COSALPHA:units = "" ;
+float HGT(Time, south_north, west_east) ;
+        HGT:description = "Terrain Height" ;
+        HGT:units = "m" ;
+float TSK(Time, south_north, west_east) ;
+        TSK:description = "SURFACE SKIN TEMPERATURE" ;
+        TSK:units = "K" ;
+float P_TOP(Time) ;
+        P_TOP:description = "PRESSURE TOP OF THE MODEL" ;
+        P_TOP:units = "Pa" ;
+float T00(Time) ;
+        T00:description = "BASE STATE TEMPERATURE" ;
+        T00:units = "K" ;
+float P00(Time) ;
+        P00:description = "BASE STATE PRESURE" ;
+        P00:units = "Pa" ;
+float TLP(Time) ;
+        TLP:description = "BASE STATE LAPSE RATE" ;
+        TLP:units = "" ;
+float TISO(Time) ;
+        TISO:description = "TEMP AT WHICH THE BASE T TURNS CONST" ;
+        TISO:units = "K" ;
+float TLP_STRAT(Time) ;
+        TLP_STRAT:description = "BASE STATE LAPSE RATE (DT/D(LN(P)) IN STRATOSPHERE" ;
+        TLP_STRAT:units = "K" ;
+float P_STRAT(Time) ;
+        P_STRAT:description = "BASE STATE PRESSURE AT BOTTOM OF STRATOSPHERE" ;
+        P_STRAT:units = "Pa" ;
+float MAX_MSTFX(Time) ;
+        MAX_MSTFX:description = "Max map factor in domain" ;
+        MAX_MSTFX:units = "" ;
+float MAX_MSTFY(Time) ;
+        MAX_MSTFY:description = "Max map factor in domain" ;
+        MAX_MSTFY:units = "" ;
+float RAINC(Time, south_north, west_east) ;
+        RAINC:description = "ACCUMULATED TOTAL CUMULUS PRECIPITATION" ;
+        RAINC:units = "mm" ;
+float RAINSH(Time, south_north, west_east) ;
+        RAINSH:description = "ACCUMULATED SHALLOW CUMULUS PRECIPITATION" ;
+        RAINSH:units = "mm" ;
+float RAINNC(Time, south_north, west_east) ;
+        RAINNC:description = "ACCUMULATED TOTAL GRID SCALE PRECIPITATION" ;
+        RAINNC:units = "mm" ;
+float SNOWNC(Time, south_north, west_east) ;
+        SNOWNC:description = "ACCUMULATED TOTAL GRID SCALE SNOW AND ICE" ;
+        SNOWNC:units = "mm" ;
+float GRAUPELNC(Time, south_north, west_east) ;
+        GRAUPELNC:description = "ACCUMULATED TOTAL GRID SCALE GRAUPEL" ;
+        GRAUPELNC:units = "mm" ;
+float HAILNC(Time, south_north, west_east) ;
+        HAILNC:description = "ACCUMULATED TOTAL GRID SCALE HAIL" ;
+        HAILNC:units = "mm" ;
+float REFL_10CM(Time, bottom_top, south_north, west_east) ;
+        REFL_10CM:description = "Radar reflectivity (lamda = 10 cm)" ;
+        REFL_10CM:units = "dBZ" ;
+float CLDFRA(Time, bottom_top, south_north, west_east) ;
+        CLDFRA:description = "CLOUD FRACTION" ;
+        CLDFRA:units = "" ;
+float SWDOWN(Time, south_north, west_east) ;
+        SWDOWN:description = "DOWNWARD SHORT WAVE FLUX AT GROUND SURFACE" ;
+        SWDOWN:units = "W m-2" ;
+float GLW(Time, south_north, west_east) ;
+        GLW:description = "DOWNWARD LONG WAVE FLUX AT GROUND SURFACE" ;
+        GLW:units = "W m-2" ;
+float SWNORM(Time, south_north, west_east) ;
+        SWNORM:description = "NORMAL SHORT WAVE FLUX AT GROUND SURFACE (SLOPE-DEPENDENT)" ;
+        SWNORM:units = "W m-2" ;
+float ACSWUPT(Time, south_north, west_east) ;
+        ACSWUPT:description = "ACCUMULATED UPWELLING SHORTWAVE FLUX AT TOP" ;
+        ACSWUPT:units = "J m-2" ;
+float ACSWUPTC(Time, south_north, west_east) ;
+        ACSWUPTC:description = "ACCUMULATED UPWELLING CLEAR SKY SHORTWAVE FLUX AT TOP" ;
+        ACSWUPTC:units = "J m-2" ;
+float ACSWDNT(Time, south_north, west_east) ;
+        ACSWDNT:description = "ACCUMULATED DOWNWELLING SHORTWAVE FLUX AT TOP" ;
+        ACSWDNT:units = "J m-2" ;
+float ACSWDNTC(Time, south_north, west_east) ;
+        ACSWDNTC:description = "ACCUMULATED DOWNWELLING CLEAR SKY SHORTWAVE FLUX AT TOP" ;
+        ACSWDNTC:units = "J m-2" ;
+float ACSWUPB(Time, south_north, west_east) ;
+        ACSWUPB:description = "ACCUMULATED UPWELLING SHORTWAVE FLUX AT BOTTOM" ;
+        ACSWUPB:units = "J m-2" ;
+float ACSWUPBC(Time, south_north, west_east) ;
+        ACSWUPBC:description = "ACCUMULATED UPWELLING CLEAR SKY SHORTWAVE FLUX AT BOTTOM" ;
+        ACSWUPBC:units = "J m-2" ;
+float ACSWDNB(Time, south_north, west_east) ;
+        ACSWDNB:description = "ACCUMULATED DOWNWELLING SHORTWAVE FLUX AT BOTTOM" ;
+        ACSWDNB:units = "J m-2" ;
+float ACSWDNBC(Time, south_north, west_east) ;
+        ACSWDNBC:description = "ACCUMULATED DOWNWELLING CLEAR SKY SHORTWAVE FLUX AT BOTTOM" ;
+        ACSWDNBC:units = "J m-2" ;
+float ACLWUPT(Time, south_north, west_east) ;
+        ACLWUPT:description = "ACCUMULATED UPWELLING LONGWAVE FLUX AT TOP" ;
+        ACLWUPT:units = "J m-2" ;
+float ACLWUPTC(Time, south_north, west_east) ;
+        ACLWUPTC:description = "ACCUMULATED UPWELLING CLEAR SKY LONGWAVE FLUX AT TOP" ;
+        ACLWUPTC:units = "J m-2" ;
+float ACLWDNT(Time, south_north, west_east) ;
+        ACLWDNT:description = "ACCUMULATED DOWNWELLING LONGWAVE FLUX AT TOP" ;
+        ACLWDNT:units = "J m-2" ;
+float ACLWDNTC(Time, south_north, west_east) ;
+        ACLWDNTC:description = "ACCUMULATED DOWNWELLING CLEAR SKY LONGWAVE FLUX AT TOP" ;
+        ACLWDNTC:units = "J m-2" ;
+float ACLWUPB(Time, south_north, west_east) ;
+        ACLWUPB:description = "ACCUMULATED UPWELLING LONGWAVE FLUX AT BOTTOM" ;
+        ACLWUPB:units = "J m-2" ;
+float ACLWUPBC(Time, south_north, west_east) ;
+        ACLWUPBC:description = "ACCUMULATED UPWELLING CLEAR SKY LONGWAVE FLUX AT BOTTOM" ;
+        ACLWUPBC:units = "J m-2" ;
+float ACLWDNB(Time, south_north, west_east) ;
+        ACLWDNB:description = "ACCUMULATED DOWNWELLING LONGWAVE FLUX AT BOTTOM" ;
+        ACLWDNB:units = "J m-2" ;
+float ACLWDNBC(Time, south_north, west_east) ;
+        ACLWDNBC:description = "ACCUMULATED DOWNWELLING CLEAR SKY LONGWAVE FLUX AT BOTTOM" ;
+        ACLWDNBC:units = "J m-2" ;
+float SWUPT(Time, south_north, west_east) ;
+        SWUPT:description = "INSTANTANEOUS UPWELLING SHORTWAVE FLUX AT TOP" ;
+        SWUPT:units = "W m-2" ;
+float SWUPTC(Time, south_north, west_east) ;
+        SWUPTC:description = "INSTANTANEOUS UPWELLING CLEAR SKY SHORTWAVE FLUX AT TOP" ;
+        SWUPTC:units = "W m-2" ;
+float SWDNT(Time, south_north, west_east) ;
+        SWDNT:description = "INSTANTANEOUS DOWNWELLING SHORTWAVE FLUX AT TOP" ;
+        SWDNT:units = "W m-2" ;
+float SWDNTC(Time, south_north, west_east) ;
+        SWDNTC:description = "INSTANTANEOUS DOWNWELLING CLEAR SKY SHORTWAVE FLUX AT TOP" ;
+        SWDNTC:units = "W m-2" ;
+float SWUPB(Time, south_north, west_east) ;
+        SWUPB:description = "INSTANTANEOUS UPWELLING SHORTWAVE FLUX AT BOTTOM" ;
+        SWUPB:units = "W m-2" ;
+float SWUPBC(Time, south_north, west_east) ;
+        SWUPBC:description = "INSTANTANEOUS UPWELLING CLEAR SKY SHORTWAVE FLUX AT BOTTOM" ;
+        SWUPBC:units = "W m-2" ;
+float SWDNB(Time, south_north, west_east) ;
+        SWDNB:description = "INSTANTANEOUS DOWNWELLING SHORTWAVE FLUX AT BOTTOM" ;
+        SWDNB:units = "W m-2" ;
+float SWDNBC(Time, south_north, west_east) ;
+        SWDNBC:description = "INSTANTANEOUS DOWNWELLING CLEAR SKY SHORTWAVE FLUX AT BOTTOM" ;
+        SWDNBC:units = "W m-2" ;
+float LWUPT(Time, south_north, west_east) ;
+        LWUPT:description = "INSTANTANEOUS UPWELLING LONGWAVE FLUX AT TOP" ;
+        LWUPT:units = "W m-2" ;
+float LWUPTC(Time, south_north, west_east) ;
+        LWUPTC:description = "INSTANTANEOUS UPWELLING CLEAR SKY LONGWAVE FLUX AT TOP" ;
+        LWUPTC:units = "W m-2" ;
+float LWDNT(Time, south_north, west_east) ;
+        LWDNT:description = "INSTANTANEOUS DOWNWELLING LONGWAVE FLUX AT TOP" ;
+        LWDNT:units = "W m-2" ;
+float LWDNTC(Time, south_north, west_east) ;
+        LWDNTC:description = "INSTANTANEOUS DOWNWELLING CLEAR SKY LONGWAVE FLUX AT TOP" ;
+        LWDNTC:units = "W m-2" ;
+float LWUPB(Time, south_north, west_east) ;
+        LWUPB:description = "INSTANTANEOUS UPWELLING LONGWAVE FLUX AT BOTTOM" ;
+        LWUPB:units = "W m-2" ;
+float LWUPBC(Time, south_north, west_east) ;
+        LWUPBC:description = "INSTANTANEOUS UPWELLING CLEAR SKY LONGWAVE FLUX AT BOTTOM" ;
+        LWUPBC:units = "W m-2" ;
+float LWDNB(Time, south_north, west_east) ;
+        LWDNB:description = "INSTANTANEOUS DOWNWELLING LONGWAVE FLUX AT BOTTOM" ;
+        LWDNB:units = "W m-2" ;
+float LWDNBC(Time, south_north, west_east) ;
+        LWDNBC:description = "INSTANTANEOUS DOWNWELLING CLEAR SKY LONGWAVE FLUX AT BOTTOM" ;
+        LWDNBC:units = "W m-2" ;
+float OLR(Time, south_north, west_east) ;
+        OLR:description = "TOA OUTGOING LONG WAVE" ;
+        OLR:units = "W m-2" ;
+float XLAT_U(Time, south_north, west_east_stag) ;
+        XLAT_U:description = "LATITUDE, SOUTH IS NEGATIVE" ;
+        XLAT_U:units = "degree_north" ;
+float XLONG_U(Time, south_north, west_east_stag) ;
+        XLONG_U:description = "LONGITUDE, WEST IS NEGATIVE" ;
+        XLONG_U:units = "degree_east" ;
+float XLAT_V(Time, south_north_stag, west_east) ;
+        XLAT_V:description = "LATITUDE, SOUTH IS NEGATIVE" ;
+        XLAT_V:units = "degree_north" ;
+float XLONG_V(Time, south_north_stag, west_east) ;
+        XLONG_V:description = "LONGITUDE, WEST IS NEGATIVE" ;
+        XLONG_V:units = "degree_east" ;
+float ALBEDO(Time, south_north, west_east) ;
+        ALBEDO:description = "ALBEDO" ;
+        ALBEDO:units = "-" ;
+float CLAT(Time, south_north, west_east) ;
+        CLAT:description = "COMPUTATIONAL GRID LATITUDE, SOUTH IS NEGATIVE" ;
+        CLAT:units = "degree_north" ;
+float ALBBCK(Time, south_north, west_east) ;
+        ALBBCK:description = "BACKGROUND ALBEDO" ;
+        ALBBCK:units = "" ;
+float EMISS(Time, south_north, west_east) ;
+        EMISS:description = "SURFACE EMISSIVITY" ;
+        EMISS:units = "" ;
+float NOAHRES(Time, south_north, west_east) ;
+        NOAHRES:description = "RESIDUAL OF THE NOAH SURFACE ENERGY BUDGET" ;
+        NOAHRES:units = "W m{-2}" ;
+float TMN(Time, south_north, west_east) ;
+        TMN:description = "SOIL TEMPERATURE AT LOWER BOUNDARY" ;
+        TMN:units = "K" ;
+float XLAND(Time, south_north, west_east) ;
+        XLAND:description = "LAND MASK (1 FOR LAND, 2 FOR WATER)" ;
+        XLAND:units = "" ;
+float UST(Time, south_north, west_east) ;
+        UST:description = "U* IN SIMILARITY THEORY" ;
+        UST:units = "m s-1" ;
+float PBLH(Time, south_north, west_east) ;
+        PBLH:description = "PBL HEIGHT" ;
+        PBLH:units = "m" ;
+float HFX(Time, south_north, west_east) ;
+        HFX:description = "UPWARD HEAT FLUX AT THE SURFACE" ;
+        HFX:units = "W m-2" ;
+float QFX(Time, south_north, west_east) ;
+        QFX:description = "UPWARD MOISTURE FLUX AT THE SURFACE" ;
+        QFX:units = "kg m-2 s-1" ;
+float LH(Time, south_north, west_east) ;
+        LH:description = "LATENT HEAT FLUX AT THE SURFACE" ;
+        LH:units = "W m-2" ;
+float ACHFX(Time, south_north, west_east) ;
+        ACHFX:description = "ACCUMULATED UPWARD HEAT FLUX AT THE SURFACE" ;
+        ACHFX:units = "J m-2" ;
+float ACLHF(Time, south_north, west_east) ;
+        ACLHF:description = "ACCUMULATED UPWARD LATENT HEAT FLUX AT THE SURFACE" ;
+        ACLHF:units = "J m-2" ;
+float SNOWC(Time, south_north, west_east) ;
+        SNOWC:description = "FLAG INDICATING SNOW COVERAGE (1 FOR SNOW COVER)" ;
+        SNOWC:units = "" ;
+float SR(Time, south_north, west_east) ;
+        SR:description = "fraction of frozen precipitation" ;
+        SR:units = "-" ;
+float C1H(Time, bottom_top) ;
+        C1H:description = "half levels, c1h = d bf / d eta, using znw" ;
+        C1H:units = "Dimensionless" ;
+float C2H(Time, bottom_top) ;
+        C2H:description = "half levels, c2h = (1-c1h)*(p0-pt)" ;
+        C2H:units = "Pa" ;
+float C1F(Time, bottom_top_stag) ;
+        C1F:description = "full levels, c1f = d bf / d eta, using znu" ;
+        C1F:units = "Dimensionless" ;
+float C2F(Time, bottom_top_stag) ;
+        C2F:description = "full levels, c2f = (1-c1f)*(p0-pt)" ;
+        C2F:units = "Pa" ;
+float C3H(Time, bottom_top) ;
+        C3H:description = "half levels, c3h = bh" ;
+        C3H:units = "Dimensionless" ;
+float C4H(Time, bottom_top) ;
+        C4H:description = "half levels, c4h = (eta-bh)*(p0-pt)+pt, using znu" ;
+        C4H:units = "Pa" ;
+float C3F(Time, bottom_top_stag) ;
+        C3F:description = "full levels, c3f = bf" ;
+        C3F:units = "Dimensionless" ;
+float C4F(Time, bottom_top_stag) ;
+        C4F:description = "full levels, c4f = (eta-bf)*(p0-pt)+pt, using znw" ;
+        C4F:units = "Pa" ;
+float PCB(Time, south_north, west_east) ;
+        PCB:description = "base state dry air mass in column" ;
+        PCB:units = "Pa" ;
+float PC(Time, south_north, west_east) ;
+        PC:description = "perturbation dry air mass in column" ;
+        PC:units = "Pa" ;
+float LANDMASK(Time, south_north, west_east) ;
+        LANDMASK:description = "LAND MASK (1 FOR LAND, 0 FOR WATER)" ;
+        LANDMASK:units = "" ;
+float LAKEMASK(Time, south_north, west_east) ;
+        LAKEMASK:description = "LAKE MASK (1 FOR LAKE, 0 FOR NON-LAKE)" ;
+        LAKEMASK:units = "" ;
+float SST(Time, south_north, west_east) ;
+        SST:description = "SEA SURFACE TEMPERATURE" ;
+        SST:units = "K" ;
+```
+
+### 全局属性列表
+
+```
+	:TITLE = " OUTPUT FROM WRF V4.0.3 MODEL" ;
+	:START_DATE = "2018-07-14_00:00:00" ;
+	:SIMULATION_START_DATE = "2018-07-14_00:00:00" ;
+    :WEST-EAST_GRID_DIMENSION = 501 ;
+    :SOUTH-NORTH_GRID_DIMENSION = 501 ;
+    :BOTTOM-TOP_GRID_DIMENSION = 56 ;
+    :DX = 4000.f ;
+    :DY = 4000.f ;
+    :AERCU_OPT = 0 ;
+    :AERCU_FCT = 1.f ;
+    :IDEAL_CASE = 0 ;
+    :DIFF_6TH_SLOPEOPT = 0 ;
+    :AUTO_LEVELS_OPT = 2 ;
+    :DIFF_6TH_THRESH = 0.1f ;
+    :DZBOT = 50.f ;
+    :DZSTRETCH_S = 1.3f ;
+    :DZSTRETCH_U = 1.1f ;
+    :SKEBS_ON = 0 ;
+    :SPEC_BDY_FINAL_MU = 1 ;
+    :USE_Q_DIABATIC = 0 ;
+    :GRIDTYPE = "C" ;
+    :DIFF_OPT = 1 ;
+    :KM_OPT = 4 ;
+    :DAMP_OPT = 3 ;
+    :DAMPCOEF = 0.2f ;
+    :KHDIF = 0.f ;
+    :KVDIF = 0.f ;
+    :MP_PHYSICS = 6 ;
+    :RA_LW_PHYSICS = 4 ;
+    :RA_SW_PHYSICS = 4 ;
+    :SF_SFCLAY_PHYSICS = 1 ;
+    :SF_SURFACE_PHYSICS = 2 ;
+    :BL_PBL_PHYSICS = 1 ;
+    :CU_PHYSICS = 0 ;
+    :SF_LAKE_PHYSICS = 0 ;
+    :SURFACE_INPUT_SOURCE = 3 ;
+    :SST_UPDATE = 0 ;
+    :GRID_FDDA = 0 ;
+    :GFDDA_INTERVAL_M = 0 ;
+    :GFDDA_END_H = 0 ;
+    :GRID_SFDDA = 0 ;
+    :SGFDDA_INTERVAL_M = 0 ;
+    :SGFDDA_END_H = 0 ;
+    :HYPSOMETRIC_OPT = 2 ;
+    :USE_THETA_M = 1 ;
+    :GWD_OPT = 0 ;
+    :SF_URBAN_PHYSICS = 0 ;
+    :SF_SURFACE_MOSAIC = 0 ;
+    :SF_OCEAN_PHYSICS = 0 ;
+    :SHCU_PHYSICS = 0 ;
+    :MFSHCONV = 0 ;
+    :FEEDBACK = 1 ;
+    :SMOOTH_OPTION = 2 ;
+    :SWRAD_SCAT = 1.f ;
+    :W_DAMPING = 0 ;
+    :RADT = 15.f ;
+    :BLDT = 0.f ;
+    :CUDT = 0.f ;
+    :AER_OPT = 0 ;
+    :SWINT_OPT = 0 ;
+    :AER_TYPE = 1 ;
+    :AER_AOD550_OPT = 1 ;
+    :AER_ANGEXP_OPT = 1 ;
+    :AER_SSA_OPT = 1 ;
+    :AER_ASY_OPT = 1 ;
+    :AER_AOD550_VAL = 0.12f ;
+    :AER_ANGEXP_VAL = 1.3f ;
+    :AER_SSA_VAL = 0.85f ;
+    :AER_ASY_VAL = 0.9f ;
+    :MOIST_ADV_OPT = 1 ;
+    :SCALAR_ADV_OPT = 1 ;
+    :TKE_ADV_OPT = 1 ;
+    :DIFF_6TH_OPT = 0 ;
+    :DIFF_6TH_FACTOR = 0.12f ;
+    :OBS_NUDGE_OPT = 0 ;
+    :BUCKET_MM = -1.f ;
+    :BUCKET_J = -1.f ;
+    :PREC_ACC_DT = 0.f ;
+    :ISFTCFLX = 0 ;
+    :ISHALLOW = 0 ;
+    :ISFFLX = 1 ;
+    :ICLOUD = 1 ;
+    :ICLOUD_CU = 0 ;
+    :TRACER_PBLMIX = 1 ;
+    :SCALAR_PBLMIX = 0 ;
+    :YSU_TOPDOWN_PBLMIX = 0 ;
+    :GRAV_SETTLING = 0 ;
+    :DFI_OPT = 0 ;
+    :SIMULATION_INITIALIZATION_TYPE = "REAL-DATA CASE" ;
+    :WEST-EAST_PATCH_START_UNSTAG = 1 ;
+    :WEST-EAST_PATCH_END_UNSTAG = 500 ;
+    :WEST-EAST_PATCH_START_STAG = 1 ;
+    :WEST-EAST_PATCH_END_STAG = 501 ;
+    :SOUTH-NORTH_PATCH_START_UNSTAG = 1 ;
+    :SOUTH-NORTH_PATCH_END_UNSTAG = 500 ;
+    :SOUTH-NORTH_PATCH_START_STAG = 1 ;
+    :SOUTH-NORTH_PATCH_END_STAG = 501 ;
+    :BOTTOM-TOP_PATCH_START_UNSTAG = 1 ;
+    :BOTTOM-TOP_PATCH_END_UNSTAG = 55 ;
+    :BOTTOM-TOP_PATCH_START_STAG = 1 ;
+    :BOTTOM-TOP_PATCH_END_STAG = 56 ;
+    :GRID_ID = 1 ;
+    :PARENT_ID = 0 ;
+    :I_PARENT_START = 1 ;
+    :J_PARENT_START = 1 ;
+    :PARENT_GRID_RATIO = 1 ;
+    :DT = 20.f ;
+    :CEN_LAT = 39.00001f ;
+    :CEN_LON = -98.f ;
+    :TRUELAT1 = 30.f ;
+    :TRUELAT2 = 50.f ;
+    :MOAD_CEN_LAT = 39.00001f ;
+    :STAND_LON = -98.f ;
+    :POLE_LAT = 90.f ;
+    :POLE_LON = 0.f ;
+    :GMT = 0.f ;
+    :JULYR = 2018 ;
+    :JULDAY = 195 ;
+    :MAP_PROJ = 1 ;
+    :MAP_PROJ_CHAR = "Lambert Conformal" ;
+    :MMINLU = "MODIFIED_IGBP_MODIS_NOAH" ;
+    :NUM_LAND_CAT = 21 ;
+    :ISWATER = 17 ;
+    :ISLAKE = 21 ;
+    :ISICE = 15 ;
+    :ISURBAN = 13 ;
+    :ISOILWATER = 14 ;
+    :HYBRID_OPT = 2 ;
+    :ETAC = 0.2f ;
+```
 
 <a id=Special_Output></a>
 
 ## 特殊的WRF输出变量
 
-WRF模型输出在注册表文件中定义的状态变量，这些状态变量用于模型的预测方程式中。这些变量中的一些是摄动场。因此，以下用于重建气象变量的定义是必要的：
-total geopotential总地势	PH + PHB
-total geopotential height in m总地势高度，以米为单位	( PH + PHB ) / 9.81
-total potential temperature in_ K总潜在温度	T + 300
-total pressure in mb总压力	( P + PB ) * 0.01
-wind compoments, grid relative风洞，相对网格	U, V
-surface pressure in Pa表面压力	psfc
-surface winds, grid relative地面风，相对网格	U10, V10 (valid at mass points)
-surface temperature and mixing ratio表面温度和混合比	T2, Q2
+WRF模型输出的状态变量在Registry文件中定义，这些状态变量用于模型的预测方程式中。其中一些变量是扰动场；因此，重建气象变量需要以下定义：
+
+total geopotential（总位势）	PH + PHB
+
+total geopotential height in m（总位势高度，以米为单位）	( PH + PHB ) / 9.81
+
+total potential temperature in_K（总潜在温度，以K为单位）	T + 300
+
+total pressure in mb（总压力，以mb为单位）	( P + PB ) × 0.01
+
+wind compoments, grid relative（风分量，相对网格）	U, V
+
+surface pressure in Pa（地面压力，以Pa为单位）	psfc
+
+surface winds, grid relative（地面风，相对网格）	U10, V10 (valid at mass points)
+
+surface temperature and mixing ratio（地面温度和混合比）	T2, Q2
 
 地图投影选项的定义：
-map_proj = 1：兰伯特共形  Lambert Conformal           
-            2：极地立体照相 Polar Stereographic
-            3：墨卡托 Mercator
-            6：经纬度（包括全球范围）latitude and longitude (including global)
+
+map_proj = 1：Lambert Conformal（兰伯特共形投影）
+           2：Polar Stereographic（极地立体投影）
+           3：Mercator（墨卡托投影）
+           6：latitude and longitude (including global)（经纬度投影，全球范围）
