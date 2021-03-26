@@ -2005,19 +2005,19 @@ cu_physics|Scheme|Cores|Moisture Tendencies|Momentum Tendencies|Shallow Convecti
 ## 辐射物理选项摘要
 
 ra_sw_physics|Scheme|Reference|Added
-----------|------|---------|-----
-1|Dudhia|Dudhia (1989, JAS)|2000
-3|CAM|Collins et al. (2004, NCAR Tech Note)|2006
-4|RRTMG|Iacono et al. (2008, JGR)|2009
+-------------|------|---------|-----
+1|Dudhia|[Dudhia (1989, JAS)](https://doi.org/10.1175/1520-0469(1989)046%3c3077:NSOCOD%3e2.0.CO;2 )|2000
+3|CAM|[Collins et al. (2004, NCAR Tech Note)](http://dx.doi.org/10.5065/1dfh-6p97 )|2006
+4|RRTMG|[Iacono et al. (2008, JGR)](https://doi.org/10.1029/2008JD009944 )|2009
+5|Goddard|[Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)](https://plus.google.com/photos/albums/podosirpm0s51j3qb911af3cvt3j84jqj?pid=6680617100027104114&oid=113663540656936214296 )|2011, updated 2019
+7|FLG|[Gu et al. (2011, JGR)](https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010JD014574 0, [Fu and Liou (1992, JAS)](https://doi.org/10.1175/1520-0469(1992)049%3c2139:OTCDMF%3e2.0.CO;2 )|2012
+14|RRTMG-K|[Baek (2017, JAMES)](https://doi.org/10.1002/2017MS000994 )|2018
 24|RRTMG|Fast version|2015
-14|RRTMG-K|Baek (2017, JAMES)|2018
-5|Goddard|Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)|2011, updated 2019
-7|FLG|Gu et al. (2011, JGR), Fu and Liou (1992, JAS)|2012
-99|GFDL|Fels and Schwarzkopf (1975, JGR)|2004
+99|GFDL|[Fels and Schwarzkopf (1975, JGR)](https://doi.org/10.1175/1520-0469(1975)032%3c1475:TSEAAN%3e2.0.CO;2 )|2004
 
 ra_sw_
 physics|Scheme|Cores+Chem|Microphysics Interaction|Cloud Fraction|Ozone
-----------|------|---------|-----
+-------|------|----------|------------------------|--------------|-----
 1|Dudhia|ARW NMM + Chem(PM2.5)|Qc Qr Qi Qs Qg|1/0|none
 2|GSFC|ARW+Chem(τ)|Qc Qi|1/0|5 profiles
 3|CAM|ARW|Qc Qi Qs|max-rand overlap|lat/month
@@ -2025,31 +2025,31 @@ physics|Scheme|Cores+Chem|Microphysics Interaction|Cloud Fraction|Ozone
 5|Goddard|ARW|Qc Qr Qi Qs Qg|1/0|5 profiles
 7|FLG|ARW|Qc Qr Qi Qs Qg|1/0|5 profiles
 14|RRTMG-K|ARW|Qc Qr Qi Qs|max-rand overlap|1 profile or lat/month
-24|RRTMG||||
+24|RRTMG| | | |
 99|GFDL|ARW NMM|Qc Qr Qi Qs|max-rand overlap|lat/date
 
 ra_lw_physics|Scheme|Reference|Added
-----------|------|---------|-----
+-------------|------|---------|-----
 1|RRTM|Mlawer et al. (1997, JGR)|2000
 3|CAM|Collins et al. (2004, NCAR Tech Note)|2006
 4|RRTMG|Iacono et al. (2008, JGR)|2009
-24|RRTMG|Fast version|2015
-14|RRTMG-K|Baek (2017)|2018
-5|Goddard|Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)|2011, updated 2019
+5|Goddard|[Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)](https://plus.google.com/photos/albums/podosirpm0s51j3qb911af3cvt3j84jqj?pid=6680617100027104114&oid=113663540656936214296 )|2011, updated 2019
 7|FLG|Gu et al. (2011, JGR), Fu and Liou (1992, JAS)|2012
-31|Held-Suarez||2008
+14|RRTMG-K|Baek (2017)|2018
+24|RRTMG|Fast version|2015
+31|Held-Suarez| |2008
 99|GFDL|Fels and Schwarzkopf (1981, JGR)|2004
 
 ra_lw_physics|Scheme|Cores+Chem|Microphysics Interaction|Cloud Fraction|Ozone|GHG
-----------|------|---------|-----
-1|RRTM|ARW NMM |Qc Qr Qi Qs Qg|1/0|1 profile|constant or yearly GHG
+-------------|------|----------|------------------------|--------------|-----|----
+1|RRTM|ARW NMM|Qc Qr Qi Qs Qg|1/0|1 profile|constant or yearly GHG
 3|CAM|ARW|Qc Qi Qs|max-rand overlap|lat/month|yearly CO2 or yearly GHG
 4|RRTMG|ARW + Chem (τ), NMM|Qc Qr Qi Qs|max-rand overlap|1 profile or lat/month|yearly CO2 or yearly GHG
 5|New Goddard|ARW|Qc Qr Qi Qs Qg|1/0|5 profiles|constant
 7|FLG|ARW|Qc Qr Qi Qs Qg|1/0|5 profiles|constant
 14|RRTMG-K|ARW|Qc Qr Qi Qs|max-rand overlap|1 profile or lat/month|constant
-24|RRTMG|||||
-31|Held-Suarez|ARW|none|none||none
+24|RRTMG| | | | |
+31|Held-Suarez|ARW|none|none| |none
 99|GFDL|ARW NMM|Qc Qr Qi Qs|max-rand overlap|lat/date|constant
 
 <a id=Namelist_Variables></a>
