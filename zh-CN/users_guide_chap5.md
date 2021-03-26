@@ -2010,7 +2010,7 @@ ra_sw_physics|Scheme|Reference|Added
 3|CAM|[Collins et al. (2004, NCAR Tech Note)](http://dx.doi.org/10.5065/1dfh-6p97 )|2006
 4|RRTMG|[Iacono et al. (2008, JGR)](https://doi.org/10.1029/2008JD009944 )|2009
 5|Goddard|[Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)](https://plus.google.com/photos/albums/podosirpm0s51j3qb911af3cvt3j84jqj?pid=6680617100027104114&oid=113663540656936214296 )|2011, updated 2019
-7|FLG|[Gu et al. (2011, JGR)](https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010JD014574 0, [Fu and Liou (1992, JAS)](https://doi.org/10.1175/1520-0469(1992)049%3c2139:OTCDMF%3e2.0.CO;2 )|2012
+7|FLG|[Gu et al. (2011, JGR)](https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010JD014574 ), [Fu and Liou (1992, JAS)](https://doi.org/10.1175/1520-0469(1992)049%3c2139:OTCDMF%3e2.0.CO;2 )|2012
 14|RRTMG-K|[Baek (2017, JAMES)](https://doi.org/10.1002/2017MS000994 )|2018
 24|RRTMG|Fast version|2015
 99|GFDL|[Fels and Schwarzkopf (1975, JGR)](https://doi.org/10.1175/1520-0469(1975)032%3c1475:TSEAAN%3e2.0.CO;2 )|2004
