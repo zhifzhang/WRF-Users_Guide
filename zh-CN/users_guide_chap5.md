@@ -1516,49 +1516,49 @@ WRF提供了多种物理选项，可以以任何方式进行组合。这些选�
 
 #### 1. 微物理方案（mp_physics）
 
-1.1 *Kessler scheme（`mp_physics = 1`）*：理想化云模拟研究中常用的暖雨降水（即无冰）方案。
+1.1 **Kessler scheme（`mp_physics = 1`）**：理想化云模拟研究中常用的暖雨降水（即无冰）方案。
 
-1.2 *Purdue Lin scheme（`mp_physics = 2`）*：具有冰、雪和霰过程的复杂方案，适用于real-data的高分辨率模拟。
+1.2 **Purdue Lin scheme（`mp_physics = 2`）**：具有冰、雪和霰过程的复杂方案，适用于real-data的高分辨率模拟。
 
-1.3 WRF Single-Moment 3-class scheme（`mp_physics = 3`）：一种简单有效的方案，具有适用于中尺度网格大小的冰雪过程。
+1.3 **WRF Single-Moment 3-class scheme（`mp_physics = 3`）**：一种简单有效的方案，具有适用于中尺度网格大小的冰雪过程。
 
-1.4 WRF Single-Moment 5-class scheme（`mp_physics = 4`）：WRF Single-Moment 3-class scheme的稍微复杂一些的版本，它允许进行混合相过程和过冷的水。
+1.4 **WRF Single-Moment 5-class scheme（`mp_physics = 4`）**：WRF Single-Moment 3-class scheme的稍微复杂一些的版本，它允许进行混合相过程和过冷的水。
 
-1.5 Ferrier Eta microphysics（`mp_physics = 5,95`）：NCEP模型中的操作微物理。一种简单有效的混合相过程诊断方案。对于精细分辨率（<5km），使用选项（5），对于粗分辨率，使用选项（95）。
+1.5 **Ferrier Eta microphysics（`mp_physics = 5,95`）**：NCEP模型中的操作微物理。一种简单有效的混合相过程诊断方案。对于精细分辨率（<5km），使用选项（5），对于粗分辨率，使用选项（95）。
 
-1.6 WRF Single-Moment 6-class scheme（`mp_physics = 6`）：适用于高分辨率模拟的冰、雪和霰过程方案。
+1.6 **WRF Single-Moment 6-class scheme（`mp_physics = 6`）**：适用于高分辨率模拟的冰、雪和霰过程方案。
 
-1.7 Goddard 4-ice microphysics scheme（`mp_physics = 7`）：分别预测冰雹和霰，为辐射提供有效半径。取代了V4.1中旧的Goddard方案。
+1.7 **Goddard 4-ice microphysics scheme（`mp_physics = 7`）**：分别预测冰雹和霰，为辐射提供有效半径。取代了V4.1中旧的Goddard方案。
 
-1.8 Thompson et al. scheme（`mp_physics = 8`）：适用于高分辨率模拟的冰、雪和霰过程方案。
+1.8 **Thompson et al. scheme（`mp_physics = 8`）**：适用于高分辨率模拟的冰、雪和霰过程方案。
 
-1.9 Milbrandt-Yau Double-Moment 7-class scheme（`mp_physics = 9`）：该方案将冰雹和霰分为两类，分别采用双时刻云、雨、冰、雪、霰和冰雹。
+1.9 **Milbrandt-Yau Double-Moment 7-class scheme（`mp_physics = 9`）**：该方案将冰雹和霰分为两类，分别采用双时刻云、雨、冰、雪、霰和冰雹。
 
-1.10 Morrison double-moment scheme（`mp_physics = 10`）：用于云解析模拟的双时刻冰、雪、雨和霰。
+1.10 **Morrison double-moment scheme（`mp_physics = 10`）**：用于云解析模拟的双时刻冰、雪、雨和霰。
 
-1.11 CAM V5.1 2-moment 5-class scheme。
+1.11 **CAM V5.1 2-moment 5-class scheme**。
 
-1.12 Stony Brook University (Y. Lin) scheme（`mp_physics = 13`）：这是一个五级方案，预测了混合相过程的沸腾强度。
+1.12 **Stony Brook University (Y. Lin) scheme（`mp_physics = 13`）**：这是一个五级方案，预测了混合相过程的沸腾强度。
 
-1.14 WRF Double-Moment 5-class scheme（`mp_physics = 14`）：这个方案有双时刻雨。云和CCN用于暖进程，但在其他方面与WSM5类似。
+1.14 **WRF Double-Moment 5-class scheme（`mp_physics = 14`）**：这个方案有双时刻雨。云和CCN用于暖进程，但在其他方面与WSM5类似。
 
-1.15 WRF Double-Moment 6-class scheme（`mp_physics = 16`）：这个方案有双时刻雨。云和CCN用于暖进程，但在其他方面与WSM6类似。
+1.15 **WRF Double-Moment 6-class scheme（`mp_physics = 16`）**：这个方案有双时刻雨。云和CCN用于暖进程，但在其他方面与WSM6类似。
 
-1.16 NSSL 2-moment scheme（`mp_physics = 17,18,19,21,22`）：方案（17）是一个针对云滴、雨滴、冰晶、雪、霰和冰雹的双时刻方案。它还预测了霰颗粒的平均密度，这使得霰可以跨越从冰冻水滴到低密度霰的范围。选项（18）类似，但还预测云凝聚核（CCN）浓度（用于ideal模拟）。该方案适用于研究领域的云解析模拟（dx<=2km）。方案（19）是NSSL方案的单时刻版本，而方案（21）类似于Gilmore et al. (2004)。方案（22）是方案（17）的无冰雹双时刻方案。
+1.16 **NSSL 2-moment scheme（`mp_physics = 17,18,19,21,22`）**：方案（17）是一个针对云滴、雨滴、冰晶、雪、霰和冰雹的双时刻方案。它还预测了霰颗粒的平均密度，这使得霰可以跨越从冰冻水滴到低密度霰的范围。选项（18）类似，但还预测云凝聚核（CCN）浓度（用于ideal模拟）。该方案适用于研究领域的云解析模拟（dx<=2km）。方案（19）是NSSL方案的单时刻版本，而方案（21）类似于Gilmore et al. (2004)。方案（22）是方案（17）的无冰雹双时刻方案。
 
-1.17 WSM7（`mp_physics = 24`）：与WSM6一样，但是添加了一个冰雹类别。V4.1中的新功能。
+1.17 **WSM7（`mp_physics = 24`）**：与WSM6一样，但是添加了一个冰雹类别。V4.1中的新功能。
 
-1.18 WDM7（`mp_physics = 26`）：与WDM6一样，但是添加了一个冰雹类别。V4.1中的新功能。
+1.18 **WDM7（`mp_physics = 26`）**：与WDM6一样，但是添加了一个冰雹类别。V4.1中的新功能。
 
-1.19 Thompson aerosol-aware（`mp_physics = 28`）：该方案考虑了对水和冰友好的气溶胶。气候学数据集可用于指定气溶胶变量的初始和边界条件（Thompson和Eidhammer，2014，JAS）。该方案还包括一个表面尘埃方案。
+1.19 **Thompson aerosol-aware（`mp_physics = 28`）**：该方案考虑了对水和冰友好的气溶胶。气候学数据集可用于指定气溶胶变量的初始和边界条件（Thompson和Eidhammer，2014，JAS）。该方案还包括一个表面尘埃方案。
 
-1.20 HUJI（`mp_physics = 32,30`）：以色列希伯来大学的光谱箱微物理方案，包括了“完整”（32）和“快速”（30）两个可选方案。
+1.20 **HUJI（`mp_physics = 32,30`）**：以色列希伯来大学的光谱箱微物理方案，包括了“完整”（32）和“快速”（30）两个可选方案。
 
-1.21 Morrison double-moment scheme with CESM aerosol（`mp_physics = 40`：必须与MSKF积云方案一起使用）。
+1.21 **Morrison double-moment scheme with CESM aerosol（`mp_physics = 40`）**：必须与MSKF积云方案一起使用。
 
-1.22 P3 (Morrison and Milbrandt)（`mp_physics = 50,51,52`）：可预测的粒子特性方案。它有一个代表冰、雪和霰的组合的冰类别，并且还包含有边缘冰质量和边缘冰体积的预测数组。双时刻雨和冰方案（50）。P3-nc方案（51）：与P3相同，但增加了过饱和依赖活化和双时刻云水。P3-2ice方案（52）：与P3-nc相同，但有两个冰数组。
+1.22 **P3 (Morrison and Milbrandt)（`mp_physics = 50,51,52`）**：可预测的粒子特性方案。它有一个代表冰、雪和霰的组合的冰类别，并且还包含有边缘冰质量和边缘冰体积的预测数组。双时刻雨和冰方案（50）。P3-nc方案（51）：与P3相同，但增加了过饱和依赖活化和双时刻云水。P3-2ice方案（52）：与P3-nc相同，但有两个冰数组。
 
-1.23 Jensen ISHMAEL（`mp_physics = 55`）：该方案可预测冰晶生长中的颗粒形状和习惯。V4.1中的新功能。
+1.23 **Jensen ISHMAEL（`mp_physics = 55`）**：该方案可预测冰晶生长中的颗粒形状和习惯。V4.1中的新功能。
  
 #### 2.1 长波辐射方案（ra_lw_physics）
 
