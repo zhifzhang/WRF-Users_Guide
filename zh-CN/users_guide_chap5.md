@@ -1881,7 +1881,7 @@ bl_pbl_physics|Scheme方案|Cores|sf_sfclay_physics|Prognostic variables预测�
 4|QNSE-EDMF|ARW/NMM|4|TKE_PBL|el_pbl, exch_h, exch_m|QC,QI
 5|MYNN2|ARW|1,2,5,(91)|QKE|Tsq, Qsq, Cov, exch_h, exch_m|QC
 6|MYNN3|ARW|1,2,5,(91)|QKE, Tsq, Qsq, Cov|exch_h, exch_m|QC
-7|ACM2|ARW|1,7,(91)| | ||QC,QI
+7|ACM2|ARW|1,7,(91)| | |QC,QI
 8|BouLac|ARW|1,2,(91)|TKE_PBL|el_pbl, exch_h, exch_m, wu_tur, wv_tur, wt_tur, wq_tur|QC
 9|UW|ARW|1,2,(91)|TKE_PBL|exch_h, exch_m|QC
 10|TEMF|ARW|10|TE_TEMF|*_temf|QC, QI
@@ -1893,98 +1893,73 @@ bl_pbl_physics|Scheme方案|Cores|sf_sfclay_physics|Prognostic variables预测�
 
 ## 微物理学选项摘要
 
-mp_physics	Scheme	Reference	Added
+mp_physics|Scheme|Reference|Added
+--------------|------|---------|-----
+1|Kessler|[Kessler (1969)](https://doi.org/10.1007/978-1-935704-36-2_1 )|2000
+2|Purdue Lin|[Chen and Sun (2002, JMSJ)](https://www.jstage.jst.go.jp/article/jmsj/80/1/80_1_99/_article )|2000
+3|WSM3|[Hong, Dudhia and Chen (2004, MWR)](https://doi.org/10.1175/1520-0493(2004)132%3c0103:ARATIM%3e2.0.CO;2 )|2004
+4|WSM5|[Hong, Dudhia and Chen (2004, MWR)](https://doi.org/10.1175/1520-0493(2004)132%3c0103:ARATIM%3e2.0.CO;2 )|2004
+5|Eta (Ferrier)|Rogers, Black, Ferrier, Lin, Parrish and DiMego (2001, web doc)|2000
+6|WSM6|[Hong and Lim (2006, JKMS)](http://www2.mmm.ucar.edu/wrf/users/phys_refs/MICRO_PHYS/WSM6.pdf )|2004
+7|Goddard 4-ice|[Tao, Simpson and McCumber (1989, MWR)](https://doi.org/10.1175/1520-0493(1989)117%3c0231:AIWSA%3e2.0.CO;2 ), and [Tao et al. (2016, JGRA)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015JD023986 )|2019
+8|Thompson|[Thompson, Field, Rasmussen and Hall (2008, MWR)](https://doi.org/10.1175/2008MWR2387.1 )|2009
+9|Milbrandt 2-mom|Milbrandt and Yau (2005, JAS, [part I](https://doi.org/10.1175/JAS3534.1 ), [part II](https://doi.org/10.1175/JAS3535.1 ))|2010
+10|Morrison 2-mom|[Morrison, Thompson and Tatarskii (2009, MWR)](https://doi.org/10.1175/2008MWR2556.1 )|2008
+11|CAM 5.1|[Neale et al. (2012, NCAR Tech Note)](http://www.cesm.ucar.edu/models/cesm1.0/cam/ )|2013
+13|SBU-YLin|[Lin and Colle (2011, MWR)](https://doi.org/10.1175/2010MWR3293.1 )|2011
+14|WDM5|[Lim and Hong (2010, MWR)](https://doi.org/10.1175/2009MWR2968.1 )|2009
+16|WDM6|[Lim and Hong (2010, MWR)](https://doi.org/10.1175/2009MWR2968.1 )|2009
+17|NSSL 2-mom|[Mansell, Ziegler and Bruning (2010, JAS)](https://doi.org/10.1175/2009JAS2965.1 )|2012
+18|NSSL 2-mom w/CCN prediction|[Mansell, Ziegler and Bruning (2010, JAS)](https://doi.org/10.1175/2009JAS2965.1 )|2012
+19|NSSL 1-mom| |2013
+21|NSSL 1-momlfo| |2013
+22|NSSL 2-mom w/o hail| |2015
+24|WSM7|[Bae et al. (2018, APJAS)](https://doi.org/10.1007/s13143-018-0066-3 )|2019
+26|WDM7|[Bae et al. (2018, APJAS)](https://doi.org/10.1007/s13143-018-0066-3 )|2019
+28|Thompson aerosol-aware|[Thompson and Eidhammer (2014, JAS)](https://doi.org/10.1175/JAS-D-13-0305.1 )|2014
+30|HUJI SBM ‘fast’|[Khain et al. (2010, JAS)](https://doi.org/10.1175/2009JAS3210.1 )|2014
+32|HUJI SBM full|[Khain et al. (2004, JAS)](https://doi.org/10.1175/JAS-3350.1 )|2014
+40|Morrison+CESM aerosol|EPA|2018
+50/51/52|P3|[Morrison and Milbrandt (2015, JAS)](https://doi.org/10.1175/JAS-D-14-0065.1 )|2017
+55|Jensen ISHMAEL|[Jensen et al. (2017, JAS)](https://doi.org/10.1175/JAS-D-16-0350.1 )|2019
 
-1	Kessler	Kessler (1969)
-2000
-2	Purdue Lin 	Chen and Sun (2002, JMSJ)
-2000
-3	WSM3	Hong, Dudhia and Chen (2004, MWR)
-2004
-4	WSM5	Hong, Dudhia and Chen (2004, MWR)
-2004
-5	Eta (Ferrier)	Rogers, Black, Ferrier, Lin, Parrish and DiMego (2001, web doc)	2000
-6	WSM6	Hong and Lim (2006, JKMS)
-2004
-7	Goddard 4-ice	Tao, Simpson and McCumber (1989, MWR), and Tao et al. (2016, JGRA)
-2019
-8 	Thompson	Thompson, Field, Rasmussen and Hall (2008, MWR)https://doi.org/10.1175/2008MWR2387.1
-2009
-9	Milbrandt 2-mom	Milbrandt and Yau (2005, JAS, part I, part II)
-2010
-10	Morrison 2-mom	Morrison, Thompson and Tatarskii (2009, MWR)
-2008
-11	CAM 5.1	Neale et al. (2012, NCAR Tech Note)
-2013
-13	SBU-YLin	Lin and Colle (2011, MWR)
-2011
-14	WDM5	Lim and Hong (2010, MWR)
-2009
-16	WDM6	Lim and Hong (2010, MWR)
-2009
-17	NSSL 2-mom	Mansell, Ziegler and Bruning (2010, JAS)
-2012
-18	NSSL 2-mom w/
-CCN prediction	Mansell, Ziegler and Bruning (2010, JAS)
-2012
-19	NSSL 1-mom		2013
-21	NSSL 1-momlfo		2013
-22	NSSL 2-mom w/o hail		2015
-24	WSM7	Bae et al. (2018, APJAS)
-2019
-26	WDM7	Bae et al. (2018, APJAS)
-2019
-28	Thompson aerosol-aware	Thompson and Eidhammer (2014, JAS)
-2014
-30	HUJI SBM ‘fast’	Khain et al. (2010, JAS)
-2014
-32	HUJI SBM full	Khain et al. (2004, JAS)
-2014
-40	Morrison+CESM aerosol	EPA	2018
-50/51/52	P3	Morrison and Milbrandt (2015, JAS)
-2017
-55	Jensen ISHMAEL	Jensen et al. (2017, JAS)
-2019
+mp_physics|Scheme|Cores|Mass Variables|Number Variables
+----------|------|-----|--------------|----------------
+1|Kessler|ARW|Qc Qr|
+2|Purdue Lin|ARW (Chem)|Qc Qr Qi Qs Qg|
+3|WSM3|ARW|Qc Qr|
+4|WSM5|ARW/NMM|Qc Qr Qi Qs|
+5|Eta (Ferrier)|ARW/NMM|Qc Qr Qs (Qt*)|
+6|WSM6|ARW/NMM|Qc Qr Qi Qs Qg|
+7|Goddard 4-ice|ARW/NMM|Qv Qc Qr Qi Qs Qg Qh|
+8|Thompson|ARW/NMM|Qc Qr Qi Qs Qg|Ni Nr
+9|Milbrandt 2-mom|ARW|Qc Qr Qi Qs Qg Qh|Nc Nr Ni Ns Ng Nh
+10|Morrison 2-mom|ARW (Chem)|Qc Qr Qi Qs Qg|Nr Ni Ns Ng
+11|CAM 5.1|ARW|Qc Qr Qi Qs Qg|Nr Ni Ns Ng
+13|SBU-YLin|ARW|Qc Qr Qi Qs|
+14|WDM5|ARW|Qc Qr Qi Qs|Nn** Nc Nr
+16|WDM6|ARW|Qc Qr Qi Qs Qg |Nn** Nc Nr
+17|NSSL 2-mom|ARW|Qc Qr Qi Qs Qg Qh|Nc Nr Ni Ns Ng Nh
+18|NSSL 2-mom+CCN|ARW|Qc Qr Qi Qs Qg Qh|Nc Nr Ni Ns Ng Nh Nn Vg
+19|NSSL 1-mom|ARW|Qc Qr Qi Qs Qg Qh|Vg***
+21|NSSL 1-momlfo|ARW|Qc Qr Qi Qs Qg|
+22|nssl 2-mom|ARW|Qc Qr Qi Qs Qg |Nc Nr Ni Ns Ng 
+24|WSM6|ARW|Qv Qc Qr Qi Qs Qg Qh|
+26|WDM7|ARW|Qv Qc Qr Qi Qs Qg Qh|
+28|Thompson aerosol-aware|ARW/NMM|Qc Qr Qi Qs Qg|Ni Nr Nwf Nif
+30|HUJI fast|ARW|Qc Qr Qs Qg Qi|Nc Nr Ns Ni Ng Nn
+32|HUJI full|ARW|Qc Qr Qs Qg Qh Qip Qic Qid Qnn|Nc Nr Ns Ng Nip Nic Nid Nn
+40|Morrison with aerosol|ARW|Qc Qr Qi Qs Qg|Nr Ni Ns Ng
+50|P3|ARW|Qc Qr Qi|Nr Ni Ri+ Bi++
+51|P3-nc|ARW|Qc Qr Qi|Nc Nr Ni Ri Bi
+52|P3-2ice|ARW|Qc Qr Qi,Qi2|Nc Nr Ni Ri Bi, Ni2, Ri2, Bi2
+55|Jensen ISHMAEL|ARW|Qv Qc Qr Qi Qi2 Qi3|
 
-mp_physics	Scheme	Cores	Mass Variables	Number Variables
-1	Kessler	ARW	Qc Qr	
-
-2	Purdue Lin	ARW (Chem)	Qc Qr Qi Qs Qg	
-
-3	WSM3	ARW	Qc Qr	
-
-4	WSM5	ARW/NMM	Qc Qr Qi Qs	
-
-5	Eta (Ferrier)	ARW/NMM	Qc Qr Qs (Qt*)	
-
-6	WSM6	ARW/NMM	Qc Qr Qi Qs Qg	
-
-7	Goddard 4-ice	ARW/NMM	Qv Qc Qr Qi Qs Qg Qh	
-8 	Thompson	ARW/NMM	Qc Qr Qi Qs Qg 	Ni Nr
-9	Milbrandt 2-mom	ARW	Qc Qr Qi Qs Qg Qh	Nc Nr Ni Ns Ng Nh
-10	Morrison 2-mom	ARW (Chem)	Qc Qr Qi Qs Qg	Nr Ni Ns Ng
-11	CAM 5.1	ARW	Qc Qr Qi Qs Qg	Nr Ni Ns Ng
-13	SBU-YLin	ARW	Qc Qr Qi Qs	
-14	WDM5	ARW	Qc Qr Qi Qs	Nn** Nc Nr
-16	WDM6	ARW	Qc Qr Qi Qs Qg 	Nn** Nc Nr
-17	NSSL 2-mom	ARW	Qc Qr Qi Qs Qg Qh	Nc Nr Ni Ns Ng Nh
-18	NSSL 2-mom
-+CCN	ARW	Qc Qr Qi Qs Qg Qh	Nc Nr Ni Ns Ng Nh Nn Vg
-19	NSSL 1-mom	ARW	Qc Qr Qi Qs Qg Qh	Vg***
-21	NSSL 1-momlfo	ARW	Qc Qr Qi Qs Qg	
-22	/nssl 2-mom	ARW	Qc Qr Qi Qs Qg 	Nc Nr Ni Ns Ng 
-24	WSM6	ARW	Qv Qc Qr Qi Qs Qg Qh	
-26	WDM7	ARW	Qv Qc Qr Qi Qs Qg Qh	
-28	Thompson aerosol-aware	ARW/NMM	Qc Qr Qi Qs Qg	Ni Nr Nwf Nif
-30	HUJI fast 	ARW	Qc Qr Qs Qg Qi	Nc Nr Ns Ni Ng Nn
-32	HUJI full	ARW	Qc Qr Qs Qg Qh Qip Qic Qid Qnn	Nc Nr Ns Ng Nip Nic Nid Nn
-40	Morrison with aerosol	ARW	Qc Qr Qi Qs Qg	Nr Ni Ns Ng
-50	P3	ARW	Qc Qr Qi	Nr Ni Ri+ Bi++
-51	P3-nc	ARW	Qc Qr Qi	Nc Nr Ni Ri Bi
-52	P3-2ice	ARW	Qc Qr Qi,Qi2	Nc Nr Ni Ri Bi, Ni2, Ri2, Bi2
-55	Jensen ISHMAEL	ARW	Qv Qc Qr Qi Qi2 Qi3	
-* Advects only total condensates   ** Nn = CCN number  *** Vg: graupel volume
-+ Rimed ice mass ++ rimed ice volume
+* Advects only total condensates   
+** Nn = CCN number  
+*** Vg: graupel volume
++ Rimed ice mass 
+++ rimed ice volume
 
 <a id=Cumulus_Parameterization></a>
 
