@@ -1894,7 +1894,7 @@ bl_pbl_physics|Scheme方案|Cores|sf_sfclay_physics|Prognostic variables预测�
 ## 微物理学选项摘要
 
 mp_physics|Scheme|Reference|Added
---------------|------|---------|-----
+----------|------|---------|-----
 1|Kessler|[Kessler (1969)](https://doi.org/10.1007/978-1-935704-36-2_1 )|2000
 2|Purdue Lin|[Chen and Sun (2002, JMSJ)](https://www.jstage.jst.go.jp/article/jmsj/80/1/80_1_99/_article )|2000
 3|WSM3|[Hong, Dudhia and Chen (2004, MWR)](https://doi.org/10.1175/1520-0493(2004)132%3c0103:ARATIM%3e2.0.CO;2 )|2004
@@ -1955,123 +1955,102 @@ mp_physics|Scheme|Cores|Mass Variables|Number Variables
 52|P3-2ice|ARW|Qc Qr Qi,Qi2|Nc Nr Ni Ri Bi, Ni2, Ri2, Bi2
 55|Jensen ISHMAEL|ARW|Qv Qc Qr Qi Qi2 Qi3|
 
-* Advects only total condensates   
-** Nn = CCN number  
+```
+* Advects only total condensates
+** Nn = CCN number
 *** Vg: graupel volume
-+ Rimed ice mass 
++ Rimed ice mass
 ++ rimed ice volume
+```
 
 <a id=Cumulus_Parameterization></a>
 
 ## 积云参数化选项摘要
 
-cu_physics	Scheme	Reference	Added
+cu_physics|Scheme|Reference|Added
+----------|------|---------|-----
+1|Kain-Fritsch|[Kain (2004, JAM)](https://doi.org/10.1175/1520-0450(2004)043%3c0170:TKCPAU%3e2.0.CO;2 )|2000
+2|Betts-Miller-Janjic|Janjic ([1994, MWR](https://doi.org/10.1175/1520-0493(1994)122%3c0927:TSMECM%3e2.0.CO;2 ); [2000, JAS](https://doi.org/10.1175/1520-0469(2000)057%3c3686:CODAEO%3e2.0.CO;2 ))|2002
+3|Grell-Freitas|[Grell and Freitas (2014, ACP)](https://projects.ncsu.edu/atmos_collaboration/gary/mea716/pdf_cp/Grell_Freitas_2014.pdf )|2013
+4|Old Simplied Arakawa-Schubert|[Pan and Wu (1995)](https://repository.library.noaa.gov/view/noaa/11429 ), NMC Office Note 409|2005/2011
+5|Grell-3|[Grell (1993, MWR)](https://doi.org/10.1175/1520-0493(1993)121%3c0764:PEOAUB%3e2.0.CO;2 ), [Grell and Devenyi (2002, GRL)](https://doi.org/10.1029/2002GL015311 )|2008
+6|Tiedtke|[Tiedtke (1989, MWR)](https://doi.org/10.1175/1520-0493(1989)117%3c1779:ACMFSF%3e2.0.CO;2 ), Zhang et al. (2011, MWR)|2011
+7|Zhang-McFarlane|[Zhang and McFarlane (1995, AO)](https://doi.org/10.1080/07055900.1995.9649539 )|2011
+10|KF-CuP|[Berg et al. (2013, MWR)](https://doi.org/10.1175/MWR-D-12-00136.1 )|2016
+11|Multi-scale KF|[Zheng et al. (2016, MWR)](https://doi.org/10.1175/MWR-D-15-0005.1 )|2015
+14 |KIAPS SAS|[Han and Pan (2011, Wea. Forecasting)](https://doi.org/10.1175/WAF-D-10-05038.1 ), [Kwon and Hong (2017, WMR)](https://doi.org/10.1175/MWR-D-16-0034.1 )|2018
+16|New Tiedtke|[Zhang and Wang (2017, JCLI)](https://doi.org/10.1175/JCLI-D-16-0597.1 )|2015
+93|Grell-Devenyi|[Grell and Devenyi (2002, GRL)](https://doi.org/10.1029/2002GL015311 )|2002
+99|Old Kain-Fritsch|Kain and Fritsch ([1990, JAS](https://doi.org/10.1175/1520-0469(1990)047%3c2784:AODEPM%3e2.0.CO;2 ); [1993, Meteo. Monogr.](https://link.springer.com/chapter/10.1007/978-1-935704-13-3_16 ))|2000
 
-1	Kain-Fritsch	Kain (2004, JAM)
-2000
-2	Betts-Miller-Janjic	Janjic (1994, MWR; 2000, JAS)
-2002
-3	Grell-Freitas	Grell and Freitas (2014, ACP)
-2013
-4	Old Simplied Arakawa-Schubert	Pan and Wu (1995), NMC Office Note 409
-	2005/
-2011
-5	Grell-3	Grell (1993, MWR), Grell and Devenyi (2002, GRL)
-2008
-6	Tiedtke	Tiedtke (1989, MWR), Zhang et al. (2011, MWR)	2011
-7	Zhang-McFarlane	Zhang and McFarlane (1995, AO)
-2011
-10	KF-CuP	Berg et al. (2013, MWR)
-2016
-11	Multi-scale KF	Zheng et al. (2016, MWR)
-2015
-14 	KIAPS SAS	Han and Pan (2011, Wea. Forecasting), Kwon and Hong (2017, WMR)
-2018
-16	New Tiedtke	Zhang and Wang (2017, JCLI)
-2015
-84	New SAS (HWRF)	Han and Pan (2011, Wea. Forecasting)
-2012
-93	Grell-Devenyi	Grell and Devenyi (2002, GRL)
-2002
-99	Old Kain-Fritsch	Kain and Fritsch (1990, JAS; 1993, Meteo. Monogr.)
-2000
-
-cu_physics	Scheme	Cores	Moisture Tendencies	Momentum Tendencies	Shallow Convection
-1	Kain-Fritsch	ARW / NMM	Qc Qr Qi Qs	no
-	yes
-2	BMJ	ARW / NMM	-	no
-	yes
-3	GF	ARW	Qc Qi	no	yes
-4	OSAS	ARW / NMM	Qc Qi	yes (NMM)	yes (ARW)
-5	G3	ARW	Qc Qi	no	yes
-6	Tiedtke	ARW / NMM	Qc Qi	yes	yes
-7	Zhang-McFarlane	ARW	Qc Qi	yes 	no
-10	KF-CuP	ARW	Qc Qr Qi Qs	no	yes
-11	Multi-scale KF	ARW	Qc Qr Qi Qs	no	yes
-96	NSAS	ARW	Qc Qr Qi Qs	yes	yes
-14	KSAS	ARW	Qc Qr Qi Qs	yes	use shcu_physics=4
-16	New Tiedtke	ARW	Qc Qi	yes	yes
-84	NSAS (HWRF)	NMM	Qc Qi	yes	
-93	GD	ARW	Qc Qi	no	no
-99	old KF	ARW	Qc Qr Qi Qs	no	no
+cu_physics|Scheme|Cores|Moisture Tendencies|Momentum Tendencies|Shallow Convection
+----------|------|-----|-------------------|-------------------|------------------
+1|Kain-Fritsch|ARW/NMM|Qc Qr Qi Qs|no|yes
+2|BMJ|ARW/NMM|-|no|yes
+3|GF|ARW|Qc Qi|no|yes
+4|OSAS|ARW/NMM|Qc Qi|yes (NMM)|yes (ARW)
+5|G3|ARW|Qc Qi|no|yes
+6|Tiedtke|ARW/NMM|Qc Qi|yes|yes
+7|Zhang-McFarlane|ARW|Qc Qi|yes|no
+10|KF-CuP|ARW|Qc Qr Qi Qs|no|yes
+11|Multi-scale KF|ARW|Qc Qr Qi Qs|no|yes
+14|KSAS|ARW|Qc Qr Qi Qs|yes|use shcu_physics=4
+16|New Tiedtke|ARW|Qc Qi|yes|yes
+93|GD|ARW|Qc Qi|no|no
+96|NSAS|ARW|Qc Qr Qi Qs|yes|yes
+99|old KF|ARW|Qc Qr Qi Qs|no|no
 
 <a id=Radiation></a>
 
 ## 辐射物理选项摘要
 
-ra_sw_physics	Scheme	Reference	Added
-1	Dudhia	Dudhia (1989, JAS)
-2000
-3	CAM	Collins et al. (2004, NCAR Tech Note)
-2006
-4	RRTMG	Iacono et al. (2008, JGR)
-2009
-24	RRTMG	Fast version	2015
-14	RRTMG-K	Baek (2017, JAMES)
-2018
-5	Goddard	Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)
-2011, updated 2019
-7	FLG	Gu et al. (2011, JGR), Fu and Liou (1992, JAS)
-2012
-99	GFDL	Fels and Schwarzkopf (1975, JGR)
-2004
+ra_sw_physics|Scheme|Reference|Added
+----------|------|---------|-----
+1|Dudhia|Dudhia (1989, JAS)|2000
+3|CAM|Collins et al. (2004, NCAR Tech Note)|2006
+4|RRTMG|Iacono et al. (2008, JGR)|2009
+24|RRTMG|Fast version|2015
+14|RRTMG-K|Baek (2017, JAMES)|2018
+5|Goddard|Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)|2011, updated 2019
+7|FLG|Gu et al. (2011, JGR), Fu and Liou (1992, JAS)|2012
+99|GFDL|Fels and Schwarzkopf (1975, JGR)|2004
 
 ra_sw_
-physics	Scheme	Cores+Chem	Microphysics Interaction	Cloud Fraction	Ozone
-1	Dudhia	ARW NMM + Chem(PM2.5)	Qc Qr Qi Qs Qg	1/0	none
-2	GSFC	ARW+Chem(τ)	Qc Qi	1/0	5 profiles
-3	CAM	ARW	Qc Qi Qs	max-rand overlap	lat/month
-4	RRTMG	ARW + Chem (τ), NMM	Qc Qr Qi Qs	max-rand overlap	1 profile or lat/month
-5	Goddard	ARW	Qc Qr Qi Qs Qg	1/0	5 profiles
-7	FLG	ARW	Qc Qr Qi Qs Qg	1/0	5 profiles
-14	RRTMG-K	ARW	Qc Qr Qi Qs	max-rand overlap	1 profile or lat/month
-24	RRTMG				
-99	GFDL	ARW NMM	Qc Qr Qi Qs	max-rand overlap	lat/date
+physics|Scheme|Cores+Chem|Microphysics Interaction|Cloud Fraction|Ozone
+----------|------|---------|-----
+1|Dudhia|ARW NMM + Chem(PM2.5)|Qc Qr Qi Qs Qg|1/0|none
+2|GSFC|ARW+Chem(τ)|Qc Qi|1/0|5 profiles
+3|CAM|ARW|Qc Qi Qs|max-rand overlap|lat/month
+4|RRTMG|ARW + Chem (τ), NMM|Qc Qr Qi Qs|max-rand overlap|1 profile or lat/month
+5|Goddard|ARW|Qc Qr Qi Qs Qg|1/0|5 profiles
+7|FLG|ARW|Qc Qr Qi Qs Qg|1/0|5 profiles
+14|RRTMG-K|ARW|Qc Qr Qi Qs|max-rand overlap|1 profile or lat/month
+24|RRTMG||||
+99|GFDL|ARW NMM|Qc Qr Qi Qs|max-rand overlap|lat/date
 
-ra_lw_physics	Scheme	Reference	Added
-1	RRTM	Mlawer et al. (1997, JGR)	2000
-3	CAM	Collins et al. (2004, NCAR Tech Note)	2006
-4	RRTMG	Iacono et al. (2008, JGR)	2009
-24	RRTMG	Fast version	2015
-14	RRTMG-K	Baek (2017)	2018
-5	Goddard	Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)
-2011, updated 2019
-7	FLG	Gu et al. (2011, JGR), Fu and Liou (1992, JAS)	2012
-31	Held-Suarez		2008
-99	GFDL	Fels and Schwarzkopf (1981, JGR)	2004
+ra_lw_physics|Scheme|Reference|Added
+----------|------|---------|-----
+1|RRTM|Mlawer et al. (1997, JGR)|2000
+3|CAM|Collins et al. (2004, NCAR Tech Note)|2006
+4|RRTMG|Iacono et al. (2008, JGR)|2009
+24|RRTMG|Fast version|2015
+14|RRTMG-K|Baek (2017)|2018
+5|Goddard|Chou and Suarez (1999, NASA Tech Memo), Matsui et al. (2018, CD)|2011, updated 2019
+7|FLG|Gu et al. (2011, JGR), Fu and Liou (1992, JAS)|2012
+31|Held-Suarez||2008
+99|GFDL|Fels and Schwarzkopf (1981, JGR)|2004
 
-ra_lw_
-physics	Scheme	Cores+Chem	Microphysics Interaction	Cloud Fraction	Ozone	GHG
-1	RRTM	ARW NMM 	Qc Qr Qi Qs Qg	1/0	1 profile	constant or yearly GHG
-3	CAM	ARW	Qc Qi Qs	max-rand overlap	lat/month	yearly CO2 or yearly GHG
-4	RRTMG	ARW + Chem (τ), NMM	Qc Qr Qi Qs	max-rand overlap	1 profile or lat/month	yearly CO2 or yearly GHG
-5	New Goddard	ARW	Qc Qr Qi Qs Qg	1/0	5 profiles	constant
-7	FLG	ARW	Qc Qr Qi Qs Qg	1/0	5 profiles	constant
-14	RRTMG-K	ARW	Qc Qr Qi Qs	max-rand overlap	1 profile or lat/month	constant
-24	RRTMG					
-31	Held-Suarez	ARW	none	none		none
-99	GFDL	ARW NMM	Qc Qr Qi Qs	max-rand overlap	lat/date	constant
-
+ra_lw_physics|Scheme|Cores+Chem|Microphysics Interaction|Cloud Fraction|Ozone|GHG
+----------|------|---------|-----
+1|RRTM|ARW NMM |Qc Qr Qi Qs Qg|1/0|1 profile|constant or yearly GHG
+3|CAM|ARW|Qc Qi Qs|max-rand overlap|lat/month|yearly CO2 or yearly GHG
+4|RRTMG|ARW + Chem (τ), NMM|Qc Qr Qi Qs|max-rand overlap|1 profile or lat/month|yearly CO2 or yearly GHG
+5|New Goddard|ARW|Qc Qr Qi Qs Qg|1/0|5 profiles|constant
+7|FLG|ARW|Qc Qr Qi Qs Qg|1/0|5 profiles|constant
+14|RRTMG-K|ARW|Qc Qr Qi Qs|max-rand overlap|1 profile or lat/month|constant
+24|RRTMG|||||
+31|Held-Suarez|ARW|none|none||none
+99|GFDL|ARW NMM|Qc Qr Qi Qs|max-rand overlap|lat/date|constant
 
 <a id=Namelist_Variables></a>
 
