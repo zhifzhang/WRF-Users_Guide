@@ -1341,7 +1341,7 @@ wrfbdy_d01_2000-01-25_06:00:00
 
 <a id=Examples_namelists></a>
 
-### 各种应用的namelist示例
+## 各种应用的namelist示例
 
 这里提供了一些物理选项集（包括模型顶部和垂直层的数量）以供参考。它们可以为在您的应用程序中测试模型提供一个很好的起点。另请注意，其他因素也会影响结果；例如区域设置、模型垂直层的分布以及输入数据。
 
@@ -1448,7 +1448,7 @@ spec_exp                            = 0.33,
 
 <a id=Check_Output></a>
 
-### 检查输出文件
+## 检查输出文件
 
 模型运行完成后，最好的作法是快速检查几件事。
 
@@ -1475,7 +1475,7 @@ Timing for Writing wrfout_d01_2006-01-22_00:00:00 for domain 1: 0.60250 elapsed 
 
 <a id=Trouble_Shooting></a>
 
-### 故障排除
+## 故障排除
 
 * 如果模型很快中止运行，则可能是计算机内存不足以运行特定配置，或者输入数据存在严重问题。对于第一个问题，请尝试输入`unlimit`或`ulimit -s unlimited`（在配置和编译之前），以查看是否可以获得更多的内存和/或堆栈大小。   
       
@@ -1504,70 +1504,80 @@ Timing for Writing wrfout_d01_2006-01-22_00:00:00 for domain 1: 0.60250 elapsed 
 
 当发生这种情况时，请考虑使用namelist选项`w_damping`和/或减少时间步长。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <a id=Physics_Dynamics></a>
 
-### 物理与动力学选项
+## 物理与动力学选项
 
-物理选项physics options
-WRF提供了多种物理选项，可以以任何方式进行组合。这些选项的范围通常从简单高效，复杂到计算成本更高，从新开发的方案到成熟的方案（例如当前操作模型中的方案）。
-每个主要的WRF版本都会有不同的选择，但是这里我们将概述WRF版本3和4中提供的选项。
-1.微物理方案（mp_physics）
-a.	Kessler暖云方案：一种理想的云模型研究中常用的暖云降水方案（即无冰）（mp_physics = 1）。
-b.	Purdue Lin方案：具有冰，雪和up过程的复杂方案，适用于真实数据的高分辨率模拟（2）。
-c.	WRF单矩3类方案：一种简单，有效的方案，具有适用于中尺度网格大小的冰雪过程（3）。
-d.	WRF单矩5级方案：（c）的稍微复杂一些的版本，它允许进行混合相过程和过冷的水（4）。
-e.	Eta微观物理学：NCEP模型中的操作微观物理学。具有诊断混合阶段过程的简单有效方案。对于精细分辨率（<5 km），请使用选项（5），对于较粗分辨率，请使用选项（9 5）。
-f.	WRF单矩6类方案：一种具有冰，雪和毛刺过程的方案，适用于高分辨率模拟（6）。
-g.	戈达德4冰微物理学方案（7）分别预测冰雹和graupel，为辐射提供有效半径。取代了V4.1中较旧的Goddard方案。
-h.	New Thompson et al方案：一种适用于高分辨率模拟的具有冰，雪和毛刺过程的新方案（8）。这增加了雨水浓度集中并从3.0版中的雨水浓度更新方案。3.1版的新功能。
-i.	Milbrandt-Yau Double-Moment 7级方案（9）。该方案包括单独的带有双时云，雨，冰，雪，graupel和冰雹的冰雹和graupel类别。3.2版中的新功能。（注意：请勿在V3.6和V3.6.1中使用此方案。
-j.	莫里森双矩方案（10）。双重时刻的冰，雪，雨和雨滴，用于云解析模拟。3.0版中的新功能。
-k.	CAM V5.1 2矩5级方案。
-l.	斯托尼布鲁克大学（Y. Lin）计划（13）。这是一个5类方案，其边缘强度预计可解释混合相过程。版本3.3中的新增功能。
-m.	 WRF Double-Moment 5类方案（14）。这个计划有双时雨。云和CCN用于温暖的进程，但与WSM5类似。3.1版的新功能。
-n.	WRF Double-Moment 6级方案（16）。这个计划有双时雨。云和CCN用于温暖的进程，但与WSM6类似。3.1版的新功能。
-o.	NSSL 2矩方案（17、18）。自3.4版以来的新功能，这是针对云滴，雨滴，冰晶，雪，gra和冰雹的两步方案。它还可以预测平均graupel颗粒密度，这可使graupel跨越从冻结液滴到低密度graupel的范围。还有一个附加选项可以预测云凝结核浓度（CCN，选项18）的浓度（适用于理想的模拟）。该方案旨在用于研究应用中的云解析模拟（dx <= 2km）。从V3.5开始，又增加了两个单矩方案（19和21）。选项19是NSSL方案的单机版，选项21与Gilmore等类似。（2004）。选件22（V3.7中的新增功能）是不加冰雹的两时制（选件17）。
-p.	WSM7（24）。与WSM6一样，但是添加了一个冰雹类别。V4.1中的新功能。
-q.	WDM7（26）。与WDM6一样，但添加了冰雹类别。V4.1中的新功能。
-r.	汤普森气雾剂（28）。该方案考虑了对水和冰友好的气溶胶。气候数据集可用于指定气溶胶变量的初始条件和边界条件（Thompson和Eidhammer，2014年，JAS。）（版本3.6中的新增功能）。在版本4.0中添加了表面除尘方案。
-s.	自版本3.6起，HUJI（以色列希伯来大学，以色列）的光谱箱微物理学有完整（32）和“快速”（30）版本可用。
-t.	带有CESM气雾剂（40）的莫里森双矩方案：必须与MSKF积云方案一起使用。版本4.0中的新增功能。
-u.	P3（Morrison和Milbrandt）（50，51，52）：预测的粒子特性方案。它具有一个代表冰，雪和，的组合的冰类别，并且还带有边缘冰块和边缘冰量的预测数组。双时雨和冰（50）。P3-nc（51）：与P3一样，但添加了依赖于超饱和度的活化作用和双矩云水。V3.9中的新功能。P3-2ice（52）：与P3-nc中一样，但有两个冰块阵列。V4.0中的新功能。
-v.	Jensen ISHMAEL（55）：该方案可预测冰晶生长中的颗粒形状和习惯。V4.1中的新功能。
+### 物理选项
+
+WRF提供了多种物理选项，可以以任何方式进行组合。这些选项的范围通常从简单高效，到复杂和需求更高的计算成本；从新开发的方案到像目前运作模式中的那些行之有效的方案。
+
+每个主要WRF版本的选择都有所不同，但这里我们将概述WRF版本4中提供的选项。
+
+#### 1. 微物理方案（mp_physics）
+
+1.2 Kessler scheme（`mp_physics = 1`）：理想化云模拟研究中常用的暖雨降水（即无冰）方案。
+
+1.2 Purdue Lin scheme（`mp_physics = 2`）：具有冰、雪和霰过程的复杂方案，适用于real-data的高分辨率模拟。
+
+1.3 WRF Single-Moment 3-class scheme（`mp_physics = 3`）：一种简单有效的方案，具有适用于中尺度网格大小的冰雪过程。
+
+1.4 WRF Single-Moment 5-class scheme（`mp_physics = 4`）：WRF Single-Moment 3-class scheme的稍微复杂一些的版本，它允许进行混合相过程和过冷的水。
+
+1.5 Ferrier Eta microphysics（`mp_physics = 5,95`）：NCEP模型中的操作微物理。一种简单有效的混合相过程诊断方案。对于精细分辨率（<5km），使用选项（5），对于粗分辨率，使用选项（95）。
+
+1.6 WRF Single-Moment 6-class scheme（`mp_physics = 6`）：适用于高分辨率模拟的冰、雪和霰过程方案。
+
+1.7 Goddard 4-ice microphysics scheme（`mp_physics = 7`）：分别预测冰雹和霰，为辐射提供有效半径。取代了V4.1中旧的Goddard方案。
+
+1.8 Thompson et al. scheme（`mp_physics = 8`）：适用于高分辨率模拟的冰、雪和霰过程方案。
+
+1.9 Milbrandt-Yau Double-Moment 7-class scheme（`mp_physics = 9`）：该方案将冰雹和霰分为两类，分别采用双时刻云、雨、冰、雪、霰和冰雹。
+
+1.10 Morrison double-moment scheme（`mp_physics = 10`）：用于云解析模拟的双时刻冰、雪、雨和霰。
+
+1.11 CAM V5.1 2-moment 5-class scheme。
+
+1.12 Stony Brook University (Y. Lin) scheme（`mp_physics = 13`）：这是一个五级方案，预测了混合相过程的沸腾强度。
+
+1.14 WRF Double-Moment 5-class scheme（`mp_physics = 14`）：这个方案有双时刻雨。云和CCN用于暖进程，但在其他方面与WSM5类似。
+
+1.15 WRF Double-Moment 6-class scheme（`mp_physics = 16`）：这个方案有双时刻雨。云和CCN用于暖进程，但在其他方面与WSM6类似。
+
+1.16 NSSL 2-moment scheme（`mp_physics = 17,18,19,21,22`）：方案（17）是一个针对云滴、雨滴、冰晶、雪、霰和冰雹的双时刻方案。它还预测了霰颗粒的平均密度，这使得霰可以跨越从冰冻水滴到低密度霰的范围。选项（18）类似，但还预测云凝聚核（CCN）浓度（用于ideal模拟）。该方案适用于研究领域的云解析模拟（dx<=2km）。方案（19）是NSSL方案的单时刻版本，而方案（21）类似于Gilmore et al. (2004)。方案（22）是方案（17）的无冰雹双时刻方案。
+
+1.17 WSM7（`mp_physics = 24`）：与WSM6一样，但是添加了一个冰雹类别。V4.1中的新功能。
+
+1.18 WDM7（`mp_physics = 26`）：与WDM6一样，但是添加了一个冰雹类别。V4.1中的新功能。
+
+1.19 Thompson aerosol-aware（`mp_physics = 28`）：该方案考虑了对水和冰友好的气溶胶。气候学数据集可用于指定气溶胶变量的初始和边界条件（Thompson和Eidhammer，2014，JAS）。该方案还包括一个表面尘埃方案。
+
+1.20 HUJI（`mp_physics = 32,30`）：以色列希伯来大学的光谱箱微物理方案，包括了“完整”（32）和“快速”（30）两个可选方案。
+
+1.21 Morrison double-moment scheme with CESM aerosol（`mp_physics = 40`：必须与MSKF积云方案一起使用）。
+
+1.22 P3 (Morrison and Milbrandt)（`mp_physics = 50,51,52`）：可预测的粒子特性方案。它有一个代表冰、雪和霰的组合的冰类别，并且还包含有边缘冰质量和边缘冰体积的预测数组。双时刻雨和冰方案（50）。P3-nc方案（51）：与P3相同，但增加了过饱和依赖活化和双时刻云水。P3-2ice方案（52）：与P3-nc相同，但有两个冰数组。
+
+1.23 Jensen ISHMAEL（`mp_physics = 55`）：该方案可预测冰晶生长中的颗粒形状和习惯。V4.1中的新功能。
  
-2.1长波辐射（ra_lw_physics）
-a.	RRTM方案（ra_lw_physics = 1）：快速辐射传输模型。使用查找表来提高效率的准确方案。解释了多个波段和微物理学物种。对于痕量气体，
-CO 2 的体积混合比值为330e-6，N 2 O = 0。CH 4 = 0。在V3.5之前的代码中；在V3.5中，CO 2 = 379e-6，N 2 O = 319e-9和CH4 = 1774e-9。有关时变选项，请参见第2.3节。
-b.	GFDL方案（99）：Eta工作辐射方案。具有二氧化碳，臭氧和微物理效应的较旧的多频带方案。
-c.	CAM方案（3）：来自CCSM中使用的CAM 3气候模型。允许浮质和微量气体。它每年使用CO 2 ，常数为N 2 O （311e-9）和CH 4 （1714e-9）。有关时变选项，请参见第2.3节。
-d.	dRRTMG方案（4）：版本3.1中添加了RRTM的新版本。它包括随机云重叠的MCICA方法。对于主要痕量气体，CO 2 = 379e-6（2005年有效），N 2 O = 319e-9，CH 4 = 1774e-9。有关时变选项，请参见第2.3节。在V3.7中，作为选项24引入了快速版本。从V4.2开始，CO 2 值被以下年份的函数所代替：CO2（ppm）= 280 + 90 exp（0.02 *（2000年））与观测值相比，在1920年代和1960年代误差约为4％，在2000年之后误差约为1％。
-e.	戈达德计划（5）。来自简单气候的高效，多波段臭氧。设计用于与Goddard微物理学粒子半径信息一起运行。在V4.1中更新。
-f.	傅留谷方案（7）。多波段，云和云分数效应，气候和示踪气体产生的臭氧剖面。CO 2 ＝ 345e-6。3.4版的新功能。
-g.	RRTMG-K方案（14）：Baek（2017）改进的RRTMG方案版本，装有G的McICA的修订辐射包和两流近似法：全球天气预报模型中的性能评估，J. Adv。模型。Earth Syst。，9，doi：10.1002 / 2017MS000994）。V4.0中的新功能。 
+#### 2.1 长波辐射方案（ra_lw_physics）
+
+2.1.1 RRTM scheme（`ra_lw_physics = 1`）：快速辐射传输模型。使用查找表来提高效率的准确方案。计算了多个波段和微物理学物种。对于示踪气体，
+CO2的体积混合比值为379e-6，N2O为319e-9，CH4为1774e-9。有关随时间变化的选项，请参见下述章节。
+
+2.1.2 CAM scheme（`ra_lw_physics = 3`）：来自CCSM中使用的CAM 3气候模型。允许气溶胶和示踪气体。它使用的CO2为年均值，使用的N2O（311e-9）和CH4（1714e-9）为常数。有关随时间变化的选项，请参见下述章节。
+
+2.3 RRTMG scheme（`ra_lw_physics = 4`）：RRTM的更新版本。它包括随机云重叠的MCICA方法。对于主要示踪气体，CO2=379e-6（2005年有效），N2O=319e-9，CH4=1774e-9。有关随时间变化的选项，请参见下述章节。从V4.2开始，CO2值被年份函数代替：CO2（ppm）=280+90exp（0.02×（year-2000）），计算结果与观测值相比，1920年代和1960年代的误差约为4%，2000年后的误差约为1%。
+
+2.4 Goddard scheme（`ra_lw_physics = 5`）。高效的，多波段，臭氧来自简单的气候学。设计用于运行Goddard微物理粒子半径信息。已在V4.1中更新。
+
+2.5 Fu-Liou-Gu scheme（`ra_lw_physics = 7`）。多波段，云和云分数效应，气候和示踪气体产生的臭氧剖面。CO2＝345e-6。
+
+2.6 RRTMG-K scheme（`ra_lw_physics = 14`）：改进的RRTMG方案版本，Baek (2017), A revised radiation package of G-packed McICA and two-stream approximation: Performance evaluation in a global weather forecasting model, J. Adv. Model. Earth Syst., 9, doi:10.1002/2017MS000994)。
+
+2.7 RRTMG-fast scheme（`ra_lw_physics = 24`）：RRTMG方案的快速版本。
+
+2.8 GFDL scheme（`ra_lw_physics = 99`）：Eta运行辐射方案。一个较老的具有二氧化碳、臭氧和微物理效应的多波段方案。
 
 2.2短波辐射（ra_sw_physics）
 a.	Dudhia方案：简单的向下积分，可以有效地吸收云层，以及晴朗的天空吸收和散射（ra_sw_physics = 1）。
@@ -1815,7 +1825,7 @@ spec_exp ：松弛带斜坡的指数乘数，用于指定的边界条件。0。=
 
 <a id=PBL_Physics></a>
 
-### PBL物理选项摘要
+## PBL物理选项摘要
 
 bl_pbl_physics	Scheme	Reference	Added
 1	YSU	Hong, Noh and Dudhia (2006, MWR)
@@ -1935,7 +1945,7 @@ physics
 
 <a id=Microphysics></a>
 
-### 微物理学选项摘要
+## 微物理学选项摘要
 
 mp_physics	Scheme	Reference	Added
 
@@ -2032,7 +2042,7 @@ mp_physics	Scheme	Cores	Mass Variables	Number Variables
 
 <a id=Cumulus_Parameterization></a>
 
-### 积云参数化选项摘要
+## 积云参数化选项摘要
 
 cu_physics	Scheme	Reference	Added
 
@@ -2086,7 +2096,7 @@ cu_physics	Scheme	Cores	Moisture Tendencies	Momentum Tendencies	Shallow Convecti
 
 <a id=Radiation></a>
 
-### 辐射物理选项摘要
+## 辐射物理选项摘要
 
 ra_sw_physics	Scheme	Reference	Added
 1	Dudhia	Dudhia (1989, JAS)
@@ -2144,7 +2154,7 @@ physics	Scheme	Cores+Chem	Microphysics Interaction	Cloud Fraction	Ozone	GHG
 
 <a id=Namelist_Variables></a>
 
-### namelist变量描述
+## namelist变量描述
 
 在下面的namelist变量的说明。嵌套函数的变量由变量后的（max_dom）表示。另请参阅WRF /中的Registry / Registry.EM 和run / README.namelist 文件以获取更多详细信息。
 可以参考别的资料，表超级长。
@@ -2152,7 +2162,7 @@ physics	Scheme	Cores+Chem	Microphysics Interaction	Cloud Fraction	Ozone	GHG
 
 <a id=Output_Fields></a>
 
-### WRF输出字段
+## WRF输出字段
 
 fields清单
 以下是netCDF命令'ncdump -h'的已编辑输出列表。请注意，有效的输出字段将取决于所使用的模型选项。如果字段具有零值，则不会通过所选的模型选项来计算字段。
@@ -2811,7 +2821,7 @@ ncdump -h wrfout_d<domain>_<date>
 
 <a id=Special_Output></a>
 
-### 特殊的WRF输出变量
+## 特殊的WRF输出变量
 
 WRF模型输出在注册表文件中定义的状态变量，这些状态变量用于模型的预测方程式中。这些变量中的一些是摄动场。因此，以下用于重建气象变量的定义是必要的：
 total geopotential总地势	PH + PHB
@@ -2828,4 +2838,3 @@ map_proj = 1：兰伯特共形  Lambert Conformal
             2：极地立体照相 Polar Stereographic
             3：墨卡托 Mercator
             6：经纬度（包括全球范围）latitude and longitude (including global)
-
