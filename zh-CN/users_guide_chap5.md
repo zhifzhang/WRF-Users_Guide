@@ -2060,12 +2060,13 @@ ra_lw_physics|Scheme|Cores+Chem|Microphysics Interaction|Cloud Fraction|Ozone|GH
 
 **变量名称**|**输入选项**|**描述**
 -------------|------------|--------
-&time_control| |时间控制选项
+&time_control|-|时间控制选项
 run_days|0|模拟运行时间（天）
-run_hours|0|模拟运行时间（小时）*注意: 如果运行时间超过1天，可以同时设置run_days和run_hours，也可以只设置run_hours。比如运行时间为36h，可以设置run_days=1和run_hours=12，或者设置run_days=0和run_hours=36*
+run_hours|0|模拟运行时间（小时）
+-|-|*注意：如果运行时间超过1天，可以同时设置run_days和run_hours，也可以只设置run_hours。比如运行时间为36h，可以设置run_days=1和run_hours=12，或者设置run_days=0和run_hours=36*
 run_minutes|0|模拟运行时间（分钟）
 run_seconds|0|模拟运行时间（秒）
- | |*注意：以下的开始时间用于命名第一个wrfout文件。它还控制嵌套域的开始时间和重新启动的时间。*
+-|-|*注意：以下的开始时间用于命名第一个wrfout文件。它还控制嵌套域的开始时间和重新启动的时间。*
 start_year (max_dom)|2019|开始时间的4位数年
 start_month (max_dom)|09|开始时间的2位数月
 start_day (max_dom)|04|开始时间的2位数日
