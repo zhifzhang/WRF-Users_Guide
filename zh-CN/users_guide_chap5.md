@@ -2176,6 +2176,9 @@ input_from_hires (max_dom)|.true.|当设置为.true时，在嵌套中使用高�
 rsmas_data_path|“high-res-data-directory”|高分辨率数据所在目录的路径
 iofields_filename (max_dom)|"my_iofields_list.txt"|输出其他变量或者从输出中删除变量的选项。您必须创建一个文本文件`my_iofields_list.txt`，在文件中声明要输出的变量。详见本章上文。
 ignore_iofields_warning|.true.|当使用`iofields_filename`选项时，如果在用户指定的文件中遇到错误，则通知模型继续。如果设置为.false.，则如果文件中遇到错误，模型将中止运行
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&domains**|-|**尺寸、嵌套、参数**
 time_step|60|积分时间步长，单位：秒，典型情况下不超过6×dx（dx单位为km时）
 time_step_fract_num|0|分数时间步长中的分子
@@ -2304,6 +2307,9 @@ ocean_levels|30|使用`sf_ocean_physics = 2`时海的层数
 ocean_z|values for # of `ocean_levels`|海洋层深度的垂直剖面（以米为单位）。详细信息请参见`run/README.namelist`
 ocean_t|values for # of `ocean_levels`|海洋温度的垂直剖面（K）。详细信息请参见`run/README.namelist`
 ocean_s|values for # of `ocean_levels`|盐度的垂直剖面。详细信息请参见`run/README.namelist`
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&physics**|-|-
 chem_opt (max_dom)|0|是否开启WRF-Chem
 mp_physics (max_dom)|-|微观物理设置，所有域都应使用相同的值
@@ -2698,7 +2704,10 @@ irr_start_julianday|0|Julian day to start irrigation (included)
 irr_end_julianday|0|Julian day to end irrigation (not included)
 irr_freq|1|Frequency of irrigation (in days)
 irr_ph|0|Phase of irrigation; 0=in phase; 1=not in phase
-**&stoch**|-|用于Stochastic Kinetic-Energy Backscatter方案（SKEB；用于干扰预测），参见[随机参数化方案](#Stochastic_Parameterization_Schemes)
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
+**&stoch**|-|**用于Stochastic Kinetic-Energy Backscatter方案（SKEB；用于干扰预测），参见[随机参数化方案](#Stochastic_Parameterization_Schemes)**
 rand_perturb (max_dom)|1|Creates random perturbation field
 lengthscale_rand_pert (max_dom)|500000|perturbation correlation lengthscale (in meters)
 timescale_rand_pert (max_dom)|21600|temporal decorrelation of random field (in seconds)
@@ -2761,6 +2770,9 @@ gridpt_stddev_spp_lsm (max_dom)|0.3|standard deviation of random perturbation fi
 stddev_cutoff_spp_lsm (max_dom)|3.0|cutoff tails of perturbation pattern above this threshold standard deviation
 iseed_spp_lsm|317|seed for random number stream for spp_lsm
 nens|1|Seed for random number stream for both stochastic schemes. For ensemble forecasts this parameter needs to be different for each member. The seed is a function of initial start time to ensure different random number streams for forecasts starting from different initial times. Changing this seed changes the random number streams for all activated stochastic parameterization schemes
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&noah_mp**|-|**NoahMP LSM选项**
 dveg|-|dynamic vegetation option
 -|1|off [LAI (Leaf Area Index) from table; FVEG (veg fraction) = shdfac (model variable for veg fraction)]
@@ -2832,6 +2844,9 @@ opt_crop|-|Options for crop model
 -|0|（默认值） no crop model, will run default dynamic vegetation
 -|1|Liu, et al., 2016
 -|2|Gecros (Genotype-by-Environment interaction on CROp grown Simulator); Yin and van Laar, 2005
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&fdda**|-|**网格、obs和光谱微移选项**
 **用于网格微移**|-|-
 grid_fdda (max_dom)|-|Nudging switch
@@ -2952,6 +2967,9 @@ obs_sfc_scheme_vert|-|vertical spreading scheme for surface obs
 -|1|original scheme (simple scheme)
 obs_max_sndng_gap|20|max allowed pressure gap between soundings for interpolation (cb)
 obs_scl_neg_qv_innov|1|Setting to 1 prevents nudging toward negative Qv
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&dynamics**|-|**扩散、阻尼、平流选项**
 hybrid_opt |2|（默认值） Klemp cubic form with etac
 -|0|Original WRF coordinate (through V3)
@@ -3076,6 +3094,9 @@ sfs_opt (max_dom)|-|nonlinear backscatter and anisotrophy (NBA)
 m_opt (max_dom)|1|adds output of Mij stress terms when NBA is not used
 tracer_opt (max_dom)|2|Setting to “2” activates 8 pre-defined tracers in the Registry
 rad_nudge|1|Turns on nudging toward initial sounding in idealized TC case
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&bdy_control**|-|**边界条件控制**
 spec_bdy_width|5|total number of rows for specified boundary value nudging (real only)
 spec_zone|1|number of points in specified zone (specified boundary condition option; real only)
@@ -3099,10 +3120,16 @@ constant_bc|.true.|constant boundary condition used with DFI
 spec_bdy_final_mu|1|calls spec_bdy_final for mu; this may cause different restart results since V3.8
 have_bcs_moist (max_dom)|.true.|If set to .true., will use microphysics variables in boundary file in model run after ndown
 have_bcs_scalar (max_dom)|.true.|If set to .true., will use scalar variables in boundary file in model run after ndown （默认值）
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&namelist_quilt**|-|**用于MPI应用的异步I/O选项**
 nio_tasks_per_group|0|（默认值） no quilting
 -|>0|# of processors used for IO quilting per IO group
 nio_groups|1|set to higher value for nesting IO or history and restart IO
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&grib2**|-|-
 background_proc_id|255|background generating process identifier, typically defined by the originating center to identify background data used in creating the data; this is octet 13 of Section 4 in the grib2 message
 forecast_proc_id|255|analysis or generating forecast process identifier, typically defined by the originating center to identify the forecast process used to generate the data; this is octet 14 of Section 4 in the grib2 message
@@ -3110,6 +3137,9 @@ production_status|255|production status of processed data in the grib2 message; 
 compression|-|the compression method to encode the output grib2 message; only jpeg2000 and PNG are supported.
 -|40|（默认值） for jpeg2000
 -|41|PNG
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&dfi_control**|-|**数字滤波器选项控制（支持无反馈嵌套）**
 dfi_opt|0|（默认值） no digital filter initialization
 -|1|digital filter launch (DFL)
@@ -3144,6 +3174,9 @@ dfi_fwdstop_hour|12|2-digit hour of stop time for forward DFI integration
 dfi_fwdstop_minute|30|2-digit minute of stop time for forward DFI integration
 dfi_fwdstop_second|00|2-digit second of stop time for forward DFI integration
 dfi_savehydmeteors|0|Option for radar data assimilation:0: sets hydrometeors to 0 and lets them spin up in DFI;1: keeps hydrometeors unchanged.
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&scm**|-|**仅适用于单列模型（SCM）选项**
 scm_force|1|Turns on single column forcing
 scm_force_dx|4000.|DX for SCM forcing (m)
@@ -3168,6 +3201,9 @@ scm_force_th_largescale|.true.|turns on large-scale theta forcing in SCM
 scm_force_qv_largescale|.true.|turns on large-scale qv forcing in SCM
 scm_force_ql_largescale|.true.|turns on large-scale ql forcing in SCM
 scm_force_wind_largescale|.true.|turns on large-scale wind forcing in SCM
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&tc**|-|**仅用于控制tc_em.exe的选项**
 insert_bogus_storm|.true.|Inserts a bogus tropical storm
 remove_storm|.true.|Only removes the original TC
@@ -3178,6 +3214,9 @@ vmax_meters_per_second (max_dom)|-999.|wind max of bogus storm (m s-1)
 rmax|-999.|maximum radius outward from storm center of bogus TC
 vmax_ratio (max_dom)|-999.|ratio for representative maximum winds, 0.75 for 45 km grid, and 0.9 for 15 kim grid
 rankine_lid|-999.|top pressure limit for the TC bogus scheme
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&diags**|-|**设置压力层上的输出字段**，必须同时设置`auxhist23_outname=”wrfpress_d<domain>_<date>”`，`io_form_auxhist23 = 2,`，`auxhist23_interval = 180, 180,`，`frames_per_auxhist23 = 100, 100,`
 p_lev_diags|1|Setting to 1 outputs pressure level diagnostics
 num_press_levels|4|Number of pressure levels
@@ -3189,6 +3228,9 @@ z_levels|0|list of height values (m) to interpolate data to; positive numbers ar
 p_lev_missing|-999.|Missing value below ground
 extrap_below_grnd|2|Option to extrapolate adiabatically below the ground. Default is 1=off.
 solar_diagnostics (new since V4.2)|1|turns on solar forecasting diagnostics for additional solar-related outputs. See full description in section p7.
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&afwa**|-|**不能与OpenMP一起使用**
 afwa_diag_opt (max_dom)|1|Turns on AFWA diagnostics
 afwa_ptype_opt (max_dom)|1|Turns on precip type option
@@ -3204,6 +3246,9 @@ afwa_buoy_opt (max_dom)|1|Turns on buoyancy option
 afwa_ptype_ccn_tmp|264.15|CCN temperature for precipitation type calculation
 afwa_ptype_tot_melt|50|total melting energy for precipitation type calculation
 progn (max_dom)|1|use mix-activate scheme (only for Morrison, WDM6, WDM5, and NSSL_2MOMCCN/NSSL_2MOM)
+
+**变量名称**|**输入选项**|**描述**
+-------------|------------|--------
 **&ideal**|-|-
 ideal_case|1|Indicates this is an idealized case run – necessary for all idealized cases; default is 0=off
 
