@@ -157,7 +157,7 @@ WRF V4.0版本主要更新点如下：
 
 	5.14 [特殊的WRF输出变量](users_guide_chap5.md#Special_Output)
 
-6. WRF Data Assimilation
+6. [WRF数据同化](users_guide_chap6.md)
 	Introduction	6-2
 	Installing WRFDA for 3DVAR Run….	6-4
 	Installing WRFPLUS and WRFDA for 4DVAR Run	6-9
@@ -175,7 +175,8 @@ WRF V4.0版本主要更新点如下：
 	Additional WRFDA Options	6-67
 	Description of Namelist Variables	6-70
 
-7. Objective Analysis (OBSGRID) 
+7. [客观分析（OBSGRID）](users_guide_chap7.md)
+
 	Introduction	7-1
 	Program Flow	7-2
 	Source of Observations	7-3
@@ -190,7 +191,8 @@ WRF V4.0版本主要更新点如下：
 	Observations Format	7-15
 	OBSGRID Namelist	7-19
 
-8. WRF Software
+8. [WRF软件](users_guide_chap8.md)
+
 	WRF Build Mechanism	8-1
 	Registry	8-5
 	I/O Applications Program Interface (I/O API)	8-14
@@ -198,7 +200,8 @@ WRF V4.0版本主要更新点如下：
 	Software Documentation	8-15
 	Performance	8-15
 
-9. Post-Processing Programs
+9. [后处理程序](users_guide_chap9.md)
+
 	Introduction	9-1
 	NCL		9-2
 	RIP		9-20
@@ -206,7 +209,8 @@ WRF V4.0版本主要更新点如下：
 	UPP 		9-36
 	VAPOR	9-38
 
-10. Utilities and Tools
+10. [实用工具](users_guide_chap10.md)
+
 	Introduction	10-1
 	read_wrf_nc	10-1
 	iowrf		10-5
@@ -216,7 +220,8 @@ WRF V4.0版本主要更新点如下：
 	proc_oml.f	10-14
 	Tools		10-15
 
-Appendix A: WRF-Fire 
+11. [附录A WRF-Fire](Appendix_A)
+
 	Introduction	A-1
 	WRF_Fire in idealized cases	A-3
 	Fire variables in namelist.input 	A-4
