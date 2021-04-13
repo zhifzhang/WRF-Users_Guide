@@ -1730,145 +1730,169 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 
 **CLM 4.5 lake model（`sf_lake_physics = 1`）**：湖泊方案是从社区土地模型（Community Land Model，CLM）版本4.5（Oleson等人，2013）获得的，Gu等人（2013）对此做了一些修改。它是一维的质量和能量平衡方案，具有20-25个模型层，其中包括湖冰上最多5个雪层，湖底最多10个水层和10个土壤层。湖泊方案与WPS派生的实际湖泊点和湖泊深度一起使用，也可以与WRF中用户定义的湖泊点和湖泊深度一起使用（`lake_min_elev`和`lakedepth_default`）。湖泊方案独立于地表方案，因此可以与WRF中嵌入的任何地表方案一起使用。湖泊方案的发展和评估详见：Subin et al. (2012) and Gu et al. (2013) (Subin et al. 2012: Improved lake model for climate simulations, J. Adv. Model. Earth Syst., 4, M02001. DOI:10.1029/2011MS000072; Gu et al. 2013: Calibration and validation of lake surface temperature simulations with the coupled WRF-Lake model. Climatic Change, 1-13, 10.1007/s10584-013-0978-y)。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
 #### 4 行星边界层（bl_pbl_physics）
 
-a.	延世大学方案：在不稳定的混合层中具有显式夹杂层和抛物线K轮廓的非局部K方案（bl_pbl_physics = 1）。
-- topo_wind ：= 1：表面地形校正卷绕到表示在山顶部（门尼斯和Dudhia，JAMC 2012）从分格地形额外的阻力和增强的流动。仅适用于YSU PBL。3.4版的新功能。= 2：更简单的与地形变化有关的校正。3.5版的新功能。
-- ysu_topdown_pblmix ：= 1：自上而下选项混合由辐射冷却驱动。V3.7中的新功能。
-b.	Mellor-Yamada-Janjic方案：Eta操作方案。一维局部湍流预混湍动能方案（2）。
-c.	MRF方案：（a）的较旧版本，将夹带层作为非局部K混合层的一部分进行了隐式处理（99）。
-d.	ACM2 PBL：具有非局部向上混合和局部向下混合的非对称对流模型（7）。3.0版中的新功能。
-e.	准标准比例消除PBL（4）。一种TKE预测选项，它对稳定的分层区域使用新的理论（自3.1开始可用）。白天部分使用版本3.4中添加的具有浅对流（mfshconv = 1）的涡流扩散质量通量方法。
-f.	Mellor-Yamada Nakanishi和Niino Level 2.5 PBL（5）。预测子网格TKE术语。3.1版中的新增功能，V3.8中进行了重大更新。
--icloud_bl：= 1，可以选择将亚网格规模的云从MYNN耦合到辐射；-bl_mynn_cloudpdf：= 1，Kuwano等人（2010）; = 2，Chaboureau和Bechtold（2002，JAS，带有mods，默认）; 
--bl_mynn_cloudmix：= 1，混合云水和冰（当scalar_pblmix = 1时，qnc和qni混合）；
-g.	以上三个选项是V3.8中的新增功能。
--bl_mynn_edmf = 1，激活MYNN中的质量通量（从v3.9开始可以尝试）；
--bl_mynn_mixlength = 2：1来自RAP / HRRR，2来自混合（也可从v3.9获得）。
-h.	Mellor-Yamada Nakanishi和Niino Level 3 PBL（6）。预测TKE和其他第二时刻。3.1版的新功能。
-i.	Mellor-Yamada Nakanishi和Niino Level 3 PBL（6）。预测TKE和其他第二时刻。3.1版的新功能。
-j.	BouLac PBL（8）：Bougeault-LacarrèrePBL。TKE预测选项。3.1版的新功能。设计用于BEP城市模型。
-k.	UW（Bretherton and Park）计划（9）。来自CESM气候模型的TKE方案。版本3.3中的新增功能。
-l.	总能量-质量通量（TEMF）方案（10）。子电网总能量预测变量，加上质量通量型浅对流。版本3.3中的新增功能。
-m.	LES PBL：版本3中提供了大涡模拟（LES）边界层。为此，选择bl_pbl_physic = 0，isfflx = 1以及sf_sfclay_physics 和sf_surface_physics 。这使用扩散进行垂直混合，并且必须使用diff_opt = 2和km_opt = 2或3，请参见下文。使用isfflx = 0或2 选择运行LESPBL的其他理想方式。3.0 版中的新增功能。
-n.	Grenier-Bretherton-McCaa方案（12）：这是一个TKE方案。经过云计算的PBL案例测试。3.5版的新功能。
-o.	新洪方案（11）：在对流PBL中包括垂直传输的比例依赖性。YSU遵循在稳定的PBL和自由气氛中的垂直混合。该方案还诊断了TKE和混合长度输出。V3.7中的新功能。
-p.	SMS-3DTKE：这是3D TKE子网格混合方案，可自适应大涡流模拟（LES）和中尺度极限之间的网格大小。可以通过设置bl_pbl_physic = 0，km_opt = 5，diff_opt = 2 来激活它，并且只能与sf_sfclay_physics = 1，5，91 一起使用。4.2版的新功能。
+4.1 **Yonsei University scheme（`bl_pbl_physics = 1`）**：在不稳定的混合层中具有显式夹杂层和抛物线K轮廓的非局部K方案。
+
+    - `topo_wind`：= 1：地表风的地形校正，以表示来自子网格地形的额外阻力以及山顶处的​​流量增加（Jimenez and Dudhia, JAMC 2012）。仅适用于YSU PBL。= 2：更简单的与地形变化有关的校正。
+    
+    - `ysu_topdown_pblmix`：= 1：由辐射冷却驱动的自上而下混合的选项。
+
+4.2 **Mellor-Yamada-Janjic scheme（`bl_pbl_physics = 2`）**：Eta操作方案。一维局部湍流预混湍动能方案。
+
+4.3 **Quasi-Normal Scale Elimination PBL（`bl_pbl_physics = 4`）**：一种TKE预测选项，它对稳定的分层区域使用新的理论。白天部分使用具有浅对流的涡流扩散质量通量方法（`mfshconv = 1`）。
+
+4.4 **Mellor-Yamada Nakanishi and Niino Level 2.5 PBL（`bl_pbl_physics = 5`）**。预测子网格TKE项。
+
+    - `icloud_bl`：= 1，将子网格规模的云从MYNN耦合到辐射的选项；
+    
+    - `bl_mynn_cloudpdf`：= 1，Kuwano等人（2010）; = 2，Chaboureau和Bechtold（2002，JAS，带有mods，默认值）; 
+    
+    - `bl_mynn_cloudmix`：= 1，混合云水和冰（当`scalar_pblmix = 1`时，qnc和qni混合）；
+    
+    - `bl_mynn_edmf`：= 1，激活MYNN中的质量通量；
+    
+    - `bl_mynn_mixlength`：= 1，来自RAP/HRRR；2，来自混合。
+
+4.5 **Mellor-Yamada Nakanishi and Niino Level 3 PBL（`bl_pbl_physics = 6`）**：预测TKE和其他第二时刻。
+
+4.6 **ACM2 PBL（`bl_pbl_physics = 7`）**：具有非局部向上混合和局部向下混合的非对称对流模型。
+
+4.7 **BouLac PBL（`bl_pbl_physics = 8`）**：Bougeault-Lacarrère PBL。一个TKE预测选项。设计用于BEP城市模型。
+
+4.8 **UW (Bretherton and Park) scheme（`bl_pbl_physics = 9`）**：来自CESM气候模型的TKE方案。
+
+4.9 **Total Energy - Mass Flux (TEMF) scheme（`bl_pbl_physics = 10`）**：子网格总能量预测变量，加上质量通量型浅对流。
+
+4.10 **Shin-Hong scheme（`bl_pbl_physics = 11`）**：在对流PBL中包括垂直传输的比例依赖性。YSU遵循在稳定的PBL和自由气氛中的垂直混合。该方案还诊断了TKE和混合长度输出。
+
+4.11 **Grenier-Bretherton-McCaa scheme（`bl_pbl_physics = 12`）**：这是一个TKE方案。在云顶PBL案例中测试。
+
+4.12 **MRF scheme（`bl_pbl_physics = 99`）**：4.1的较旧版本，将夹带层作为非局部K混合层的一部分进行了隐式处理。
+
+4.13 **LES PBL**：提供了大涡模拟（large-eddy-simulation，LES）边界层。采用本选项时，需设置`bl_pbl_physic = 0`，`isfflx = 1`并选择`sf_sfclay_physics`和`sf_surface_physics`。本选项使用扩散进行垂直混合，并且必须使用`diff_opt = 2`和`km_opt = 2或3`，请参见下文。使用`isfflx = 0或2`选择运行LESPBL的其他理想方式。
+
+4.14 **SMS-3DTKE**：这是3D TKE子网格混合方案，可自适应大涡模拟（LES）和中尺度极限之间的网格大小。可以通过设置`bl_pbl_physic = 0`，`km_opt = 5`，`diff_opt = 2`来激活它，并且只能与`sf_sfclay_physics = 1，5，91`一起使用。4.2版的新功能。
 
 #### 5 积云参数化（cu_physics）
 
-a.	Kain-Fritsch方案：深质量流和浅层对流子网格方案，该方案使用质量流量法并具有下降气流和CAPE去除时间尺度（cu_physics = 1）。
--  kfeta_trigger = 1 -缺省触发器; = 2 –湿度对流调制触发函数基于Ma和Tan（2009，大气研究）。当大规模强迫作用较弱时，可能会改善亚热带地区的结果。
-- cu_rad_feedback =真-允许与辐射分格云量相互作用。V3.6中的新功能。（Alapaty等人，2012年，《地球物理研究快报》）
-b.	贝茨-米勒-詹吉克计划。运营Eta计划。色谱柱湿润度调节方案朝着混合均匀的轮廓（2）方向放松。
-c.	Grell-Devenyi（GD）集成方案：多封闭，多参数，集成方法，通常具有144个子网格成员（在V3.5中移至选项93）。
-d.	简化的Arakawa-Schubert（SAS）（4）。简单的质量通量方案，带有准平衡封闭，浅混合方案（仅在NMM中具有动量传递）。适用于版本3.3中的ARW。
-e.	Grell 3D是GD方案的改进版本，如果打开了沉降扩展（选项cugd_avedx），它也可以用于高分辨率（除了较粗的分辨率）（5）。3.0版中的新功能。
-f.	Tiedtke方案（美国夏威夷版）（6）。具有CAPE去除时间尺度，浅层分量和动量传递的质量通量类型方案。版本3.3中的新增功能。
-g.	Zhang-McFarlane方案（7）。来自CESM气候模型的带动量传递的质量通量CAPE去除型深对流。版本3.3中的新增功能。
-h.	新的简化的Arakawa-Schubert（NSAS）（96）。具有深浅成分和动量传递的新质量通量方案。版本3.3中的新增功能。这是V3。*中的选项14。
-i.	新的简化的Arakawa-Schubert（84，HWRF版本）。具有深浅成分和动量传递的新质量通量方案。3.4版的新功能。
-j.	Grell-Freitas（GF）方案（3）：一种改进的GD方案，试图平滑过渡到解决云的规模，这是Arakawa等人提出的。（2004）。3.5版的新功能。
-k.	旧的Kain-Fritsch方案：使用对流和CAPE去除时间尺度的质量通量方法的深对流方案（99）。
-l.	多尺度Kain-Fritsch方案（11）：使用基于尺度的动态调整时标，基于LCC的夹带。还使用基于Bechtold的新触发功能。V3.7中的新功能。V4.0中添加了使用CESM气雾剂的选项。在V4.2中，增加了对流动量传输。可以通过设置cmt_opt_flag = .false 来关闭它。里面的代码。
-m.	新的Tiedtke方案（16）：此版本类似于REGCM4和ECMWF cy40r1中使用的Tiedtke方案。V3.7中的新增功能，V3.8中已更新。
-n.	Kain-Fritsch-Cumulus势能方案（10）：此选项使用概率密度函数（PDFs）使用累积势能方案通过与边界层湍流相关联的一个来修改KF ad-hoc触发函数。该方案还根据与浅积云有关的时间尺度来计算积云分数。（Berg et al.2013。）V3.8中的新增功能。
-o.	KIAPS SAS（14）：基于NSAS，但可感知规模。V4.0中的新功能。
+5.1 **Kain-Fritsch scheme（`cu_physics = 1`）**：深质量流和浅层对流子网格方案，该方案使用质量流量法并具有下降气流和CAPE去除时间尺度。
+
+    -  `kfeta_trigger`：= 1 ，缺省触发器; = 2，湿度对流调制触发函数（基于Ma和Tan，2009，大气研究）。当大规模强迫作用较弱时，可能会改善亚热带地区的结果。
+    
+    - `cu_rad_feedback`：=true，允许与辐射子网格云量相互作用。（Alapaty等人，2012年，Geophysical Research Letters）
+
+5.2 **Betts-Miller-Janjic scheme（`cu_physics = 2`）**：操作Eta方案。色谱柱湿润度调节方案朝着混合均匀的轮廓方向放松。
+
+5.3 **Grell-Freitas (GF) scheme（`cu_physics = 3`）**：一种改进的GD方案，试图平滑过渡到解决云的规模，这是Arakawa等人（2004）提出的。
+
+5.4 **Simplified Arakawa-Schubert (SAS)（`cu_physics = 4`）**：简单的质量通量方案，带有准平衡封闭，浅混合方案（仅在NMM中具有动量传递）。
+
+5.5 **Grell 3D（`cu_physics = 5`）**：是GD方案的改进版本，如果打开了沉降扩展（选项`cugd_avedx`），它也可以用于高分辨率（除了较粗的分辨率）。
+
+5.6 **Tiedtke scheme (U. of Hawaii version)（`cu_physics = 6`）**：具有CAPE去除时间尺度，浅层分量和动量传递的质量通量类型方案。
+
+5.7 **Zhang-McFarlane scheme（`cu_physics = 7`）**：来自CESM气候模型的带动量传递的质量通量CAPE去除型深对流。
+
+5.8 **Kain-Fritsch-Cumulus Potential scheme（`cu_physics = 10`）**：此选项使用概率密度函数（probability density function，PDFs）使用累积势能方案通过与边界层湍流相关联的一个来修改KF ad-hoc触发函数。该方案还根据与浅积云有关的时间尺度来计算积云分数。（Berg et al.2013）
+
+5.9 **Multi-scale Kain-Fritsch scheme（`cu_physics = 11`）**：使用基于尺度的动态调整时标，基于LCC的夹带。还使用基于Bechtold的新触发功能。包括使用CESM气溶胶的选项。在V4.2中，增加了对流动量传输。可以通过设置内部代码`cmt_opt_flag = .false.`来关闭它。
+
+5.10 **KIAPS SAS（`cu_physics = 14`）**：基于NSAS，但可感知规模。
+
+5.11 **New Tiedtke scheme（`cu_physics = 16`）**：此版本类似于REGCM4和ECMWF cy40r1中使用的Tiedtke方案。
+
+5.12 **New Simplified Arakawa-Schubert (HWRF version)（`cu_physics = 84`）**：具有深浅成分和动量传递的新质量通量方案。
+
+5.13 **Grell-Devenyi (GD) ensemble scheme（`cu_physics = 93`）**：多封闭、多参数、集成方法，通常具有144个子网格成员。
+
+5.14 **New Simplified Arakawa-Schubert (NSAS)（`cu_physics = 96`）**：具有深浅成分和动量传递的新质量通量方案。
+
+5.15 **Old Kain-Fritsch scheme（`cu_physics = 99`）**：使用对流和CAPE去除时间尺度的质量通量方法的深对流方案。
 
 #### 6 浅对流选项（shcu_physics）
 
-a.	.ishallow = 1，启用浅对流选项。与Grell 3D方案一起使用（cu_physics = 5）–将来将移至shcu_physics类别。
-b.	UW（布雷瑟顿和帕克）计划（2）。CESM气候模型中带动量传递的浅积云选择。版本3.3中的新增功能。
-c.	GRIMS（全球/区域集成建模系统）方案（3）：它使用涡流扩散和pal算法表示浅对流过程，并直接与YSU PBL方案耦合。3.5版的新功能。
-d.	.NSAS浅层方案（4）：这是从NSAS中提取的，应与KSAS深层积层方案一起使用。V4.0中的新功能。
-e.	.邓浅方案（5）：仅与MYNN和MYJ PBL方案一起运行。V4.1中的新功能。
+6.1 `ishallow = 1`时，启用浅对流选项。与Grell 3D方案（`cu_physics = 5`）一起使用，将来将移至`shcu_physics`类别。
+
+6.2 **UW (Bretherton and Park) scheme（`shcu_physics = 2`）**：CESM气候模型中带动量传递的浅积云选择。
+
+6.3 **GRIMS (Global/Regional Integrated Modeling System) scheme（`shcu_physics = 3`）**：使用涡流扩散和pal算法表示浅对流过程，并直接与YSU PBL方案耦合。
+
+6.4 **NSAS shallow scheme（`shcu_physics = 4`）**：这是从NSAS中提取的，应与KSAS深层积云方案一起使用。
+
+6.5 **Deng shallow scheme（`shcu_physics = 5`）**：仅与MYNN和MYJ PBL方案一起运行。V4.1中的新功能。
 
 #### 7 其他物理选项
 
-a.	用于热带风暴和飓风应用的选项：
--sf_ocean_physics = 1（在以前的版本中从omlcall 重命名）：简单的海洋混合层模型（1）：遵循Pollard，Rhines和Thompson（1972）的一维海洋混合层模型。其他两个名称列表选项可用于指定初始混合层深度（尽管可能会摄取实际的混合层深度数据）（oml_hml0 ）和低于混合层的温度降低速率（oml_gamma ）。从V3.2开始，此选项可用于所有sf_surface_physics 选项。
--sf_ocean_physics = 2：V3.5中的新功能。基于Price等人的3D Price-Weller-Pinkel（PWP）海洋模型。（1994）。该模型预测水平对流，压力梯度力以及混合层过程。在V3.5中，仅通过名称列表变量ocean_z，ocean_t 和ocean_s的简单初始化可用。
--isftcflx ：修改表面体阻力（Donelan）和焓系数，使其与热带风暴和飓风的最新研究结果更加一致。此选项还包括热通量中的耗散加热项。这是仅适用于sf_sfclay_physics = 1，有用于计算焓系数的两个选项：isftcflx = 1：常数ž 0Q （因为V3.2），用于热和水分; isftcflx = 2 Garratt配方，热量和水分的形式略有不同。
-b.	长时间模拟的其他选项（版本3.1中的新增功能）：
-- tmn_update ：更新深层土壤温度（1）。
-- sst_skin ：根据曾和Beljaars（2005）计算的皮肤SST（1）
--bucket_mm ：水当量降水累积的桶重置值（以mm为单位的值，-1 =无效）。
--bucket_J ：能量累积的存储桶重置值（以焦耳为单位的值，-1 =无效）。仅适用于CAM和RRTMG辐射（ra_lw_physics = 3和4以及ra_sw_physics = 3和4）选项。
--要使用没有leap年的气候数据驱动WRF模型，有一个编译选项可以做到。编辑configure.wrf 并添加-DNO_LEAP_CALENDAR给宏ARCH_LOCAL。
-c.	土地模型输入选项：
--usemonalb ：设置为.true时，它使用来自geogrid的每月反照率字段，而不是表值
-- rdlai2d ：当设置为.TRUE，它使用从格栅月LAI数据（新的V3.6）和现场还将前往wrflowinp文件，如果sst_update 为1。
-d.	gwd_opt ：重力波拖动选项。建议用于所有网格尺寸。该方案包括两个子网格的地形效果：重力波阻力和低水平流阻。后者是在V3.7中添加的。从V4.0开始，方案的输入风将旋转到地球坐标，然后将输出调整回投影域。这使该方案可以用于WRF支持的所有地图投影。为了正确应用此选项，必须使用来自geogrid的适当输入字段。有关详细信息，请参见本指南第3章中的“为重力波拖曳方案选择静态数据”部分。版本3.1中的新增功能，已在V3.7和V4.0中更新
-e.	windfarm_opt ：风力涡轮机阻力参数化方案。它表示特定涡轮机在风场和TKE场上的子电网效应。从文件中读取风电场的物理特性，并建议使用制造商的规范。run / wind-turbine-1.tbl中提供了该文件的示例。涡轮机的位置从文件windturbines.txt中读取。有关更多详细信息，请参见WRF /目录中的README.windturbine。版本3.3中的新增功能，在此版本中，它仅适用于2.5级MYNN PBL选项（bl_pbl_physics = 5），并在V3.6中进行了更新。
-f.	地表灌溉参数化：V4.2中增加了三种灌溉方案，可在模型中表示地表灌溉过程，并明确控制水量和灌溉时间（有关更多信息，请参阅https://doi.org/10.5194/gmd-2019- 233）。该方案（物理名称列表）代表不同的技术，具体取决于应用过程中的水蒸发损失。蒸发过程考虑以下因素造成的损失：
-       sf_surf_irr_scheme = 1：表面蒸散（仅适用于Noah-LSM）
-       sf_surf_irr_scheme = 1：树叶/冠层截留和表面蒸散
-       sf_surf_irr_scheme = 3：微观物理过程，叶片/冠层截留和表面蒸散
-每天使用的灌溉水量定义为“ irr_daily_amount ”（毫米/天）。该应用程序在一天中的时间段从“ irr_start_hours ” UTC值开始，持续“ irr_num_hours”。”一年中的灌溉时间范围由“ irr_start_julianday ”和“ irr_end_julianday” 内的儒略日定义。要考虑大于每天的灌溉间隔，可以将“ irr_freq ”设置为大于1的值。因此，在“ irr_freq ”期间内的活动日中应用的水量为（irr_daily_amount * irr_freq ）。“ irr_ph ”调节灌溉的空间激活（irr_freq > 1），尤其是确定是否在同一天为所有域激活了灌溉（irr_ph = 0）。对于irr_ph 不等于0 给出了两个选项：
-          irr_ph = 1：激活场是（i，j，IRRIGATION）的函数
-          irr_ph = 1：使用fortran RANDOM函数创建激活字段
-      考虑到WRF中可能存在多个巢，对于每个模拟，灌溉方案应仅在一个域上运行。这样可以确保不重复使用水，并且与计算的irr_daily_amount 保持一致。有关代码更改的更多信息，请参见https://github.com/wrf-model/WRF/commit/ 9 bd5b61d9a。
+7.1 用于热带风暴和飓风应用的选项：
 
-两个域案例的灌溉名称列表参数示例：
-  sf_surf_irr_scheme = 0、1 
-  irr_daily_amount = 0,8                     
-  irr_start_hour = 0，14                         
-  irr_num_hours = 0，2                         
-  irr_start_julianday = 0，121                   
-  irr_end_julianday = 0，170     
-  irr_ph = 0，0                       
-  irr_freq = 0，3                      
-这些设置将使用通道方法从14 UTC开始以2毫米/天的值灌溉内部区域2个小时。灌溉从儒略日121开始，到儒略日170结束。每3天将水同时浇灌到所有灌溉网格点的整个内部区域（irr_freq = 3）。这导致每小时灌溉12毫米/小时（每天应用24毫米），然后乘以网格单元内的灌溉百分比（由WPS中处理的灌溉字段决定）。
+        - `sf_ocean_physics = 1`（在以前的版本中名为`omlcall`）：简单的海洋混合层模型：遵循Pollard，Rhines和Thompson（1972）的一维海洋混合层模型。其他两个namelist选项可用于指定初始混合层深度（尽管可能会摄取实际的混合层深度数据）（`oml_hml0`）和低于混合层的温度降低速率（`oml_gamma`）。此选项可用于所有`sf_surface_physics`选项。
+        
+        - `sf_ocean_physics = 2`：基于Price等人（1994）的3D Price-Weller-Pinkel（PWP）海洋模型。该模型预测水平对流、压力梯度力以及混合层过程。通过namelist变量`ocean_z`，`ocean_t`和`ocean_s`的简单初始化可用。
+        
+        - `isftcflx`：修改表面体阻力（Donelan）和焓系数，使其与热带风暴和飓风的最新研究结果更加一致。此选项还包括热通量中的耗散加热项。这是仅适用于`sf_sfclay_physics = 1`，有用于计算焓系数的两个选项：`isftcflx = 1`：常数z0q，用于热和水分; `isftcflx = 2`：Garratt公式，热量和水分的形式略有不同。
+
+7.2 长时间模拟的其他选项：
+
+    - `tmn_update`：更新深层土壤温度（1）。
+    
+    - `sst_skin`：根据Zeng和Beljaars（2005）计算的表面SST（1）。
+    
+    - `bucket_mm`：水当量降水累积的桶重置值（以mm为单位的值，-1 = 无效）。
+    
+    - bucket_J ：能量累积的存储桶重置值（以焦耳为单位的值，-1 = 无效）。仅适用于CAM和RRTMG辐射（`ra_lw_physics = 3、4、14、24`以及`ra_sw_physics = 3、4、14、24`）选项。
+    
+    - 使用没有leap年的气候数据驱动WRF模型，有一个编译选项可以做到。编辑`configure.wrf`并添加`-DNO_LEAP_CALENDAR`给宏`ARCH_LOCAL`。
+
+7.3 土地模型输入选项：
+
+    - `usemonalb`：设置为.true.时，使用来自geogrid的每月反照率字段，而不是表值。
+    
+    - `rdlai2d`：设置为.true.时，使用来自geogrid的每月LAI数据，并且如果`sst_update`为1，则该字段也将转到wrflowinp文件。
+
+7.4 `gwd_opt`：重力波拖动选项。建议用于所有网格尺寸。该方案包括两个子网格的地形效果：重力波阻力和低水平流阻。方案的输入风将旋转到地球坐标，然后将输出调整回投影域。这使该方案可以用于WRF支持的所有地图投影。为了正确应用此选项，必须使用来自geogrid的适当输入字段。有关详细信息，请参见本指南[第3章中的“为重力波拖曳方案选择静态数据”部分](users_guide_chap3.md#Selecting_Static_Data )。
+
+7.5 `windfarm_opt`：风力涡轮机阻力参数化方案。它表示特定涡轮机在风场和TKE场上的子网格效应。从文件中读取风电场的物理特性，并建议使用制造商的规范。`run/wind-turbine-1.tbl`中提供了该文件的示例。涡轮机的位置从文件`windturbines.txt`中读取。有关更多详细信息，请参见WRF/目录中的`README.windturbine`。它仅适用于2.5 level MYNN PBL选项（`bl_pbl_physics = 5`）。
+
+7.6 地表灌溉参数化：V4.2中增加了三种灌溉方案，可在模型中表示地表灌溉过程，并明确控制水量和灌溉时间（有关更多信息，请参阅https://doi.org/10.5194/gmd-2019-233）。该方案（&physics namelist）代表不同的技术，具体取决于应用过程中的水蒸发损失。蒸发过程考虑以下因素造成的损失：
+
+    - `sf_surf_irr_scheme = 1`：表面蒸散（仅适用于Noah-LSM）
+
+    - `sf_surf_irr_scheme = 2`：树叶/冠层截留和表面蒸散
+
+    - `sf_surf_irr_scheme = 3`：微观物理过程，叶片/冠层截留和表面蒸散
+
+每天使用的灌溉水量定义为`irr_daily_amount`（毫米/天）。该应用在一天中的时间段从`irr_start_hours` UTC时间开始，并持续`irr_num_hours`。一年中的灌溉时间范围由`irr_start_julianday`和`irr_end_julianday`内的儒略日定义。要考虑大于每天的灌溉间隔，可以将`irr_freq`设置为大于1的值。因此，在`irr_freq`期间内的活动日中应用的水量为（`irr_daily_amount` × `irr_freq`）。`irr_ph`调节灌溉的空间激活（当`irr_freq > 1`），尤其是确定是否在同一天为所有域激活了灌溉（`irr_ph = 0`）。对于`irr_ph`不等于0给出了两个选项：
+
+        - `irr_ph = 1`：激活字段是（i，j，IRRIGATION）的函数
+
+        - `irr_ph = 1`：使用fortran RANDOM函数创建激活字段
+
+考虑到WRF中可能存在多个嵌套，对于每个模拟，灌溉方案应仅在一个域上运行。这样可以确保不重复使用水，并且与计算的`irr_daily_amount`保持一致。有关代码更改的更多信息，请参见https://github.com/wrf-model/WRF/commit/9bd5b61d9a 。
+
+两个域案例的灌溉namelist参数示例：
+
+```
+  sf_surf_irr_scheme    =  0, 1
+  irr_daily_amount      =  0, 8
+  irr_start_hour        =  0, 14
+  irr_num_hours         =  0, 2
+  irr_start_julianday   =  0, 121
+  irr_end_julianday     =  0, 170
+  irr_ph                =  0, 0
+  irr_freq              =  0, 3
+```                    
+这些设置将使用通道方法从UTC时间14：00开始以2毫米/天的值灌溉内部区域2个小时。灌溉从儒略日121开始，到儒略日170结束。每3天将水同时浇灌到所有灌溉网格点的整个内部区域（`irr_freq = 3`）。这导致每小时灌溉12毫米/小时（每天应用24毫米），然后乘以网格单元内的灌溉百分比（由WPS中处理的IRRIGATION字段决定）。
 
 #### 8 物理灵敏度选项
 
-a.	no_mp_heating ：设置为1时，它将关闭微物理学的潜热。使用此选项时，应将cu_physics 设置为0 
-b.	icloud ：设置为0时，它将在短波辐射选项1、4和长波辐射选项1、4中关闭对光学深度的云影响。请注意，自V3.6起，此名称列表还控制使用哪种云分方法进行辐射。
-c.	isfflx ：设置为0时，它将关闭表面的显热通量和潜热通量。此选项适用于sf_sfclay_physics = 1、5、7、11。d 
-d.	ifsnow ：设置为0时，它将关闭sf_surface_physics = 1中的积雪效果。
+8.1 `no_mp_heating`：设置为1时，它将关闭微物理学的潜热。使用此选项时，应将`cu_physics`设置为0。
 
+8.2 `icloud`：设置为0时，它将在短波辐射选项1、4和长波辐射选项1、4中关闭对光学深度的云影响。请注意，此namelist还控制使用哪种云分数方法进行辐射。
 
+8.3 `isfflx`：设置为0时，它将关闭表面的显热通量和潜热通量。此选项适用于`sf_sfclay_physics = 1、5、7、11`。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+8.4 `ifsnow`：设置为0时，它将关闭`sf_surface_physics = 1`中的积雪效果。
 
 ### 扩散和阻尼选项（&dynamics）
 
