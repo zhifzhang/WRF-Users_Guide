@@ -1627,96 +1627,132 @@ CO2的体积混合比值为379e-6，N2O为319e-9，CH4为1774e-9。有关随时�
 
 icloud：=1，使用Xu-Randall方法; =2，使用阈值方法得出0或1的云分数；=3，使用遵循Sundqvist等人（1989）的基于RH的方法。RH的阈值取决于网格大小。
 
+#### 3.1 表面层（sf_sfclay_physics）
 
+3.1.1 **Revised MM5 surface layer scheme（`sf_sfclay_physics = 1`）**：删除限制并使用更新的稳定性函数（Jimenez等，MWR 2012）。海洋上的热和湿度粗糙度长度（或热和湿度的交换系数）使用COARE 3公式（Fairall等，2003年）。
 
+3.1.2 **Eta similarity（`sf_sfclay_physics = 2`）**：用于Eta模型。基于具有Zilitinkevich的Monin-Obukhov的热粗糙度长度和查找表中的标准相似性函数。
 
+3.1.3 **QNSE surface layer（`sf_sfclay_physics = 4`）**：Quasi-Normal Scale Elimination PBL方案的表面层选项。
 
+3.1.4 **MYNN surface laye（`sf_sfclay_physics = 5`）r**：Nakanishi和Niino PBL的表面层方案。
 
+3.1.5 **Pleim-Xiu surface layer（`sf_sfclay_physics = 7`）**。
 
+3.1.6 **TEMF surface layer**：总能量–质量通量表面层方案。
 
+3.1.7 **MM5 similarity（`sf_sfclay_physics = 91`）**：基于具有Carslon-Boland粘性子层的Monin-Obukhov和查找表中的标准相似度函数。海洋上的热和湿度粗糙度长度（或热和湿度的交换系数）使用COARE 3公式（Fairall等，2003年）。
 
-
-
-
-
-
-
-
-
-
-
-
-
-#### 3.1表面层（sf_sfclay_physics）
-
-a.	MM5相似度：基于具有Carslon-Boland粘性子层的Monin-Obukhov和查找表中的标准相似度函数（sf_sfclay_physics = 91）。在V3.7中，将海洋上的热和湿气粗糙度长度（或热和湿气的交换系数）更改为COARE 3公式（Fairall等，2003）。
-b.	埃塔相似度：用于埃塔模型。基于具有Zilitinkevich的Monin-Obukhov的热粗糙度长度和查找表中的标准相似性函数（2）。
-c.	Pleim-Xiu表面层。（7）。3.0版中的新功能。
-d.	QNSE表面层。准标准比例消除PBL方案的表面层选项（4）。3.1版的新功能。
-e.	MYNN表面层。Nakanishi和Niino PBL的表面层方案（5）。3.1版的新功能。
-f.	TEMF表面层。总能量–质量通量表面层方案。版本3.3中的新增功能。
-g.	修订的MM5表面层方案（V3.6之前的选项11，从V3.6起更名为选项1）：删除限制并使用更新的稳定性函数。3.4版的新功能。（Jimenez等，MWR 2012）。在V3.7中，代码加速以提供与旧MM5方案相似的时序。海洋中的热和湿气粗糙度长度（或热和湿气的交换系数）在V3.7中更改为COARE 3公式（Fairall等，2003）。
-h.	其他：iz0tlnd = 1（与sf_sfclay_physics = 1、91 和5一起使用），Chen-Zhang在陆地上的热粗糙度长度，取决于植被高度，0 =每个sfclay选项中的原始热粗糙度长度。3.2版中的新功能。
- 
- 
+3.1.8 **Other**：`iz0tlnd = 1`（与`sf_sfclay_physics = 1、91 和5`一起使用），Chen-Zhang在陆地上的热粗糙度长度，取决于植被高度，0 =每个sfclay选项中的原始热粗糙度长度。
+  
 #### 3.2 陆地表面（sf_surface_physics）
 
-a.	（1）5层热扩散：仅土壤温度方案，使用5层。
-b.	（2）诺亚陆地表面模型：统一的NCEP / NCAR / AFWA方案，具有四层土壤温度和湿度，分数积雪和冻结土壤物理特性。版本3.1中添加了新的修改，以更好地表示冰原和积雪区域的过程。
--在V3.6，子平铺选项被引入，并且它是由名称列表激活sf_surface_mosaic = 1，和瓷砖的在网格框的数目由名称列表定义mosaic_cat ，具有3的默认值。
-c.（3）RUC地表模型：此模型采用分层方法求解能量和水分预算，因为在第一大气层和顶层土壤层的中间计算了大气通量以及土壤通量，这些通量分别改变了覆盖地面的层中的热量和水分。RUC LSM目前在与大气接触面附近的土壤中使用9个级别的高分辨率。（注意：如果从靠近地面的低分辨率模型（如Noah LSM）进行初始化，则最高水位可能太潮湿，从而导致模型预测中出现湿/冷偏差。解决方案：循环土壤水分，使其在30°C时旋转至少需要几天才能适应RUC LSM的垂直结构）。 
+3.2.1 **5-layer thermal diffusion（`sf_surface_physics = 1`）**：仅土壤温度方案，使用5层。
+
+3.2.2 **Noah Land Surface Model（`sf_surface_physics = 2`）**：统一的NCEP/NCAR/AFWA方案，具有四层土壤温度和湿度，分数积雪覆盖和冻土物理特性。
+
+  - sub-tiling选项可由namelist的`sf_surface_mosaic = 1`激活，网格框中的tiles数由namelist的`mosaic_cat`定义，默认值为3。
+
+3.2.3 **RUC Land Surface Model（`sf_surface_physics = 3`）**：此模型采用分层方法求解能量和水分预算，因为在第一大气层和顶层土壤层的中间计算了大气通量以及土壤通量，这些通量分别改变了覆盖地面的层中的热量和水分。RUC LSM在与大气接触面附近的土壤中使用9层的高分辨率。（注意：如果从靠近地面的低分辨率模型（如Noah LSM）进行初始化，则最高层可能太潮湿，从而导致模型预测中出现湿/冷偏差。解决方案：循环土壤水分，让其旋转几天，以适应RUC LSM的垂直结构）。 
  
-土壤水分的预后变量是体积土壤水分含量减去与土壤颗粒结合的剩余土壤水分，因此不参与水分传输。RUC LSM考虑了土壤中的冻结和解冻过程。它能够使用云微物理学方案提供的显式混合相降水。它具有简单的海冰处理方法，可以解决海冰中的热量扩散问题，并可以在海冰上形成积雪。在温暖的季节，RUC LSM修正农田区域的土壤水分，以补偿这些地区的灌溉。 
- 
+土壤水分的预后变量是体积土壤水分含量减去与土壤颗粒结合的剩余土壤水分，因此不参与水分传输。RUC LSM考虑了土壤中的冻结和解冻过程。它能够使用云微物理学方案提供的显式混合相降水。它具有简单的海冰处理方法，可以解决海冰中的热量扩散问题，并可以在海冰上形成积雪。在温暖的季节，RUC LSM修正农田区域的土壤水分，以补偿这些地区的灌溉。
+
 根据积雪深度，积聚在土壤顶部的积雪最多可以有两层（参考S16）。当雪层很薄时，它与表层土壤结合在一起，以避免夜间过度辐射冷却。当雪水当量低于阈值3 cm时，网格单元可能会被雪部分覆盖。当发生这种情况时，表面参数（例如粗糙度长度和反照率）将被计算为积雪和无雪区域的加权平均值。能源预算利用迭代积雪算法。融化的水可以部分冻结，并保留在雪层中，其余部分则渗入积雪，渗入土壤并形成地表径流。积雪密度随积雪温度，积雪深度和压实参数而变化。对于给定的植被类型，从最大雪反照率初始化雪反照率，但也可以根据雪温度和雪分数来修改雪反照率。为了更好地表示积雪在地面上的积雪，RUC LSM引入了冻结降水密度的估算。 
  
 对RUC LSM的最新修改包括对机盖截留液体或冻结降水的改进，以及对零星积雪的“马赛克”方法，对雪域的积雪和无雪部分分别进行了能量和水分预算的处理网格单元，并在时间步长结束时聚合单独的解决方案。
  
 初始化RUC LSM所需的数据集包括： 
-1. 土壤和土地利用类型的高分辨率数据集；  
+
+1. 高分辨率的土壤和土地利用类型数据集；  
+   
 2. 无雪地区的气候反照率； 
+   
 3. 在有积雪的情况下最大表面反照率的空间分布； 
-4. 网格单元中植被类型的分数，在计算表面参数时要考虑亚网格尺度的异质性；        
+   
+4. 网格单元中植被类型的分数，在计算表面参数时要考虑亚网格尺度的异质性；     
+      
 5. 网格单元内土壤类型的分数； 
-6. 气候绿色度； 
+   
+6. 气候绿色度分数； 
+   
 7. 气候学叶面积指数； 
+   
 8. 土壤底部的气候平均温度； 
-9. 实时海冰浓缩； 
-10.实时积雪纠正RAP和HRRR雪场中循环的积雪。
+   
+9.  实时海冰浓度； 
+    
+10. 实时积雪纠正RAP和HRRR雪场中循环的积雪。
  
-推荐的名称列表选项：
- sf_surface_physics = 3 
- num_soil_layers    = 9 
- usemonalb    = .true。，       
- rdlai2d = .true。，           
- mosaic_lu = 1         
- mosaic_soil = 1       
- 
+推荐的namelist选项：
+
+```
+   sf_surface_physics  = 3
+   num_soil_layers     = 9,
+   usemonalb           = .true.,
+   rdlai2d             = .true.,
+   mosaic_lu           = 1
+   mosaic_soil         = 1 
+```
+
 参考文献：
-Smirnova et al（2016，Mon.Wea.Rev。，S16）;
-使用RUC LSM作为土地组成部分的RAP和HRRR：https ://rapidrefresh.noaa.gov/RAP 和https://rapidrefresh.noaa.gov/hrrr/HRRR。
+
+Smirnova et al（2016，Mon.Wea.Rev.，S16）;
+
+使用RUC LSM作为土地组成部分的RAP和HRRR：https://rapidrefresh.noaa.gov/RAP 和https://rapidrefresh.noaa.gov/hrrr/HRRR。
  
-（来自GSD / NOAA的Tanya Smirnova）
- 
-d.（7）Pleim-Xiu地表模型。有关PX LSM的详细说明（包括优点/缺点，最佳实践和最新改进），请参阅http://www2.mmm.ucar.edu/wrf/users/docs/PX-ACM.pdf
-e.带植被和次网格平铺的两层方案（7）。3.0版中的新功能：多年来开发并改进了Pleim-Xiu地表模型（PX LSM； Pleim和Xiu 1995； Xiu和Pleim 2001），以提供真实的地面温度，土壤湿度以及地表敏感和潜热通量。中尺度气象模型。PX LSM基于ISBA模型（Noilhan和Planton 1989），并包括一个2层力恢复土壤温度和湿度模型。顶层的厚度为1厘米，下层的厚度为99厘米。网格集合植被和土壤参数来自土地利用类别和土壤质地类型的部分覆盖。通过动态调节土壤湿度（Pleim和Xiu，2003年）和深层土壤温度（Pleim和Gilliam，2009年），有两种间接的微调方案可以纠正2米空气温度和湿度的偏差。
-用户应认识到，PX LSM主要是为追溯模拟而开发的，在该模拟中，基于表面的观测可为间接土壤钉结提供信息。尽管可以使用FDDA namelist.input设置“ pxlsm_soil_nudge”禁用土壤微动，但是在此模式下几乎未进行测试，尽管一些用户报告了合理的结果。Gilliam和Pleim（2010）讨论了WRF模型中的实现，并提供了用于回顾性应用的典型配置。如果激活了土壤打结，建模者必须使用Obsgrid物镜重新分析实用程序来生成具有命名约定“ wrfsfdda_d0 *”的表面打结文件。Obsgrid将获取WPS“ met_em *”文件和LittleR观察文件，并生成“ wrfsfdda_d0 *”文件。PX LSM使用2-m的温度，并根据该文件重新分析混合比，以获取深层土壤水分和温度调节效果。如果建模人员希望在预报模式下激活土壤微处理来测试PX LSM，则可以使用Obsgrid将预报的2-m温度和混合比与空的观测文件一起使用以生成“ wrfsfdda_d0 *”文件，但结果将与控制相关预测模型。
-f. （4）Noah-MP（多物理场）陆面模型：在关键的陆-气相互作用过程中使用了多个选项。Noah-MP包含一个单独的植被树冠，该树冠由树冠顶部和底部定义，具有在包括遮蔽效应的两股冠层辐射传输方案中使用的叶片物理和辐射特性。Noah-MP包含一个具有液态水储存和融化/再冻能力的多层雪包，以及一个截雪模型，该模型描述了受顶篷拦截的雪的加载/卸载，融化/再冻和升华。地表水的渗透和径流以及地下水的转移和存储（包括地下水位到无限制含水层的深度）有多种选择。可以使用预测性光合作用和动态植被模型来规定或预测水平和垂直植被密度，该模型将碳分配给植被（叶，茎，木材和根）和土壤碳库（快速和慢速）。3.4版的新功能。（Niu et al.2011）
-G。（8）SSiB地表模型：这是简化的简单生物圈模型的第三代（Xue等，1991； Sun和Xue，2001）。SSiB是为在气候模型中进行土地/大气相互作用研究而开发的。SSiB中的空气动力学阻力值是根据修改后的Monin-Obukhov相似性理论根据植被性质，地面条件和整体Richardson数确定的。SSiB-3包括三个降雪层，可以真实地模拟降雪过程，包括破坏性变质，由于降雪引起的致密化过程以及融雪，这大大增强了该模型在寒冷季节研究的能力。要使用此选项，应将ra_lw_physics 和ra_sw_physics 设置为1、3或4。第二个完整模型级别应设置为不大于0.982，以便该级别的高度高于植被高度。3.4版的新功能。
-H。分数海冰（fractional_seaice = 1）。将海冰视为分数场。需要分数海冰作为输入数据。数据来源可能包括来自GFS或国家冰雪数据中心（http://nsidc.org/data/seaice/index.html）的数据。使用XICE而不是SEAICE来输入Vtable。在当前版本中，此选项适用于sf_sfclay_physics = 1、2、5 和7，而sf_surface_physics = 2、3和7。3.1版的新功能。
-I。（5）CLM4（社区土地模型第4版，Oleson等，2010； Lawrence等，2010）：CLM4是在国家大气研究中心与许多外部合作者共同开发的，代表了科学发展的地表过程模型。它包含生物地球物理学，水文学，生物地球化学和动态植被的精密处理。在CLM4中，每个模型网格单元中的土地表面都被表征为五种主要的子网格土地覆盖类型（冰川，湖泊，湿地，城市和植被）。植被亚网格由多达4 种生理功能和结构不同的植物功能类型（PFT）组成。WRF输入土地覆盖类型通过查找表转换为CLM4 PFT。CLM4垂直结构包括一个单层植被冠层，一个五层积雪和一个十层土柱。在WRF中，Jin和Wen（2012; JGR-Atmosphere），Lu and Kueppers（2012; JGR-Atmosphere）和Subin等人在WRF中对CLM的早期版本进行了定量评估。（2011; Earth Interactions）（来自Jin ）。3.5版的新功能。在V3.6中针对20/21类别的MODIS土地利用数据进行了更新。 
- 
+（来自GSD/NOAA的Tanya Smirnova）
+
+3.2.4 **Noah-MP (multi-physics) Land Surface Model（`sf_surface_physics = 4`）**：在关键的陆-气相互作用过程中使用了多个选项。Noah-MP包含一个单独的植被树冠，该树冠由树冠顶部和底部定义，具有在包括遮蔽效应的两股冠层辐射传输方案中使用的叶片物理和辐射特性。Noah-MP包含一个具有液态水储存和融化/再冻能力的多层雪包，以及一个截雪模型，该模型描述了受顶篷拦截的雪的加载/卸载，融化/再冻和升华。地表水的渗透和径流以及地下水的转移和存储（包括地下水位到无限制含水层的深度）有多种选择。可以使用预测性光合作用和动态植被模型来规定或预测水平和垂直植被密度，该模型将碳分配给植被（叶，茎，木材和根）和土壤碳库（快速和慢速）。（Niu et al.2011）
+
+3.2.5 **CLM4 (Community Land Model Version 4, Oleson et al. 2010; Lawrence et al. 2010)（`sf_surface_physics = 5`）**：CLM4包含生物地球物理学，水文学，生物地球化学和动态植被的精密处理。在CLM4中，每个模型网格单元中的土地表面都被表征为五种主要的子网格土地覆盖类型（冰川，湖泊，湿地，城市和植被）。植被子网格由多达4种生理功能和结构不同的植物功能类型（plant functional types，PFTs）组成。WRF输入土地覆盖类型通过查找表转换为CLM4 PFTs。CLM4垂直结构包括一个单层植被冠层，一个五层积雪和一个十层土壤柱。在WRF中，Jin和Wen（2012; JGR-Atmosphere），Lu and Kueppers（2012; JGR-Atmosphere）和Subin等人（2011; Earth Interactions）（来自Jin ）在WRF中对CLM的早期版本进行了定量评估。
+
+3.2.6 **Pleim-Xiu Land Surface Model（`sf_surface_physics = 7`）**：有关PX LSM的详细说明（包括优点/缺点，最佳实践和最新改进），请参阅http://www2.mmm.ucar.edu/wrf/users/docs/PX-ACM.pdf。
+
+带植被和子网格tiling的两层方案。多年来开发并改进了Pleim-Xiu地表模型（PX LSM； Pleim和Xiu 1995； Xiu和Pleim 2001），以在中尺度气象模型中提供真实的地面温度、土壤湿度以及地表敏感和潜热通量。PX LSM基于ISBA模型（Noilhan和Planton 1989），并包括一个2层力恢复土壤温度和湿度模型。顶层的厚度为1厘米，下层的厚度为99厘米。网格集合植被和土壤参数来自土地利用类别和土壤质地类型的覆盖分数。通过动态调节土壤湿度（Pleim和Xiu，2003年）和深层土壤温度（Pleim和Gilliam，2009年），有两种间接的微调方案可以纠正2米空气温度和湿度的偏差。
+
+用户应认识到，PX LSM主要是为追溯模拟而开发的，在该模拟中，基于表面的观测可为间接土壤微调提供信息。尽管可以在namelist.input的FDDA中设置`pxlsm_soil_nudge`来禁用土壤微调，但是在此模式下只进行了很少的测试，尽管一些用户报告了合理的结果。Gilliam和Pleim（2010）讨论了WRF模型中的实现，并提供了用于回顾性应用的典型配置。如果激活了土壤微调，建模者必须使用Obsgrid物镜重新分析实用程序（详见用户手册[第7章](users_guide_chap7.md )）来生成具有命名约定`wrfsfdda_d0*.`的表面微调文件。Obsgrid程序将获取WPS的`met_em*`文件和LittleR观察文件，并生成`wrfsfdda_d0*.`文件。PX LSM使用2-m的温度，并根据该文件重新分析混合比，以获取深层土壤水分和温度调节效果。如果建模人员希望在预报模式下激活土壤微调来测试PX LSM，则可以使用Obsgrid程序将预报的2-m温度和混合比与空的观测文件一起使用以生成`wrfsfdda_d0*.`文件，但结果将与管理预测模型相关。
+
+3.2.7 **SSiB Land Surface Model（`sf_surface_physics = 8`）**：这是简化的简单生物圈模型（Simplified Simple Biosphere Model，SSiB）的第三代（Xue等，1991； Sun和Xue，2001）。SSiB是为在气候模型中进行土地/大气相互作用研究而开发的。SSiB中的空气动力学阻力值是根据修改后的Monin-Obukhov相似性理论根据植被性质，地面条件和整体Richardson数确定的。SSiB-3包括三个降雪层，可以真实地模拟降雪过程，包括破坏性变质，由于降雪引起的致密化过程以及融雪，这大大增强了该模型在寒冷季节研究的能力。要使用此选项，应将`ra_lw_physics`和`ra_sw_physics`设置为1、3或4。第二个完整模型层应设置为不大于0.982，以便该层的高度高于植被高度。
+
+3.2.8 **Fractional sea-ice（`fractional_seaice = 1`）**：将海冰视为分数场。需要海冰分数作为输入数据。数据来源可能包括来自GFS或[国家冰雪数据中心](https://nsidc.org/ )的数据。使用XICE而不是SEAICE来作为Vtable输入。此选项适用于`sf_sfclay_physics = 1、2、5 和7`，以及`sf_surface_physics = 2、3和7`。
  
 #### 3.3 城市表面（sf_urban_physics –替换旧的开关ucmcall）
 
-自V3.1起，orban物理选项就可与Noah LSM一起使用，而自V3.9起，则与NoahMP一起使用。
-a.	城市雨棚模型（1）：3类UCM选项，具有针对屋顶，墙壁和街道的表面效果。在V3.7中，添加了绿色屋顶选项。
-b.	BEP（2）。建筑环境参数化：多层城市雨棚模型，允许高于最低模型级别的建筑物。仅适用于Noah LSM和Boulac和MYJ PBL选项。3.1版的新功
-c.	BEM（3）。建筑节能模型。增加了BEP，通过供暖和制冷系统实现建筑能耗预算。与BEP的选项相同。3.2版中的新功能。
- 
-#### 3.4 湖泊物理学（sf_lake_physics）
+城市物理选项可与Noah LSM和NoahMP一起使用。 从V4.3开始，对代码进行了更新，以包括使用本地气候区的功能，该功能适用​​于所有三个城市应用（其他信息，请参见[此文档](https://www2.mmm.ucar.edu/wrf/users/docs/readme_bep_bem_v4.3_modifications.pdf )）。
 
-CLM 4.5湖泊模型（1）。湖泊方案是从社区土地模型版本4.5（Oleson等人，2013）获得的，Gu等人对此做了一些修改。（2013）。它是一维的质量和能量平衡方案，具有20-25个模型层，其中包括湖冰上最多5个雪层，湖底最多10个水层和10个土壤层。湖泊方案与WPS派生的实际湖泊点和湖泊深度一起使用，也可以与WRF中用户定义的湖泊点和湖泊深度一起使用（lake_min_elev和lakedepth_default）。湖泊方案独立于地表方案，因此可以与WRF中嵌入的任何地表方案一起使用。湖泊计划的发展和评估包括在Subin等人中。（2012）和Gu等。（2013）（Subin等，2012：气候模拟的改进湖泊模型，J。Adv。Model。Earth Syst。，4，M02001。DOI：10.1029 / 2011MS000072； Gu等，2013：湖泊表面温度的校准和验证模拟与耦合WRF湖模型。气候变化，1-13，10.1007 / s10584-013-0978-Y）。       
+3.3.1 **Urban canopy model（`sf_urban_physics = 1`）**：3类UCM选项，具有针对屋顶、墙壁和街道的表面效果。包含绿色屋顶选项。
+
+3.3.2 **BEP，Building Environment Parameterization（`sf_urban_physics = 2`）**：多层城市雨棚模型，允许高于最低模型层的建筑物。仅适用于Noah LSM和Boulac和MYJ PBL选项。
+
+3.3.3 **BEM，Building Energy Model（`sf_urban_physics = 3`）**：增加了BEP，通过供暖和制冷系统实现建筑能耗预算。与BEP的适用选项相同，即仅适用于Noah LSM和Boulac和MYJ PBL选项。
+ 
+#### 3.4 湖泊物理（sf_lake_physics）
+
+**CLM 4.5 lake model（`sf_lake_physics = 1`）**：湖泊方案是从社区土地模型（Community Land Model，CLM）版本4.5（Oleson等人，2013）获得的，Gu等人（2013）对此做了一些修改。它是一维的质量和能量平衡方案，具有20-25个模型层，其中包括湖冰上最多5个雪层，湖底最多10个水层和10个土壤层。湖泊方案与WPS派生的实际湖泊点和湖泊深度一起使用，也可以与WRF中用户定义的湖泊点和湖泊深度一起使用（`lake_min_elev`和`lakedepth_default`）。湖泊方案独立于地表方案，因此可以与WRF中嵌入的任何地表方案一起使用。湖泊方案的发展和评估详见：Subin et al. (2012) and Gu et al. (2013) (Subin et al. 2012: Improved lake model for climate simulations, J. Adv. Model. Earth Syst., 4, M02001. DOI:10.1029/2011MS000072; Gu et al. 2013: Calibration and validation of lake surface temperature simulations with the coupled WRF-Lake model. Climatic Change, 1-13, 10.1007/s10584-013-0978-y)。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 #### 4 行星边界层（bl_pbl_physics）
 
