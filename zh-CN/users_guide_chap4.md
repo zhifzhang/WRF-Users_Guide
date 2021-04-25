@@ -12,15 +12,14 @@
 
 ## 简介
 
-[WRF模型](http://wrf-model.org/ )有两大模拟类型可以生成数据，一个是ideal初始化，一个是利用real数据。理想化的模拟通常根据现有的一维或二维测深为WRF模型生成初始条件文件，并假设简化了分析地形。Real数据案例通常需要从WPS软件包中进行预处理，该软件包可为每个大气场和静态场提供适合模型所选网格分辨率的保真度。通过选择一个初始化选项而不是另一个初始化选项（ideal理想化还是real真实化），不会更改WRF模型可执行文件本身，但是WRF模型预处理器（real.exe和Ideal.exe程序）是根据用户的选择专门构建的。
-
-real.exe和ideal.exe程序不要同时使用，这两个程序在WRF模型运行之前执行。
+[WRF模型](http://wrf-model.org/ )有两类模拟，一个是ideal初始化，一个是利用real数据。理想化的模拟通常根据现有的一维或二维测深为WRF模型生成初始条件文件，并假设简化了分析地形。Real数据案例通常需要从WPS软件包中进行预处理，该软件包可为每个大气场和静态场提供适合模型所选网格分辨率的保真度。通过选择一个初始化选项而不是另一个初始化选项（ideal理想化还是real真实化），不会更改WRF模型可执行文件本身，但是WRF模型预处理器（real.exe和Ideal.exe程序）是根据用户的选择专门构建的。在运行WRF模型之前，需要运行real.exe或Ideal.exe。
 
 理想化模型和真实模型区别如下：
 
 * 理想化模型——ideal.exe
 	* 3d
 		* em_b_wave：斜压波，100km
+		* em_convrad：对流辐射，1 km
 		* em_fire：地表火，50m
 		* em_heldsuarez：带极性滤波的全局情况，625km
 		* em_les：大涡模拟，100m
@@ -40,7 +39,7 @@ real.exe和ideal.exe程序不要同时使用，这两个程序在WRF模型运行
 
 发出`./compile`语句时，将选择预测类型。选择不同的案例进行研究时，必须重新编译代码以为模型选择正确的初始化。例如，在配置了体系结构的设置（使用`./configure`命令）之后，如果用户发出命令`./compile em_real`，那么初始化程序将使用`module_initialize_real.F`（`./WRF/dyn_em/module_initialize_*.F`文件之一）作为目标模块。
 
-对于ideal的初始化，可以使用文件的组合来构建可执行文件。对于em_fire、e m_heldsuarez、em_scm_xy和em_tropical_cyclone情况，存在单独的初始化文件。对于其他理想化情况，将使用文件`./WRF/dyn_em/module_initialize_ideal.F`。要注意WRF预测模型对这两种初始化程序都是一样的。对于每个初始化模块，执行步骤都是一样的，即：
+对于ideal的初始化，可以使用文件的组合来构建可执行文件。对于em_fire、e m_heldsuarez、em_scm_xy和em_tropical_cyclone情况，存在单独的初始化文件（例如，module_initialize_fire.F用于em_fire案例）。对于其他理想化情况，将使用文件`./WRF/dyn_em/module_initialize_ideal.F`。要注意WRF预测模型对这两种初始化程序都是一样的。对于每个初始化模块，发生相同类型的活动：
 
 * 计算位势和柱压的基态/参考剖面
 
@@ -86,7 +85,7 @@ ideal.exe可以使用户运行受控方案。一般来说，该运行程序只�
 
 在理想化模拟中，可以使用任意的边界条件（除了`specified`之外），而且一般来说，并不是为了运行复杂的物理机制。大多数都没有辐射、地表通量或摩擦效应（除了海风案例、LES和全球Held-Suarez）。理想化 情况最常用于动力学研究、再生收敛解或其他已知解以及理想化云模型。同样也有例外，热带气旋案例只缺乏辐射方案，而海风案例则有完整的参数化选项。
 
-理想化情况下有带或不带地形、带或不带初始热扰动的一维、二维、三维示例 ，namelist文件可以控制模拟区域的大小、垂直层的数量、模型顶部高度、网格大小、时间步长、扩散和阻尼特性、边界条件和物理选项。在与特定案例相关联的每个目录中都可以找到大量已有的namelist设置。
+理想化情况下有带或不带地形、带或不带初始热扰动的一维、二维、三维示例 ，namelist文件控制模拟区域的大小、垂直层的数量、模型顶部高度、网格大小、时间步长、扩散和阻尼特性、边界条件和物理选项。每个案例目录中的默认namelist中已经存在大量设置。
 
 `input_sounding`文件（在合适的案例目录下）可以是任何层的集合，这些层至少可以达到namelist中的模型顶部高度（ztop）。第一行包括表面压力（hPa）、潜在温度（K）和水分混合比（g/kg）。每一行有五个输入值：高度height（海平面以上高度）、干电位温度（K）、蒸汽混合比（g/kg）、x方向风分量（m/s）、y方向风分量（m/s）。ideal.exe程序从`input_sounding`文件进行数据插值，如果数据不足还可以进行相关推断得到。
 
@@ -208,7 +207,7 @@ ideal.exe可以使用户运行受控方案。一般来说，该运行程序只�
 
 ## Real数据案例的初始化
 
-Real数据案例是将WPS提供的输入数据用real.exe程序运行。来自WPS的数据由之前运行的外部分析或预测模型（如GFS）生成。
+Real-data WRF案例使用WRF预处理系统（WPS）提供的“real.exe”程序的输入数据，该程序最初是从先前运行的外部分析或预测模型（例如GFS）生成的。
 
 假设要用WRF按照以下要求进行单层嵌套模拟：
 
@@ -280,7 +279,7 @@ WPS包为WRF的`real.exe`程序提供数据。
 
 ### 最新版本的注意事项 
 
-在WRF v4.0版本中，默认行为是包括“湿势温度”选项和“混合垂直坐标”。这两个选项使向后兼容变得困难。
+默认行为是包括“湿势温度”选项和“混合垂直坐标”。这两个选项使向后兼容变得困难。
 
 * 湿势温度：use_theta_m = 0 (off), 1 (on)
 
@@ -298,11 +297,11 @@ WRF代码支持混合垂直坐标，但仅适用于所有real数据和ideal情�
 
 如果用户打开了HVC选项，则只能使用新版本的wrfinput_d0x和wrfbdy_d01数据。
 
-新版本提供了一个namelist选项（force_use_old_data=.TRUE.），以明确允许将旧版本的wrfinput_d0x和wrfbdy_d01文件引入WRF模型。 
+提供了一个namelist选项（force_use_old_data=.TRUE.），以明确允许将旧版本的wrfinput_d0x和wrfbdy_d01文件引入WRF模型。 
 
 ### 设置模型垂直层
 
-用户可以使用namelist选项`eta_levels`明确定义完整的eta层。给出了28层和35层的两个分布。层数必须与分配的eta表面数（`e_vert`）一致。用户可以选择仅请求层数（使用`e_vert`），然后real程序将计算得出取值。有两种方法可以选择：auto_levels_opt = 1 (old) or 2 (new)。旧的计算方法假设先有几个已知层，然后生成等高间隔的层，直到模型的顶部。新的方法具有地表和上部拉伸系数（`dz_stretch_s`和`dz_stretch_u`），以从厚度`dzbot`开始，根据log P拉伸层，向上直到最大厚度点（`max_dz`）。当厚度达到`max_dz/2`时，拉伸从`dzstretch_s`过渡到`dzstretch_u`。 
+用户可以使用namelist选项`eta_levels`明确定义完整的eta层。给出了28层和35层的两个分布。层数必须与分配的eta表面数（`e_vert`）一致。用户可以选择仅请求层数（使用`e_vert`），然后real程序将计算得出取值。有两种方法可以选择：auto_levels_opt = 1 (old) or 2 (new)。旧的计算方法假设先有几个已知层，然后生成等高间隔的层，直到模型的顶部。新的方法使用地表和上部拉伸系数（`dz_stretch_s`和`dz_stretch_u`），以从厚度`dzbot`开始，根据log P拉伸层，向上直到最大厚度点（`max_dz`）。当厚度达到`max_dz/2`时，拉伸从`dzstretch_s`过渡到`dzstretch_u`。 
  
 当dzbot=50m和max_dz=1000m时，作为dzstretch和p_top函数的最小层数
 

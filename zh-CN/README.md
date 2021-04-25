@@ -2,7 +2,7 @@
 
 这本用户手册针对2018年6月发布的ARW（ Advanced Research WRF）4.0版本。因为WRF/ARW一直在进一步的开发过程中，所以本用户手册也会不断增加和更新内容。如有任何意见和建议，请反馈到[WRF & MPAS-A Support Forum]( http://forum.mmm.ucar.edu/ )。
 
-本手册是对[ARW技术说明]( http://www.mmm.ucar.edu/wrf/users/docs/arw_v3.pdf )的补充，该技术说明更详细地描述了相关的方程式、数值模拟、边界条件和嵌套等内容。（V4版本的的技术说明仍在编辑中。）
+本手册是对[ARW技术说明]( https://opensky.ucar.edu/islandora/object/opensky:2898 )的补充，该技术说明更详细地描述了相关的方程式、数值模拟、边界条件和嵌套等内容。
 
 WRF V4.0版本主要更新点如下：
 

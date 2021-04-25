@@ -177,7 +177,7 @@ wrftladj/    |WRFPLUS
 
 `./configure`
 
-WRF模型的构建允许在configure命令中使用一些选项。
+WRF模型的构建允许在configure命令中使用附加选项。
 
 `./configure –d`：在打开调试选项的情况下构建代码
 
@@ -302,13 +302,13 @@ compile –h              help message
 
 如果检测到所有支持库都可用的前提下，则默认将使用netCDF4压缩函数进行编译。此选项通常会将文件大小减少50%以上，但请注意，输出可能需要更长的写入时间。如果所需的库不存在，将自动使用经典netCDF进行编译。也可以通过在编译前设置环境变量NETCDF_classic（setenv NETCDF_classic 1）来强制使用经典netCDF进行编译。
 
-有关更多详细信息，请访问[此网站](http://www2.mmm.ucar.edu/wrf/users/building_netcdf4.html )。
+有关为WRF安装netCDF4的更多详细信息，请访问[此网站](http://www2.mmm.ucar.edu/wrf/users/building_netcdf4.html )。
 
 ### Ideal案例
 
 Ideal案例是一种用于模拟简单的测试范围广泛的空间和时间尺度的手段。测试案例再现已知的解决方案（解析的、收敛的等）。这些案例为其他Ideal实验提供了一个起点（例如，修改一个测试案例来衡量结果的差异）。
 
-对于任何2D测试案例（在案例名称中有标记），必须使用串行或OpenMP（smpar）编译选项。此外，在配置时只能选择`0=no nesting`选项。对于其他所有案例，可以使用串行或并行（dmpar）和嵌套（除了`em_scm_xy`案例，它是一个1-D案例，必须串行编译，没有嵌套）。假设您要编译并运行二维案例，请键入：
+对于任何2D测试案例（在案例名称中有“2d”标记），必须使用串行或OpenMP（smpar）编译选项。此外，在配置时只能选择`0=no nesting`选项。对于其他所有案例，可以使用串行或并行（dmpar）和嵌套（除了`em_scm_xy`案例，它是一个1-D案例，必须串行编译，没有嵌套）。假设您要编译并运行二维案例，请键入：
 
 `./compile em_squall2d_x >& compile.log`
 
@@ -390,7 +390,7 @@ tc.exe：TC模型
 
 `cd test/em_real (or cd run)`
 
-编辑目录中的namelist.input模板文件，以匹配您的案例。
+按照您的案例编辑目录中的默认namelist.input文件。
 
 运行real-data案例需要先成功运行WRF预处理系统（WPS）。确保来自WPS的`met_em.*`文件在运行目录中可见（可采用链接或复制文件的方式）：
 
@@ -514,7 +514,7 @@ start_*, end_*：重新启动模型积分的开始和结束时间
 restart：用于指示运行是否为重新启动的开关
 ```
 
-* 如果在重新启动运行中更改了输出历史文件（`history`）和重新启动文件间隔（`restart_interval`），并且结果与预期不符，请在namelist的`time_control`部分增加`override_restart_timers=.true.`。
+* 如果在重新启动运行中更改了输出历史文件（`history`）和/或重新启动文件间隔（`restart_interval`），并且新的输出文件时间与预期不符，请在namelist的`time_control`部分增加`override_restart_timers=.true.`。
 
 * 如果在重新启动运行的初始时刻需要输出历史文件（`history`），请使用参数`write_hist_at_0h_rst=.true.`。
 
@@ -524,7 +524,7 @@ restart：用于指示运行是否为重新启动的开关
 
 ### 双向反馈嵌套
 
-双向反馈嵌套运行是指同时运行具有不同网格分辨率的多个区域并彼此相互通信。较粗的（父）域为嵌套（子）域提供边界值，嵌套将其计算反馈给较粗的域。模型可以在同一嵌套级别（无重叠嵌套）或多个嵌套级别（伸缩）处理多个域。
+双向反馈嵌套运行是指同时运行具有不同网格分辨率的多个区域并彼此相互通信。较粗的（父）域为更高分辨率的嵌套（子）域提供边界值，嵌套将其计算反馈给较粗的域。模型可以在同一嵌套级别（无重叠嵌套）或多个嵌套级别（伸缩）处理多个域。
 
 在准备嵌套运行时，请确保使用基本的嵌套选项（option1）编译代码。
 
@@ -589,7 +589,7 @@ met_em.d02.2000-01-24_12:00:00
 
 `mpirun –np 4 ./real.exe`
 
-如果成功，将为粗糙域和嵌套域创建所有输入文件。对于两个域的示例，将创建以下内容：
+如果成功，将为粗糙域和嵌套域创建输入文件。对于两个域的示例，将创建以下内容：
 
 ```
 wrfinput_d01
@@ -618,11 +618,11 @@ wrfout_d02_2000-01-24_12:00:00
 
 WRF支持两个独立的单向嵌套选项。在本节中，单向嵌套定义为：粗糙网格首先运行，其中运行ndown程序，最后运行嵌套的精细网格。精细网格运行的初始和横向边界条件是从粗网格运行获得的，同时再输入高分辨率的地面场（例如地形、土地利用等）和遮罩的地面场（例如土壤温度和湿度）。执行此任务的程序就是`ndown.exe`。
 
-**注意**：使用此程序需要编译代码以进行嵌套。
+**注意**：使用ndown程序需要编译代码以进行嵌套。
 
 **第一步**：运行粗网格。
 
-如上所述，这与任何单域WRF运行没有什么不同。输出历史记录文件频率要尽可能高（比如每小时一次），这将为下一次运行模型提供更好，更频繁的边界条件。
+如上所述，这与任何单域WRF运行没有什么不同。建议在粗网格运行中设置频繁的输出（例如每小时），以提供更好的边界条件。
 
 **第二步**：为两个域运行`geogrid.exe`和`metgrid.exe`（就像您要进行双向嵌套运行一样）。
 
@@ -642,7 +642,7 @@ WRF支持两个独立的单向嵌套选项。在本节中，单向嵌套定义�
 
 * 必须在namelist.input的`&time_control`部分添加`io_form_auxinput2=2`才能成功运行ndown.exe。
 
-* 如果希望在运行ndown时优化垂直分辨率，请设置`vert_refine_fact=integer`（详见[namelist变量描述](#Namelist_Variables)）。另一种优化垂直分辨率的方法是使用实用程序程序`v_interp`（有关详细信息，请参见“实用程序和工具”一章）。
+* 如果希望在运行ndown时优化垂直分辨率，请设置`vert_refine_fact`（详见[namelist变量描述](#Namelist_Variables)）。另一种优化垂直分辨率的方法是使用实用程序程序`v_interp`（有关详细信息，请参见“实用程序和工具”一章）。
 
 * 更改namelist变量`interval_seconds`以反映来自粗略域模型运行的历史记录输出间隔。
 
@@ -652,7 +652,7 @@ WRF支持两个独立的单向嵌套选项。在本节中，单向嵌套定义�
 
 * 运行`ndown.exe`，它使用来自粗网格的`wrfout*`文件，以及从上面第三步生成的`wrfndi_d02`文件。这将产生一个`wrfinput_d02`和`wrfbdy_d02`文件。
 
-请注意，取决于选择的编译选项，程序ndown可以串行运行，也可以在MPI中运行。但是，必须构建ndown程序以支持嵌套。要运行该程序，请键入
+请注意，取决于选择的编译选项，ndown可以串行运行，也可以在分布式内存中运行。要运行该程序，请键入
 
 `./ndown.exe >& ndown.out`
 
@@ -670,7 +670,7 @@ WRF支持两个独立的单向嵌套选项。在本节中，单向嵌套定义�
 
 * 在这一阶段，WRF模型的物理选项可以从最初的单域运行中使用的选项进行修改（即ndown之前的WRF模型和ndown之后的WRF模型可采用不同的物理选项，但是在运行ndown时必须使用与第一次运行相同的物理选项），但陆面方案（`sf_surface_physics`）除外，该方案选项具体取决于方案的土壤深度数量的不同。
 
-* 如果需要，可以利用允许初始边界和横向边界同时使用`moist`数组和`scalar`数组的功能（分别为`have_bcs_moist`和`have_bcs_scalar`）。此选项仅在ndown处理之后的WRF模型运行期间使用。使用此选项，用户必须在两次预测之间保持相同的微观物理选项。优点是，先前的WRF模型为所有微物理变量提供了实际的横向边界趋势，而不是简单的“零流入”或“零梯度流出”。
+* 如果需要，可以利用允许初始边界和横向边界同时使用`moist`数组和`scalar`数组的功能（分别为`have_bcs_moist`和`have_bcs_scalar`）。此选项仅在ndown处理之后的WRF模型运行期间使用。使用此选项，必须在两次预测之间保持相同的微物理选项。优点是，先前的WRF模型为所有微物理变量提供了实际的横向边界趋势，而不是简单的“零流入”或“零梯度流出”。
 
 * 为此网格运行WRF。
 
@@ -682,7 +682,7 @@ WRF支持两个独立的单向嵌套选项。在本节中，单向嵌套定义�
 
 **注意**：此示例用于嵌套到第三个域（总共3个域），并假定您已经具有上一次运行的`wrfout_d01*`文件。
 
-**步骤A**：为3个域运行`geogrid.exe`和`metgrid.exe`程序，得到`met_em.d01.<date>`，`met_em.d02.<date>`和`met_em.d03.<date>`文件。
+**步骤A**：为3个域运行`geogrid.exe`和`metgrid.exe`程序。
 
 **步骤B**：为3个域运行`real.exe`。
 
@@ -730,33 +730,33 @@ WRF支持两个独立的单向嵌套选项。在本节中，单向嵌套定义�
 
 ### 移动嵌套
 
-WRF中有两种类型的移动嵌套选项。在第一种选项中，由用户在namelist中指定嵌套移动。第二种选项则允许嵌套根据自动涡流跟踪算法（跟踪最低压力）来自动移动。这一方案的目的是跟踪确定的热带气旋的移动。
+WRF中有两种类型的移动嵌套选项。在第一种选项中，在namelist中指定嵌套移动。第二种选项则允许嵌套根据自动涡流跟踪算法（跟踪最低压力）来自动移动。这一方案的目的是跟踪确定的热带气旋的移动。
 
 #### 指定移动嵌套
 
 指定的嵌套移动运行选项允许用户准确地指定嵌套移动的位置；但是，设置起来可能相当复杂。必须使用嵌套选项“预设移动（preset moves）”来编译代码。且必须采用分布式内存并行化（dmpar）来编译代码，以使用多个处理器。**请注意，使用“预设移动（preset moves）”选项编译的代码将不支持静态嵌套运行。**要运行模型，只需要粗网格输入文件。在本选项中，嵌套的初始化是从粗网格数据定义的——不需要任何嵌套输入。除了将namelist选项应用于嵌套运行之外，还需要在namelist的&domains部分中添加以下内容：
 
-`num_moves`：模型运行中可以进行的移动总数。任何域的移动都将计入该总数。当前最大值设置为50，但可以通过更改`frame/module_driver_constants`中的`MAX_MOVES`来更改（如果修改此文件，则需要重新编译WRF以反映更改，但不需要`clean-a`或重新配置）。
+`num_moves`：模型运行中进行的移动总数。任何域的移动都将计入该总数。当前最大值设置为50，但可以通过更改`frame/module_driver_constants.F`中的`MAX_MOVES`来更改（如果修改此文件，则需要重新编译WRF以反映更改，但不需要`clean-a`或重新配置）。
 
 `move_id`：嵌套ID的列表，每个动作一个，用于确定将要移动的域。
 
-`move_interval`：从运行开始到应该发生移动之间的分钟数。在指定的模型时间过去之后，嵌套将在下一个时间步长移动。
+`move_interval`：从运行开始到发生移动之间的分钟数。在指定的模型时间过去之后，嵌套将在下一个时间步长移动。
 
 `move_cd_x`，`move_cd_y`：以网格点数表示的嵌套移动的距离和方向（正数表示向东和北移动，负数表示向西和南移动）。
 
 #### 自动移动嵌套
 
-要进行自动移动嵌套运行，请在模型的编译配置时选择“跟随涡流（vortex-following）”选项，且同时配置采用分布式内存并行化选项（dmpar）以使用多个处理器。再次注意，此编译将仅支持自动移动嵌套，而不同时支持指定移动嵌套运行或静态嵌套运行。同样，无需输入嵌套数据，但请注意，自动移动嵌套最适合于发育良好的漩涡。如果要使用默认值以外的其他值，请在namelist的&domains部分中添加并编辑以下变量：
+要进行自动移动嵌套运行，请在模型的编译配置时选择“跟随涡流（vortex-following）”选项，且同时配置采用分布式内存并行化选项（dmpar）以使用多个处理器。此编译将仅支持自动移动嵌套，而不支持指定移动嵌套运行或静态嵌套运行。同样，无需输入嵌套数据，但请注意，自动移动嵌套最适合于发育良好的漩涡。如果要使用默认值以外的其他值，请在namelist的&domains部分中添加并编辑以下变量：
 
 `vortex_interval`：计算涡旋位置的频率，以分钟为单位（默认为15分钟）。
 
 `max_vortex_speed`：与`vortex_interval`一起用以计算新涡旋中心位置的搜索半径（默认值为40m/s）。
 
-`corral_dist`：允许移动嵌套的边界到达上层父域边界的最近距离（以粗网格单元数表示，默认为8）。此参数可用于居中伸缩嵌套，以便所有嵌套与风暴一起移动。
+`corral_dist`：允许移动嵌套的边界和上层父域边界的最近距离（以粗网格单元数表示，默认为8）。此参数可用于居中伸缩嵌套，以便所有嵌套与风暴一起移动。
 
 `track_level`：跟踪涡旋的压力层（以Pa为单位）。
 
-`time_to_move`：移动嵌套的时间（以分钟为单位）。当风暴仍然太弱而算法无法跟踪时，此选项可能会有所帮助。
+`time_to_move`：直到嵌套开始移动的时间（以分钟为单位）。当风暴仍然太弱而算法无法跟踪时，此选项可能会有所帮助。
 
 当使用自动移动嵌套时，模型以标准输出文件（例如rsl.out.0000）中最小的平均海平面压力和最大的10m风速来转储涡流中心位置。输入`grep ATCF rsl.out.0000`将以15分钟的间隔生成风暴信息列表：
 
@@ -769,7 +769,7 @@ ATCF 	2007-08-20_12:15:00		20.29	-81.76	 929.3      133.2
 
 模型有一个额外的功能，可以在移动嵌套运行中合并高分辨率的地形和土地利用的输入数据（Chen, Shuyi S., Wei Zhao, Mark A. Donelan, James F. Price, Edward J. Walsh, 2007: The CBLAST-Hurricane Program and the Next-Generation Fully Coupled Atmosphere–Wave–Ocean Models for Hurricane Research and Prediction. Bull. Amer. Meteor. Soc., 88, 311–317.doi: http://dx.doi.org/10.1175/BAMS-88-3-311 ）。要激活此选项，请按以下步骤操作：
 
-* 在配置和编译代码前，将环境变量TERRAIN_AND_LANDUSE设置为1，如下（cshell）：
+* 在编译时，设置如下（cshell）：
 
 `setenv TERRAIN_AND_LANDUSE 1`
 
@@ -793,7 +793,7 @@ rsmas_data_path		= “terrain_and_landuse_data_directory”
 
 照常使用WPS准备WRF的输入数据。如果需要在嵌套域中进行分析微调，请确保在WPS中处理了所有域的所有时间段。对于地表分析微调，需要在METGRID之后运行OBSGRID（详见第7章），它将输出一个`wrfsfdda_d01`文件，WRF模型将读取该文件。
  
-除了前面描述的其他选项外，在运行real.exe之前，请设置以下选项（有关指导，请参见`test/em_real/`目录中的`examples.namelist`文件）：
+除了前面描述的其他选项外，在运行real.exe之前，请设置以下选项（有关指导，请参见`test/em_real/`目录中的`examples.namelist`文件选项）：
 
 ```
 grid_fdda = 1
@@ -803,13 +803,13 @@ grid_sfdda = 1
 像以前一样运行real.exe，但除了会创建`wrfinput_d0*`和`wrfbdy_d01`文件之外，还将创建名为`wrffdda_d0*`的文件。其他网格微调的namelist选项在此阶段被忽略，但最好是在运行real.exe前将所有相关的选项一次设置好，特别是如下设置：
 
 ```
-gfdda_inname   =  “wrffdda_d<domain>”
-gfdda_interval =  输入数据的时间间隔（分钟）
-gfdda_end_h    =  网格微调的结束时间（小时）
+gfdda_inname     =  “wrffdda_d<domain>”
+gfdda_interval_m =  输入数据的时间间隔（分钟）
+gfdda_end_h      =  网格微调的结束时间（小时）
 
-sgfdda_inname   =  “wrfsfdda_d<domain>”
-sgfdda_interval =  输入数据的时间间隔（分钟）
-sgfdda_end_h    =  地面网格微调的结束时间（小时）
+sgfdda_inname     =  “wrfsfdda_d<domain>”
+sgfdda_interval_m =  输入数据的时间间隔（分钟）
+sgfdda_end_h      =  地面网格微调的结束时间（小时）
 ```
 
 请浏览[此网页](http://www2.mmm.ucar.edu/wrf/users/docs/How_to_run_grid_fdda.html )和`WRF/test/em_real`目录下的`README.grid_fdda`文件以获得更多信息。
@@ -864,7 +864,7 @@ WRF支持全球范围运行的功能，但首先要注意，这不是模型中�
 
 * 键入`ncdump –h geo_em.d01.nc`来查看网格距离，这是填写WRF的namelist.input文件所必需的。x和y方向上的网格距离可能不同，但是最好将它们设置为相似或相同。WRF和WPS假定地球是一个半径为6370km的球体。对于使用的网格尺寸什么没有限制，但为了有效地使用WRF中的极点滤波器，应将东西方向的尺寸设置为2P×3Q×5R+1（其中P、Q和R可以是任意整数，包括0）。
 
-* 照常运行其余WPS程序，但只需运行一个时间段。这是因为模拟区域覆盖了整个地球，不再需要横向边界条件。
+* 照常运行其余WPS程序，但只需运行一个时间段。这是因为模拟区域覆盖了整个地球，不需要横向边界条件。
 
 * 照常运行real.exe程序，并且只需运行一个时间段，因为不需要横向边界文件`wrfbdy_d01`。
 
@@ -940,7 +940,7 @@ Total = ACSWUPT + bucket_J × I_ACSWUPT
 
 `use_adaptive_time_step = .true.`
 
-`step_to_output_time = .true.`（但嵌套域可能仍会在所需时间写入输出，请尝试使用`adjust_output_times = .true.`来弥补这一点）
+`step_to_output_time = .true.`（但嵌套域可能仍会在所需时间写入输出，使用`adjust_output_times = .true.`来弥补这一点）
 
 `target_cfl = 1.2, 1.2, 1.2, `
 
@@ -1013,7 +1013,7 @@ Total = ACSWUPT + bucket_J × I_ACSWUPT
 
 	`-:h:0:RAINC,RAINNC`
 	
-	将从标准历史记录文件中删除字段RAINC和RAINNC。
+	从标准历史记录文件中删除字段RAINC和RAINNC。
  
 	`+:h:7:RAINC,RAINNC`
 	
@@ -1027,7 +1027,7 @@ Total = ACSWUPT + bucket_J × I_ACSWUPT
 		
 		i或h，指输入或历史记录文件
 		
-		Registry中的字段名称——这是引号中的第一个字符串。注意：不包括字段名称之间的任何空格。
+		Registry中的字段名称——这是引号中的第一个字符串。
 		
 * 如果您有兴趣将变量输出到新的stream中（即不是默认的历史记录stream 0），那么以下namelist变量也将是必需的（stream 7的示例）：
 
@@ -1158,7 +1158,7 @@ io_form_auxhist23 = 2
  
 5. 在`&dyanmics`部分设置`do_avgflx_em = 1`
 
-此选项为下游传输模型输出历史时间的平均数据，包括柱压耦合的U、V和W。如果使用Grell型方案，设置`do_avg_cugd = 1`将输出时间平均的对流质量通量。
+此选项为下游传输模型输出历史时间的平均数据，包括柱压耦合的U、V和W。如果使用Grell cumulus方案，设置`do_avg_cugd = 1`将输出时间平均的对流质量通量。
  
 6. AFWA提供的天气诊断
 
@@ -1228,7 +1228,7 @@ io_form_auxhist23 = 2
 
 ### WRF-Hydro
 
-本功能将WRF模型与水文学过程（例如路由和渠化）耦合在一起。使用WRF-Hydro需要使用环境变量`WRF_HYDRO`进行单独的编译。在c-shell环境中，在进行配置和编译之前输入：
+本功能将WRF模型与水文学过程（例如路由和渠化）耦合在一起。本功能需要设置环境变量`WRF_HYDRO`进行单独的编译。在c-shell环境中，在进行配置和编译之前输入：
 
 `setenv WRF_HYDRO 1`
 
@@ -1240,7 +1240,7 @@ io_form_auxhist23 = 2
 
 此选项允许留出几个处理器以仅负责输出。如果域的尺寸很大，和/或与在输出时间之间集成模型所花费的时间相比，写入输出时间所花费的时间是重要的，那么本功能可能是有助于提升性能。设置选项有两个变量：
  
-`nio_tasks_per_group`：每个IO组使用多少处理器进行IO Quilting。通常一、两个处理器就足够了。
+`nio_tasks_per_group`：每个IO组使用多少个处理器进行IO Quilting。通常一、两个处理器就足够了。
 
 `nio_groups`：有多少个IO组，默认值为1。
  
@@ -1362,7 +1362,7 @@ ptop_requested                      = 5000,
 e_vert                              = 40,
 ```
 
-2. 网格尺寸为10~20km，运行1至3天（例如，美国NCAR每日实时运行）：
+2. 网格尺寸为10~20km，运行1至3天（例如，美国以前NCAR每日实时运行）：
 
 ```
 mp_physics                          = 8,
@@ -1450,7 +1450,7 @@ spec_exp                            = 0.33,
 
 ## 检查输出文件
 
-模型运行完成后，最好的作法是快速检查几件事。
+模型运行完成后，建议快速检查几件事。
 
 如果您使用分布式内存（dmpar）构建模型，应该每个处理器都有一个`rsl.out.*`和`rsl.error.*`文件。输入`tail rsl.out.0000`以查看是否有`SUCCESS COMPLETE WRF`，这表示模型已成功运行。
 

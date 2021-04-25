@@ -58,7 +58,7 @@
 
 ## 简介
 
-WRF预处理系统（WPS）是一个由三个程序组成的集合，它们的共同作用是为真实数据模拟准备输入文件。每个程序执行一个准备阶段：*geogrid*定义/确定模拟区域并将静态地形数据插值到网格格点；*ungrib*从GRIB格式的文件中提取气象场；*metgrid*将*ungrib*提取的气象场水平插值到*geogrid*定义的模型网格中。将气象场垂直插值到WRF eta层的工作是在*real*程序中进行的。
+WRF预处理系统（WPS）是一个由三个程序组成的集合，它们的共同作用是为real-data模拟准备输入文件。每个程序执行一个准备阶段：*geogrid*定义/确定模拟区域并将静态地形数据插值到网格格点；*ungrib*从GRIB格式的文件中提取气象场；*metgrid*将*ungrib*提取的气象场水平插值到*geogrid*定义的模型网格中。将气象场垂直插值到WRF eta层的工作是在*real*程序中进行的。
 
 ![data_flow_of_WPS](images/chap3_data_flow_of_WPS.png)
 
@@ -74,7 +74,7 @@ WPS由三个独立的程序组成：*geogrid*、*ungrib*和*metgrid*。WPS中还
 
 ### Geogrid程序 
 
-geogrid的目的是定义模拟区域，并将各种地面数据集插值到模型网格中。用户在WPS namelist文件（namelist.WPS）的“geogrid”部分namelist记录中指定必要的信息，以定义模拟区域。除了计算每个网格点的经纬度和地图比例因子外，默认情况下，geogrid还会将土壤类别、土地利用类别、地形高度、年均深层土壤温度、逐月植被分数、逐月反照率、最大积雪反照率和坡度类别插值到模型网格中。每个字段的全球数据集都通过WRF下载页面提供，由于这些数据是不随时间变化的（一般情况下），所以只需要下载一次。其中一些数据集只提供了一种分辨率，还有一些数据集包括了“全分辨率”和“低分辨率”的下载选项。通常情况下，静态字段的“低分辨率”源仅适用于代码测试和教育目的，任何涉及模型精度的应用都应使用“全分辨率”地理数据集。
+geogrid的目的是定义模拟区域，并将各种地面数据集插值到模型网格中。用户在WPS namelist文件（namelist.WPS）的“geogrid”部分namelist记录中指定必要的信息，以定义模拟区域。除了计算每个网格点的经纬度和地图比例因子外，默认情况下，geogrid还会将土壤类别、土地利用类别、地形高度、年均深层土壤温度、逐月植被分数、逐月反照率、最大积雪反照率和坡度类别插值到模型网格中。每个字段的全球数据集都通过[地理静态数据下载页面](https://www2.mmm.ucar.edu/wrf/users/download/get_sources_wps_geog.html )提供，由于这些数据是不随时间变化的（一般情况下），所以只需要下载一次。其中一些数据集只提供了一种分辨率，还有一些数据集包括了“全分辨率”和“低分辨率”的下载选项。通常情况下，静态字段的“低分辨率”源仅适用于代码测试和教育目的，任何涉及模型精度的应用都应使用“全分辨率”地理数据集。
 
 除了对默认的地面数据字段（fields）进行插值外，geogrid程序还具有足够的通用性，可以将大多数连续和分类的字段插值到模拟区域中。可以使用表格文件GEOGRID.TBL将新的或增加的数据集插值到模拟区域。GEOGRID.TBL文件可定义geogrid生成的每个字段；它描述要用于字段的插值方法，以及该字段的数据集在文件系统上的位置。
 
@@ -102,7 +102,7 @@ metgrid的输出文件是以WRF I/O API格式编写的，因此，通过选择Ne
 
 ## 安装WPS
 
-WPS使用与WRF模型相似的构建机制。geogrid和metgrid的外部库仅限于WRF模型所需的库，因为WPS使用WRF模型的WRF I/O API实现；因此，**必须在安装WPS之前编译WRF**，以便WPS程序可以使用WRF外部目录中的I/O API库。此外，ungrib程序需要三个压缩库来支持GRIB Edition 2；但是，如果不需要支持GRIB2数据，则可以在不使用这些压缩库的情况下编译ungrib。
+WPS使用与WRF模型相似的构建机制。geogrid和metgrid的外部库仅限于WRF模型所需的库，因为WPS使用WRF模型的WRF I/O API实现；因此，**必须在安装WPS之前编译WRF**，以便WPS程序可以使用WRF外部目录中的I/O API库。此外，ungrib程序需要三个压缩库来支持GRIB Edition 2；但是，如果不需要支持GRIB2数据，则可以在不使用这些压缩库的情况下编译ungrib。有关环境和库兼容性测试以及有关构建库和WPS程序的分步说明，请参阅[如何编译WRF](https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php )网页。
 
 ### 需要的库
 
@@ -306,7 +306,7 @@ WPS需要与构建WRF模型相同的Fortran和C编译器，因为WPS可执行文
 
 在兰伯特共形投影、极地立体投影和墨卡托投影的图示中，可以看到所谓的真实纬度（true latitude）是投影表面与地球表面相交或相切的纬度。在此纬度上，地图投影中的距离没有失真，而在其他纬度上，地球表面上的距离与投影表面上的距离之间的关系取决于*地图比例因子*。理想情况下，应选择地图投影及其附带的参数，以减少模型网格覆盖区域内的最大失真。这是由于地图比例因子导致的明显不同于统一性的大量失真，可能限制模型时间步长超出必要的范围。**一般情况下，极地立体投影最适合于高纬度地区的WRF模拟，兰伯特共形投影非常适合于中纬度地区，而墨卡托投影则适合于低纬度地区或主要是东西方向范围的模拟区域。进行全球的ARW模拟需要采用圆柱等距投影，尽管在旋转方面它也非常适合于地球表面的任何区域（例如当`pole_lat`，`pole_lon`和`stand_lon`从其默认值更改时）。** 
 
-在配置旋转的经纬度网格时，namelist参数`pole_lat`，`pole_lon`和`stand_lon`会从其默认值更改。参数`pole_lat`和`pole_lon`指定模型计算网格内地理北极的纬度和经度，`stand_lon`给出绕地球轴的旋转。在ARW的上下文中，计算网格是指规则的经纬度网格，在该网格上执行模型计算，并在其高纬度的纬度圆上应用傅立叶滤波器（Fourier filters）；对这种滤波细节感兴趣的用户可以参考《WRF Version 3技术说明》，在此只需注意，计算的经纬度网格总是用平行于模型网格x轴的计算纬度线和平行于网格y轴的计算经度线表示。
+在配置旋转的经纬度网格时，namelist参数`pole_lat`，`pole_lon`和`stand_lon`会从其默认值更改。参数`pole_lat`和`pole_lon`指定模型计算网格内地理北极的纬度和经度，`stand_lon`给出绕地球轴的旋转。在ARW的上下文中，计算网格是指规则的经纬度网格，在该网格上执行模型计算，并在其高纬度的纬度圆上应用傅立叶滤波器（Fourier filters）；对这种滤波细节感兴趣的用户可以参考[WRF Version 4技术说明](https://opensky.ucar.edu/islandora/object/opensky:2898 )，在此只需注意，计算的经纬度网格总是用平行于模型网格x轴的计算纬度线和平行于网格y轴的计算经度线表示。
 
 如果地球的地理经纬度网格与计算网格重合，则全球ARW区域显示了通常在常规经纬度网格上可视化的地球表面。相反，如果地理网格与模型计算网格不一致，则地理子午线和纬线将显示为复杂曲线。通过示例最容易说明差异。在下图的上半部分，显示的地球是地理经纬度网格与计算经纬度网格一致的。在下半部分，地理网格（未显示）已旋转，因此地球的地理极点不再位于计算网格的极点处。
 
@@ -1076,7 +1076,7 @@ SOILTmmm	             | K        | 土壤温度	     | “mmm”是层的深度�
 
 ## 将MPAS输出用于WRF初始条件和横向边界条件
 
-从WPS v3.9版本开始，metgrid.exe程序能够从跨尺度预测模型（[MPAS](https://mpas-dev.github.io/ )）读取netCDF格式的原始、非结构化的网格输出数据；然后，metgrid.exe程序可以将MPAS字段直接水平插值到geogrid.exe程序定义的任何域，以生成WRF real.exe程序可用的输出文件，其方式与从中间文件插值的metgrid输出完全相同。这样，MPAS的输出可用于为WRF提供初始和横向边界条件。
+metgrid.exe程序能够从跨尺度预测模型（[MPAS](https://mpas-dev.github.io/ )）读取netCDF格式的原始、非结构化的网格输出数据；然后，metgrid.exe程序可以将MPAS字段直接水平插值到geogrid.exe程序定义的任何域，以生成WRF real.exe程序可用的输出文件，其方式与从中间文件插值的metgrid输出完全相同。这样，MPAS的输出可用于为WRF提供初始和横向边界条件。
 
 运行MPAS模拟时，必须将输出数据设置为包含初始化WRF模拟所需的最小字段集。以下输出数据对于MPAS v5.x和更高版本应该足够了。
 
@@ -1155,7 +1155,7 @@ fout.close()
 fin.close()
 ```
 
-值得注意的是，尚未对megrid.exe使用本机MPAS输出针对WPS的并行（即“dmpar”）构建进行全面测试；因此建议从WPS v4.0版本开始，在处理MPAS数据集时以串行方式运行metgrid.exe。
+值得注意的是，尚未对megrid.exe使用本机MPAS输出针对WPS的并行（即“dmpar”）构建进行全面测试；因此建议在处理MPAS数据集时以串行方式运行metgrid.exe。
 
 同样，在大型MPAS网格的情况下，可能有必要增加metgrid代码中两个常量的值，该常量用于静态分配从MPAS网格到WRF域的重映射权重的计算中使用的几个数据结构。如下所示，这两个常量位于WPS/src/metgrid/remapper.F文件中。
 
@@ -1270,7 +1270,7 @@ Vtable中的第二组字段，描述了如何在metgrid和实际程序中标识�
 
 ## 从NLCD数据创建城市分数字段
 
-*注意：自WPS v4.0版本发布以来，美国大陆地区已经可以使用基于30米NLCD 2011土地覆盖而准备的城市分数字段。该数据集可从WPS地理下载页面的“optional fields”部分下获得。以下详细信息可能仍有助于准备其他地区的城市分数字段。*
+*注意：美国大陆地区已经可以使用基于30米NLCD 2011土地覆盖而准备的城市分数字段。该数据集可从WPS地理下载页面的“optional fields”部分下获得。以下详细信息可能仍有助于准备其他地区的城市分数字段。*
 
 为了创建更不均匀和详细的城市分数域以供NUDAPT使用，用户可以通过多分辨率土地特征协会从国家土地覆盖数据库（NLCD）获取高分辨率的土地覆盖信息。在WRF中生成称为FRC_URB2D的城市分数字段的过程包括：首先下载WRF域覆盖的区域上的NLCD数据，将数据转换为Geogrid使用的二进制格式（binary format），最后仅将城市类别提取为新的城市分数字段。以下步骤可作为完成此过程的指南。
 
@@ -1750,6 +1750,50 @@ METGRID.TBL文件是一个文本文件，定义了要由metgrid插入的每个�
 14 | Water 水体
 15 | Bedrock 基岩
 16 | Other (land-ice) 其他（陆地冰雪覆盖）
+
+**表4 NLCD 40种土地利用类别**
+**土地利用类别**|**土地利用描述**
+----------------|-----------------
+1  | Evergreen Needleleaf Forest
+2  | Evergreen Broadleaf Forest
+3  | Deciduous Needleleaf Forest
+4  | Deciduous Broadleaf Forest
+5  | Mixed Forests
+6  | Closed Shrublands
+7  | Open Shrublands
+8  | Woody Savannas
+9  | Savannas
+10 | Grasslands
+11 | Permanent Wetlands
+12 | Croplands
+13 | Urban and Built-up
+14 | Cropland/Natural Vegetation Mosaic
+15 | Permanent Snow and Ice
+16 | Barren or Sparsely Vegetated
+17 | IGBP Water
+18 | Unclassified
+19 | Fill Value
+20 | Unclassified
+21 | Open Water
+22 | Perennial Ice/Snow
+23 | Developed Open Space
+24 | Developed Low Intensity
+25 | Developed Medium Intensity
+26 | Developed High Intensity
+27 | Barren Land (Rock/Sand/Clay)
+28 | Deciduous Forest
+29 | Evergreen Forest
+30 | Mixed Forest
+31 | Dwarf Scrub
+32 | Shrub/Scrub
+33 | Grassland/Herbaceous
+34 | Sedge/Herbaceous
+35 | Lichens
+36 | Moss
+37 | Pasture/Hay
+38 | Cultivated Crops
+39 | Woody Wetlands
+40 | Emergent Herbaceous Wetlands
 
 <a id=WPS_Output_Fields></a>
 
