@@ -434,13 +434,13 @@ outTYPE | 输出类型，默认为绘制到屏幕上（即`x11`），其他可�
 
 - 一个或多个数据
 
-- 数据结束符号
+- 数据结束记录
 
-- 报告结束符号
+- 报告结束记录
 
 报告标题是一个600个字符长的记录（其中许多未使用，仅需要虚拟值），其中包含有关站点和整个报告的某些信息（位置、站点ID、站点类型、站点海拔等）。下表中完整描述了报告标题记录。表中粗体的项目未使用：
 
-**报告标题格式**
+**报告标题的格式**
 
 **变量**            | **Fortran I/O 格式** | **描述**
 --------------------|----------------------|---------
@@ -476,30 +476,42 @@ slp, qc             | F13.5, I7     | Sea-level pressure (Pa) and a QC flag
 **cloud_cvr, qc**   | **F13.5, I7** | **Total cloud cover (oktas) and QC**
 **ceiling, qc**     | **F13.5, I7** | **Height (m) of cloud base and QC**
 
-Following the report header record are the data records. These data records contain the observations of pressure, height, temperature, dewpoint, wind speed, and wind direction. There are a number of other fields in the data record that are not used on input. Each data record contains data for a single level of the report. For report types that have multiple levels (e.g., upper-air station sounding reports), each pressure or height level has its own data record. For report types with a single level (such as surface station reports or a satellite wind observation), the report will have a single data record. The data record contents and format are summarized in the following table
-Format of data records
-Variable	Fortran I/O Format	Description
-pressure, qc	F13.5, I7	Pressure (Pa) of observation, and QC
-height, qc	F13.5, I7	Height (m MSL) of observation, and QC
-temperature, qc	F13.5, I7	Temperature (K) and QC
-dew_point, qc	F13.5, I7	Dewpoint (K) and QC
-speed, qc	F13.5, I7	Wind speed (m/s) and QC
-direction, qc	F13.5, I7	Wind direction (degrees) and QC
-u, qc	F13.5, I7	u component of wind (m/s), and QC
-v, qc	F13.5, I7	v component of wind (m/s), and QC
-rh, qc	F13.5, I7	Relative Humidity (%) and QC
-thickness, qc	F13.5, I7	Thickness (m), and QC
-The end data record is simply a data record with pressure and height fields both set to -777777.
-After all the data records and the end data record, an end report record must appear. The end report record is simply three integers, which really aren't all that important.
+报告标题之后是数据。这些数据包含压力、高度、温度、露点、风速和风向的观测值。数据中还有许多其他字段未在输入中使用。每个数据记录都包含观测报告的一个层的数据。对于具有多个层的观测报告类型（例如高空站点探空报告），每个压力或高度层都有其自己的数据记录。对于具有单个层的观测报告类型（例如地面站报告或卫星的风观测），该报告将具有单个数据记录。下表总结了数据记录的内容和格式，表中粗体的项目未使用：
 
-Format of end_report records
-Variable	Fortran I/O Format	Description
-num_vld_fld	I7	Number of valid fields in the report
-num_error	I7	Number of errors encountered during the decoding of the report
-num_warning	I7	Number of warnings encountered during the decoding the report
-QCFlags
-In the observation files, most of the meteorological data fields also have space for an additional integer quality-control flag. The quality-control values are of the form 2n, where n takes on positive integer values. This allows the various quality control flags to be additive, yet permits the decomposition of the total sum into constituent components. Following are the current quality control flags that are applied to observations:
-pressure interpolated from first-guess height      = 2 **  1 =      2 pressure int. from std. atmos. and 1st-guess height= 2 **  3 =      8
+**数据记录的格式**
+
+**变量**          | **Fortran I/O 格式** | **描述**
+------------------|----------------------|---------
+pressure, qc      | F13.5, I7     | Pressure (Pa) of observation, and QC
+height, qc        | F13.5, I7     | Height (m MSL) of observation, and QC
+temperature, qc   | F13.5, I7     | Temperature (K) and QC
+dew_point, qc     | F13.5, I7     | Dewpoint (K) and QC
+speed, qc         | F13.5, I7     | Wind speed (m/s) and QC
+direction, qc     | F13.5, I7     | Wind direction (degrees) and QC
+**u, qc**         | **F13.5, I7** | **u component of wind (m/s), and QC**
+**v, qc**         | **F13.5, I7** | **v component of wind (m/s), and QC**
+**rh, qc**        | **F13.5, I7** | **Relative Humidity (%) and QC**
+**thickness, qc** | **F13.5, I7** | **Thickness (m), and QC**
+
+数据记录的结尾是压力和高度字段都设置为-777777的数据记录。
+
+在所有数据和数据记录结尾之后，必须有一个报告结束记录。报告结束记录仅是三个整数（详见下表，表中粗体的项目未使用），实际上并不是那么重要。
+
+**报告结束记录的格式**
+
+**变量**        | **Fortran I/O 格式** | **描述**
+----------------|----------------------|---------
+num_vld_fld     | I7     | Number of valid fields in the report
+**num_error**   | **I7** | **Number of errors encountered during the decoding of the report**
+**num_warning** | **I7** | **Number of warnings encountered during the decoding the report**
+
+### QCFlags（质量控制标记）
+
+在观测文件中，大多数气象数据字段还具有用于附加整数质量控制标记的空间。质量控制标记取值的形式为2n，其中n为正整数值。这允许添加各种质量控制标志，也允许将总和分解为各个组成部分。以下是当前应用于观测的质量控制标志：
+
+```
+pressure interpolated from first-guess height      = 2 **  1 =      2 
+pressure int. from std. atmos. and 1st-guess height= 2 **  3 =      8
 temperature and dew point both = 0                 = 2 **  4 =     16
 wind speed and direction both = 0                  = 2 **  5 =     32
 wind speed negative                                = 2 **  6 =     64
@@ -517,81 +529,104 @@ data outside normal analysis time and not QC-ed    = 2 ** 15 =  32768
 fails error maximum test                           = 2 ** 16 =  65536
 fails buddy test                                   = 2 ** 17 = 131072 
 observation outside of domain detected by QC       = 2 ** 18 = 262144
+```
 
 <a id=Namelist></a>
 
 ## OBSGRID Namelist
 
-The OBSGRID namelist file is called "namelist.oa", and must be in the directory from which OBSGRID is run. The namelist consists of nine namelist records, named "record1" through "record9", each having a loosely related area of content. Each namelist record, which extends over several lines in the namelist.oa file, begins with "&record<#>" (where <#> is the namelist record number) and ends with a slash "/".
-The namelist record &plot_sounding is only used by the corresponding utility.
-Namelist record1
-The data in namelist record1 define the analysis times to process:
-Namelist Variable	Value	Description
-start_year	2000	4-digit year of the starting time to process
-start_month	01	2-digit month of the starting time to process
-start_day	24	2-digit day of the starting time to process
-start_hour	12	2-digit hour of the starting time to process
-end_year	2000	4-digit year of the ending time to process
-end_month	01	2-digit month of the ending time to process
-end_day	25	2-digit day of the ending time to process
-end_hour	12	2-digit hour of the ending time to process
-interval	21600	Time interval (s) between consecutive times to process
-Namelist record2
-The data in record2 define the model grid and names of the input files: 
-Namelist Variable	Value	Description
-grid_id	1	ID of domain to process 
-obs_filename	CHARACTER	Root file name (may include directory information) of the observational files. All input files must have the format obs_filename:<YYYY-MM-DD_HH>. 
-One file required for each time period.
-If a wrfsfdda is being created, then similar input data files are required for each surface fdda time.
-remove_data_above_qc_flag	200000	Data with qc flags higher than this will not be output to the OBS_DOMAINdxx files. Default is to output all data. Use 65536 to remove data that failed the buddy and error max tests. To also exclude data outside analysis times that could not be QC-ed use 32768 (recommended).
-This does not affect the data used in the OA process.
-remove_unverified_data	.FALSE.	By setting this parameter to .TRUE. (recommended) any observations that could not be QC'd due to having a pressure insufficiently close to an analysis level will be removed from the OBS_DOMAINdxx files.  Obs QC'd by adjusting them to a nearby analysis level or by comparing them to an analysis level within a user-specified tolerance will be included in the OBS_DOMAINdxx files.  See use_p_tolerance_one_lev in &record4.
-trim_domain	.FALSE.	Set to .TRUE. if this domain must be cut down on output
-trim_value	5	Value by which the domain will be cut down in each direction 
-The met_em* files which are being processed must be available in the OBSGRID/ directory.
-The obs_filename and interval settings can get confusing, and deserve some additional explanation. Use of the obs_filename files is related to the times and time interval set in namelist &record1, and to the F4D options set in namelist &record8. The obs_filename files are used for the analyses of the full 3D dataset, both at upper levels and the surface. They are also used when F4D=.TRUE.; that is, if surface analyses are being created for surface FDDA nudging. The obs_filename files should contain all observations (upper-air and surface) to be used for a particular analysis at a particular time. 
-Ideally there should be an obs_filename for each time period for which an objective analysis is desired. Time periods are processed sequentially from the starting date to the ending date by the time interval, all specified in namelist &record1. All observational files must have a date associated with them. If a file is not found, the code will process as if this file contains zero observations, and then continue to the next time period. 
-If the F4D option is selected, the obs_filename files are similarly processed for surface analyses, this time with the time interval as specified by INTF4D.
-If a user wishes to include observations from outside the model domain of interest, geogrid.exe (WPS) needs to be run over a slightly larger domain than the domain of interest. Setting trim_domain to .TRUE. will cut all 4 directions of the input domain down by the number of grid points set in trim_value. 
-In the example below, the domain of interest is the inner white domain with a total of 100x100 grid points. geogrid.exe has been run for the outer domain (110x110 grid points). By setting the trim_value to 5, the output domain will be trimmed by 5 grid points in each direction, resulting in the white 100x100 grid point domain.  
- 
+OBSGRID的namelist文件称为`namelist.oa`，并且必须位于运行OBSGRID的目录中。该namelist文件由九个部分namelist记录组成，名称分别为`record1`到`record9`，每个记录都有一个内容松散的区域。每个namelist记录都在`namelist.oa`文件中跨越多行，并以`&record<#>`（其中<#>是namelist记录编号）开头，以斜杠`/`结尾。
 
-Namelist record3
-The data in the &record3 concern space allocated within the program for observations. These are values that should not frequently need to be modified:
-Namelist Variable	Value	Description
-max_number_of_obs	10000	Anticipated maximum number of reports per time period
-fatal_if_exceed_max_obs	.TRUE.	T/F flag allows the user to decide the severity of not having enough space to store all of the available observation
-Namelist record4 
-The data in &record4 set the quality control options. There are four specific tests that may be activated by the user: An error max test; a buddy test; removal of spike, and; the removal of super-adiabatic lapse rates. For some of these tests, the user has control over the tolerances, as well. 
-Namelist Variable	Value	Description
-qc_psfc	.FALSE.	Execute error max and buddy check tests for surface pressure observations (temporarily converted to sea level pressure to run QC)
-Error Max Test: For this test there is a threshold for each variable. These values are scaled for time of day, surface characteristics and vertical level.
-qc_test_error_max	.TRUE.	Check the difference between the first-guess and the observation
-max_error_t	10	Maximum allowable temperature difference (K)
-max_error_uv	13 	Maximum allowable horizontal wind component difference (m/s)
-max_error_z	8 	Not used
-max_error_rh	50 	Maximum allowable relative humidity difference (%)
-max_error_p	600 	Maximum allowable sea-level pressure difference (Pa
-max_error_dewpoint	20	Maximum allowable dewpoint difference (K)
-Buddy Check Test: For this test there is a threshold for each variable. These values are similar to standard deviations.
-qc_test_buddy	.TRUE.	Check the difference between a single observation and neighboring observations
-max_buddy_t	8	Maximum allowable temperature difference (K)
-max_buddy_uv	8	Maximum allowable horizontal wind component difference (m/s)
-max_buddy_z	8	Not used
-max_buddy_rh	40	Maximum allowable relative humidity difference (%)
-max_buddy_p	800	Maximum allowable sea-level pressure difference (Pa)
-max_buddy_dewpoint	20	Maximum allowable dewpoint difference (K)
-buddy_weight	1.0	Value by which the buddy thresholds are scaled
-Spike removal
-qc_test_vert_consistency	.FALSE.	Check for vertical spikes in temperature, dew point, wind speed and wind direction
-Removal of super-adiabatic lapse rates
-qc_test_convective_adj	.FALSE.	Remove any super-adiabatic lapse rate in a sounding by conservation of dry static energy
-For satellite and aircraft observations, data are often horizontally spaced with only a single vertical level. The following entries determine how such data are dealt with and are described in more detail below the table.
-use_p_tolerance_one_lev	.FALSE.	Should single-level above-surface observations be directly QC'd against nearby levels (.TRUE.) or extended to nearby levels (.FALSE.)
-max_p_tolerance_one_lev_qc	700	Pressure tolerance within which QC can be applied directly (Pa)
-max_p_extend_t	1300	Pressure difference (Pa) through which a single temperature report may be extended
-max_p_extend_w	1300	Pressure difference (Pa) through which a single wind report may be extended
-Dewpoint quality control: 
+namelist中的`&plot_sounding`部分仅用于上述相应的实用工具。
+
+### Namelist record1
+
+namelist `record1`中的数据定义了要处理的分析时间：
+
+**Namelist变量** | **取值** | **描述**
+-----------------|----------|---------
+start_year  | 2000  | 4-digit year of the starting time to process
+start_month | 01    | 2-digit month of the starting time to process
+start_day   | 24    | 2-digit day of the starting time to process
+start_hour  | 12    | 2-digit hour of the starting time to process
+end_year    | 2000  | 4-digit year of the ending time to process
+end_month   | 01    | 2-digit month of the ending time to process
+end_day     | 25    | 2-digit day of the ending time to process
+end_hour    | 12    | 2-digit hour of the ending time to process
+interval    | 21600 | Time interval (s) between consecutive times to process
+
+### Namelist record2
+
+`record2`中的数据定义模型网格和输入文件的名称：
+
+**Namelist变量** | **取值** | **描述**
+-----------------|----------|---------
+grid_id                   | 1         | ID of domain to process 
+obs_filename              | CHARACTER | Root file name (may include directory information) of the observational files. All input files must have the format obs_filename:<YYYY-MM-DD_HH>. One file required for each time period.If a wrfsfdda is being created, then similar input data files are required for each surface fdda time.
+remove_data_above_qc_flag | 200000    | Data with qc flags higher than this will not be output to the OBS_DOMAINdxx files. Default is to output all data. Use 65536 to remove data that failed the buddy and error max tests. To also exclude data outside analysis times that could not be QC-ed use 32768 (recommended). This does not affect the data used in the OA process.
+remove_unverified_data    | .FALSE.   | By setting this parameter to .TRUE. (recommended) any observations that could not be QC'd due to having a pressure insufficiently close to an analysis level will be removed from the OBS_DOMAINdxx files.  Obs QC'd by adjusting them to a nearby analysis level or by comparing them to an analysis level within a user-specified tolerance will be included in the OBS_DOMAINdxx files.  See use_p_tolerance_one_lev in &record4.
+trim_domain               | .FALSE.   | Set to .TRUE. if this domain must be cut down on output
+trim_value                | 5         | Value by which the domain will be cut down in each direction 
+
+准备处理的`met_em*`文件必须在OBSGRID/目录中可用。
+ 
+`obs_filename`和interval设置可能会引起混淆，需要一些其他说明。`obs_filename`文件的使用与在namelist `&record1`中设置的时间和时间间隔以及在namelist `&record8`中设置的F4D选项有关。`obs_filename`文件用于分析整个3D数据集，包括高空层和地面。当`F4D=.TRUE.`时，也会使用它们。也就是说，如果要为地面FDDA微调创建地面分析。`obs_filename`文件应包含在特定时间用于特定分析的所有观测值（高空和地面）。
+
+理想情况下，每个需要进行客观分析的时间段都应有一个`obs_filename`。时间段从开始日期到结束日期按时间间隔顺序进行处理，所有这些都在namelist `&record1`中指定。所有观测文件必须具有与之关联的日期。如果找不到文件，则代码将像该文件包含零个观测值一样进行处理，然后继续进行下一个时间段。
+
+如果选择了F4D选项，则类似地处理`obs_filename`文件以进行地表分析，这一次是按`INTF4D`指定的时间间隔进行的。
+
+如果用户希望包括来自感兴趣的模型区域之外的观测，则geogrid.exe（WPS）需要在比感兴趣的区域稍大的区域上运行。将`trim_domain`设置为`.TRUE.`时，会按`trim_value`中设置的网格点数向下削减输入区域的所有4个方向。
+
+在下面的示例中，目标区域是内部白色区域，共有100×100网格点。已经为外部区域（110×110网格点）运行geogrid.exe。通过将`trim_value`设置为5，将在每个方向上用5个网格点修剪输出区域，从而得到白色100×100网格点的区域。
+
+![trim_value](images/chap7_trim_value.png)
+
+### Namelist record3
+
+`&record3`中的数据与程序内分配的用于观测的空间有关。这些是不经常需要修改的值：
+
+**Namelist变量** | **取值** | **描述**
+-----------------|----------|---------
+max_number_of_obs       | 10000  | Anticipated maximum number of reports per time period
+fatal_if_exceed_max_obs | .TRUE. | T/F flag allows the user to decide the severity of not having enough space to store all of the available observation
+
+### Namelist record4
+
+`&record4`中的数据设置质量控制选项。用户可以激活四种特定的测试：最大错误测试；伙伴测试；去除尖峰；以及去除超级绝热流失率。对于其中一些测试，用户也可以控制公差。
+
+**Namelist变量** | **取值** | **描述**
+-----------------|----------|---------
+qc_psfc                    | .FALSE. | Execute error max and buddy check tests for surface pressure observations (temporarily converted to sea level pressure to run QC)
+Error Max Test:            |         | For this test there is a threshold for each variable. These values are scaled for time of day, surface characteristics and vertical level.
+qc_test_error_max          | .TRUE.  | Check the difference between the first-guess and the observation
+max_error_t                | 10      | Maximum allowable temperature difference (K)
+max_error_uv               | 13      | Maximum allowable horizontal wind component difference (m/s)
+max_error_z                | 8       | Not used
+max_error_rh               | 50      | Maximum allowable relative humidity difference (%)
+max_error_p                | 600     | Maximum allowable sea-level pressure difference (Pa
+max_error_dewpoint         | 20      | Maximum allowable dewpoint difference (K)
+Buddy Check Test:          |         | For this test there is a threshold for each variable. These values are similar to standard deviations.
+qc_test_buddy              | .TRUE.  | Check the difference between a single observation and neighboring observations
+max_buddy_t                | 8       | Maximum allowable temperature difference (K)
+max_buddy_uv               | 8       | Maximum allowable horizontal wind component difference (m/s)
+max_buddy_z                | 8       | Not used
+max_buddy_rh               | 40      | Maximum allowable relative humidity difference (%)
+max_buddy_p                | 800     | Maximum allowable sea-level pressure difference (Pa)
+max_buddy_dewpoint         | 20      | Maximum allowable dewpoint difference (K)
+buddy_weight               | 1.0     | Value by which the buddy thresholds are scaled
+Spike removal              |         | 
+qc_test_vert_consistency   | .FALSE. | Check for vertical spikes in temperature, dew point, wind speed and wind direction
+Removal of super-adiabatic lapse rates |   | 
+qc_test_convective_adj     | .FALSE. | Remove any super-adiabatic lapse rate in a sounding by conservation of dry static energy
+For satellite and aircraft observations, data are often horizontally spaced with only a single vertical level. The following entries determine how such data are dealt with and are described in more detail below the table. |   | 
+use_p_tolerance_one_lev    | .FALSE. | Should single-level above-surface observations be directly QC'd against nearby levels (.TRUE.) or extended to nearby levels (.FALSE.)
+max_p_tolerance_one_lev_qc | 700     | Pressure tolerance within which QC can be applied directly (Pa)
+max_p_extend_t             | 1300    | Pressure difference (Pa) through which a single temperature report may be extended
+max_p_extend_w             | 1300    | Pressure difference (Pa) through which a single wind report may be extended
+
+露点质量控制：
+
 Note that the dewpoint error max check and buddy check are using the same moisture field as the relative humidity checks.  The dewpoint checks are to allow for an additional level of quality control on the moisture fields and may be helpful for dry observations where RH differences may be small but dewpoint differences are much larger.  The maximum dewpoint thresholds are scaled based on the observed dewpoint to increase the threshold for dry conditions where larger dewpoint variations are expected.  If the user does not wish to use dewpoint error checks, simply set the thresholds to very large values.
 
 Quality control of single-level above-surface observations:
