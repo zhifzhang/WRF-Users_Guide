@@ -256,54 +256,87 @@ OBSGRID具有对嵌套执行客观分析的功能。这是通过单独的OBSGRID
 
 ## 输出文件
 
-The OBSGRID program generates some ASCII/netCDF files to detail the actions taken on observations through a time cycle of the program. In support of users wishing to plot the observations used for each variable (at each level, at each time), a file is created with this information. Primarily, the ASCII/netCDF files are for consumption by the developers for diagnostic purposes. The main output of the OBSGRID program is the gridded, pressure-level data set to be passed to the real.exe program (files metoa_em*).
-In each of the files listed below, the text ".dn.YYYY-MM-DD_HH:mm:ss.tttt" allows each time period that is processed by OBSGRID to output a separate file. The only unusual information in the date string is the final four letters "tttt" which is the decimal time to ten thousandths of a second. These files will be dependent on the domain being processed.
+OBSGRID程序生成一些ASCII/netCDF文件，以详细说明在该程序的时间周期内对观测数据采取的操作。为了支持用户希望绘制用于每个变量的观测图（在每个层、每个时间），将使用此信息创建一个文件。ASCII/netCDF文件主要供开发人员用于诊断目的。OBSGRID程序的主要输出是网格化的压力层数据集（`metoa_em*`文件），该数据集将传递给real.exe程序。
 
-metoa_em*
-These are the final analysis files at surface and pressure levels. Generating this file is the primary goal of running OBSGRID.
-These files can now be used in place of the met_em* files from WPS to generate initial and boundary conditions for WRF. To use these files when running real.exe you can do one of two things:
-1.	Rename or link the metoa_em* files back to met_em*. This way real.exe will read the files automatically. 
-2.	Use the auxinput1_inname namelist option in WRF’s namelist.input file to overwrite the default filename real.exe uses. To do this, add the following to the &time_control section of the WRF namelist.input file before running real.exe (use the exact syntax as below – do not substitute the <domain> and <date> for actual numbers):
+在下面列出的每个文件中，文本“.dn.YYYY-MM-DD_HH:mm:ss.tttt”允许OBSGRID处理的每个时间段输出一个单独的文件。日期字符串中唯一不寻常的信息是最后四个字母“tttt”，即十进制秒至十分之一秒。这些文件将取决于正在处理的区域。
 
-auxinput1_inname = "metoa_em.d<domain>.<date>"
+### metoa_em*
 
-wrfsfdda_dn
-Use of the surface FDDA option in OBSGRID creates a file called wrfsfdda_dn. This file contains the surface analyses at INTF4D intervals, analyses of T, TH, U, V, RH, QV, PSFC, PMSL, and a count of observations within 250 km of each grid point.
-Due to the input requirements of the WRF model, data at the current time (_OLD) and data for the next time (_NEW) are supplied at each time interval. Due to this requirement, users must take care to specify the same interval in the WRF fdda section for surface nudging as the interval used in OBSGRID to create the wrfsfdda_dn file.  This also means that the user may need to have data available for OBSGRID to create a surface analysis beyond the last analysis actually used by WRF surface analysis nudging.  With a positive value for the length of rampdown, even though the _OLD field at the beginning of the rampdown will be nudged throughout the rampdown, WRF still requires a _NEW field at the beginning of the rampdown period.
+这些是地面和压力层上的最终分析文件。生成此文件是运行OBSGRID的主要目标。
 
-OBS_DOMAINdxx
-These files can be used in WRF for observational nudging. The format of this file is slightly different from the standard wrf_obs / little_r format. See the Observation Nudging User's Guide or Chapter 5 of this User’s Guide for details on observational nudging. 
-The “d” in the file name represents the domain number. The “xx” is just a sequential number. 
-These files contain a list of all of the observations available for use by the OBSGRID program.
-•	The observations have been sorted and the duplicates have been removed. 
-•	Observations outside of the analysis region have been removed. 
-•	Observations with no information have been removed. 
-•	All reports for each separate location (different levels, but at the same time) have been combined to form a single report. 
-•	Data that has had the "discard" flag internally set (data which will not be sent to the quality control or objective analysis portions of the code) are not listed in this output. 
-•	The data have gone through an expensive test to determine if the report is within the analysis region, and the data have been given various quality control flags. Unless a blatant error in the data is detected (such as a negative sea-level pressure), the observation data are not typically modified, but only assigned quality control flags.
-•	Data with qc flags higher than a specified value (user controlled, via the namelist), will be set to missing data.
-The WRF observational nudging code requires that all observational data are available in a single file called OBS_DOMAINd01 (where d is the domain number), whereas OBSGRID creates one file per time. Therefore, to use these files in WRF, they should first be concatenated to a single file. A script (run_cat_obs_files.csh) is provided for this purpose. By running this script, the original OBS_DOMAINd01 files will be moved to OBS_DOMAINd01_sav, and a new OBS_DOMAINd01 file (containing all the observations for all times) will be created. This new file can be used directly in the WRF observational nudging code.
+使用这些文件代替WPS中的`met_em*`文件来生成WRF的初始条件和边界条件。要在运行real.exe时使用这些文件，可以执行以下两项操作之一：
 
-qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt(.nc)
-This file contains a listing of all of the observations available for use by the OBSGRID program.
-•	The observations have been sorted and the duplicates have been removed. 
-•	Observations outside of the analysis region have been removed. 
-•	Observations with no information have been removed. 
-•	All reports for each separate location (different levels, but at the same time) have been combined to form a single report. 
-•	Data that has had the "discard" flag internally set (data which will not be sent to the quality control or objective analysis portions of the code) are not listed in this output. 
-•	The data have gone through an expensive test to determine if the report is within the analysis region, and the data have been given various quality control flags. Unless a blatant error in the data is detected (such as a negative sea-level pressure), the observation data are not typically modified, but only assigned quality control flags.
-•	Two files are available, both containing identical information. One is the older ASCII format, while the other is in netCDF format. 
-•	The data in the ASCII file can be used as input to the plotting utility plot_sounding.exe 
-•	The netCDF file can be used to plot both station data (util/station.ncl) and sounding data (util/sounding.ncl). This is available since version 3.7 and is the recommended option. 
+1. 将`metoa_em*`文件重命名或链接为`met_em*`。这样，real.exe将自动读取此文件。
 
-qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt(.nc)
-These files are similar to the above “raw” files, and can be used in the same way. But in this case it contains the data used by the OBSGRID program, which are also the data saved to the OBS_DOMAINdxx files.
-qc_obs_used_earth_relative.dn.YYYY-MM-DD_HH:mm:ss.tttt(.nc)
-These files are identical to the above "qc_obs_used" files except that the winds are in an earth-relative framework rather than a model-relative framework.  The non-netCDF version of these files can be used as input for the Model Evaluation Tools (MET; http://www.dtcenter.org/met/users/).
+2. 使用WRF的`namelist.input`文件中的`auxinput1_inname`选项覆盖real.exe使用的默认文件名。为此，在运行real.exe之前，将以下内容添加到WRF `namelist.input`文件的`&time_control`部分中（准确完整的使用下面的语法——请勿用实际数字代替`<domain>`和`<date>`）：
 
-plotobs_out.dn.YYYY-MM-DD_HH:mm:ss.tttt
-This file lists data by variable and by level, where each observation that has gone into the objective analysis is grouped with all of the associated observations for plotting or some other diagnostic purpose. The first line of this file is the necessary FORTRAN format required to input the data. There are titles over the data columns to aid in the information identification. Below are a few lines from a typical file. This data can be used as input to the plotting utility plot_level.exe. But since version 3.7, it is recommended to use the station.ncl script that uses the data in the new netCDF data files. 
+`auxinput1_inname = "metoa_em.d<domain>.<date>"`
 
+### wrfsfdda_dn
+
+在OBSGRID中使用地面FDDA选项将创建一个名为`wrfsfdda_dn`的文件。该文件包含以INTF4D间隔进行的表面分析，包括T、TH、U、V、RH、QV、PSFC、PMSL的分析，以及每个网格点250km以内的观测点计数。
+
+由于WRF模型的输入要求，在每个时间间隔提供当前时间（`_OLD`）的数据和下次时刻（`_NEW`）的数据。由于此要求，用户必须注意在WRF fdda部分中为地面微调设置的时间间隔应该与OBSGRID中用于创建`wrfsfdda_dn`文件的时间间隔相同。这也意味着，用户可能需要OBSGRID可用的数据才能创建地面分析，该数据超出了WRF地面分析微调实际使用的最后一次分析所用数据。对于减速长度为正值，即使将在整个减速期间微调减速开始时的`_OLD`字段，WRF也需要在减速周期的开始时刻需要`_NEW`字段。
+
+### OBS_DOMAINdxx
+
+这些文件可在WRF中用于观测微调。该文件的格式与标准`wrf_obs/little_r`格式略有不同。有关观测微调的详细信息，请参见[观测微调用户指南](http://www2.mmm.ucar.edu/wrf/users/docs/ObsNudgingGuide.pdf )或本用户指南第5章的[观测微调](users_guide_chap5.md#Observation_Nudging)。
+
+文件名中的“d”代表区域编号。“xx”只是一个序列号。
+
+这些文件包含OBSGRID程序可使用的所有观测值的列表。
+
+- 对观测值进行了分类，删除了重复项。
+
+- 删除了分析区域之外的观测值。
+ 
+- 删除了没有信息的观测值。
+
+- 把每个单独位置（同一时刻不同层上）的所有报告合并为一个报告。
+
+- 内部设置了“discard（丢弃）”标志的数据（不会发送到代码的质量控制或客观分析部分的数据）不会在此输出中列出。
+
+- 数据经过了大量的测试，以确定报告是否在分析区域内，并且为数据提供了各种质量控制标记。除非检测到数据中的明显错误（例如海平面压力为负值），否则通常不会修改观测数据，而只会修改分配的质量控制标记。
+
+- QC标志高于指定值（用户通过namelist控制）的数据将被设置为丢失数据。
+
+WRF观测微调代码要求所有观测数据都在一个称为`OBS_DOMAINd01`的文件中可用（其中d是区域编号），而OBSGRID每个时刻都会创建一个此类文件。因此，要在WRF中使用这些文件，应首先将它们串联到单个文件中。为此提供了一个脚本（`run_cat_obs_files.csh`）。通过运行此脚本，原始的`OBS_DOMAINd01`文件将被移至`OBS_DOMAINd01_sav`，并且将创建一个新的`OBS_DOMAINd01`文件（包含所有时间的所有观测值）。此新文件可以直接在WRF观测微调代码中使用。
+
+### qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt(.nc)
+
+该文件包含OBSGRID程序可使用的所有观测值的列表。
+
+- 对观测值进行了分类，删除了重复项。
+
+- 删除了分析区域之外的观测值。
+
+- 删除了没有信息的观测值。
+
+- 把每个单独位置（同一时刻不同层上）的所有报告合并为一个报告。
+
+- 内部设置了“discard（丢弃）”标志的数据（不会发送到代码的质量控制或客观分析部分的数据）不会在此输出中列出。
+
+- 数据经过了大量的测试，以确定报告是否在分析区域内，并且为数据提供了各种质量控制标记。除非检测到数据中的明显错误（例如海平面压力为负值），否则通常不会修改观测数据，而只会修改分配的质量控制标记。
+
+- 提供了两个文件，两个文件都包含相同的信息。一个是较旧的ASCII格式，而另一个是netCDF格式。
+
+- ASCII格式文件中的数据可用作绘图工具plot_sounding.exe的输入。
+
+- netCDF格式文件可用于绘制站点数据（`util/station.ncl`）和探空数据（`util/sounding.ncl`）。从3.7版开始可用，这是推荐的选项。
+
+### qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt(.nc)
+
+这些文件类似于上面的“raw（原始）”文件，并且可以以相同的方式使用。但是它包含了OBSGRID程序使用的数据，也就是保存到`OBS_DOMAINdxx`文件中的数据。
+
+### qc_obs_used_earth_relative.dn.YYYY-MM-DD_HH:mm:ss.tttt(.nc)
+
+此文件与上面的`qc_obs_used`文件相同，除了风位于相对于地球的框架中，而不是相对于模型的框架中。这些文件的非netCDF版本可以用作模型评估工具[MET](http://www.dtcenter.org/met/users/ )的输入。
+
+### plotobs_out.dn.YYYY-MM-DD_HH:mm:ss.tttt
+
+此文件按变量和层列出数据，其中将已进入客观分析的每个观测与所有相关观测分组在一起，以进行绘图或其他诊断目的。该文件的第一行是输入数据所需的必要FORTRAN格式。数据列上方有标题，以帮助识别信息。以下是典型文件的几行内容。该数据可用作绘图实用程序`plot_level.exe`的输入。但是从3.7版开始，建议使用`station.ncl`脚本，该脚本使用新的netCDF文件中的数据。
+
+```
 ( 3x,a8,3x,i6,3x,i5,3x,a8,3x,2(g13.6,3x),2(f7.2,3x),i7 ) 
 Number of Observations 00001214 
 Variable Press  Obs    Station Obs        Obs-1st   X         Y         QC 
@@ -315,101 +348,134 @@ U        1001   4      CWAR    1.20569    1.07567   159.53    121.07    0
 U        1001   5      CYQX    0.470500  -2.10306   156.58    125.17    0 
 U        1001   6      CWDO    0.789376  -3.03728   155.34    127.02    0 
 U        1001   7      CWDS    0.846182   2.14755   157.37    118.95    0 
+```
 
 <a id=Plot_Utilities></a>
 
 ## 图形工具
 
-The OBSGRID package provides two utility programs for plotting observations. These programs are called plot_soundings.exe and plot_levels.exe. These optional programs use NCAR Graphics to build, which is often problematic. Two new NCL scripts are provided instead, sounding.ncl and station.ncl. Using these as opposed to the Fortran code are recommended. 
-sounding.ncl / plot_soundings.exe
-The script util/sounding.ncl plots soundings. This script generates soundings from the netCDF files qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc and qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc. Only data that are on the requested analysis levels are processed. 
-By default the script will plot the data from all the “qc_obs_used” files in the directory. This can be customized through the use of command line setting. For example:
-	ncl ./util/sounding.ncl 'qcOBS="raw"'
-		will plot data from the “qc_obs_raw” files
-	ncl util/sounding.ncl YYYY=2010 MM=6
-		will plot data from the “qc_obs_used” files for June 2010
-Available command line options are:
-qcOBS	Dataset to use. Options are “raw” or “used”. Default is “used”
-YYYY	Integer year to plot. Default is all available years.
-MM	Integer month to plot. Default is all available months.
-DD	Integer day to plot. Default is all available days.
-HH	Integer hour to plot. Default is all available hours.
-outTYPE	Output type. Default is plotting to the screen, i.e., “x11”. Other options are “pdf” or “ps”.
-The script creates the following output files(s):
-qc_obs_<qcOBS>.sounding.<date>.<outTYPE> for instance:
-qc_obs_used.sounding.2010-03-06_09.pdf 
+OBSGRID软件包提供了两个实用程序来绘制观测数据，包括`plot_soundings.exe`和`plot_levels.exe`。这些可选程序使用NCAR Graphics进行构建，这通常是有问题的。新的版本提供了两个新的NCL脚本来代替，即`sounding.ncl`和`station.ncl`。建议使用这些脚本而不是Fortran代码。
 
-The older program plot_soundings.exe also plots soundings. This program generates soundings from the qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt and qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt data files. Only data that are on the requested analysis levels are processed. The program uses information from &record1, &record2 and &plot_sounding in the namelist.oa file to generate the required output. The program creates output file(s): sounding_<file_type>_<date>.cgm
+### sounding.ncl / plot_soundings.exe
 
-plot_level.exe
-The script util/station.ncl creates station plots for each analysis level. These plots contain both observations that have passed all QC tests and observations that have failed the QC tests. Observations that have failed the QC tests are plotted in various colors according to which test failed. This script generates soundings from the netCDF files qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc and qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc.
-By default the script will plot the data from all the “qc_obs_used” files in the directory. This can be customized through the use of command line setting. For example:
-	ncl ./util/station.ncl 'qcOBS="raw"'
-		will plot data from the “qc_obs_raw” files
-	ncl util/station.ncl YYYY=2010 MM=6
-		will plot data from the “qc_obs_used” files for June 2010
-Available command line options are:
-qcOBS	Dataset to use. Options are “raw” or “used”. Default is “used”
-YYYY	Integer year to plot. Default is all available years.
-MM	Integer month to plot. Default is all available months.
-DD	Integer day to plot. Default is all available days.
-HH	Integer hour to plot. Default is all available hours.
-outTYPE	Output type. Default is plotting to the screen, i.e., “x11”. Other options are “pdf” or “ps”.
-The script creates the following output files(s):
-qc_obs_<qcOBS>.station.<date>.<outTYPE> for instance:
-qc_obs_used.station.2010-03-06_09.pdf 
-The older program plot_level.exe creates station plots for each analysis level. These plots contain both observations that have passed all QC tests and observations that have failed the QC tests. Observations that have failed the QC tests are plotted in various colors according to which test failed. The program uses information from &record1 and &record2 in the namelist.oa file to generate plots from the observations in the file plotobs_out.dn.YYYY-MM-DD_HH:mm:ss.tttt. The program creates the file(s): levels_<date>.cgm.
+脚本`util/sounding.ncl`用于绘制探空数据。该脚本从netCDF文件`qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc`和`qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc`中生成探空图件。仅处理位于需要的分析层中的数据。
+
+默认情况下，脚本将绘制目录中**所有**`qc_obs_used`文件中的数据。这可以通过使用命令行设置进行自定义。例如：
+
+`ncl ./util/sounding.ncl 'qcOBS="raw"'`
+		
+从`qc_obs_raw`文件中绘制数据
+
+`ncl util/sounding.ncl YYYY=2010 MM=6`
+
+从2010年6月的`qc_obs_used`文件中绘制数据
+
+可用的命令行选项包括：
+
+命令    | 说明
+--------|----
+qcOBS   | 要使用的数据集，选项包括`raw`或`used`，默认为`used`
+YYYY    | 要用于绘图的年份，整数格式，默认包括所有可用的年份
+MM      | 要用于绘图的月份，整数格式，默认包括所有可用的月份
+DD      | 要用于绘图的日，整数格式，默认包括所有可用的日
+HH      | 要用于绘图的小时，整数格式，默认包括所有可用的小时
+outTYPE | 输出类型，默认为绘制到屏幕上（即`x11`），其他可用的选项包括`pdf`或`ps`。本脚本创建以下输出文件：`qc_obs_<qcOBS>.sounding.<date>.<outTYPE>`，例如`qc_obs_used.sounding.2010-03-06_09.pdf`
+
+较早的`plot_soundings.exe`程序也可以绘制探空数据。该程序从`qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt`和`qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt`数据文件生成探空图件。仅处理位于需要的分析层中的数据。该程序使用`namelist.oa`文件中的`&record1`、`&record2`和`&plot_sounding`中的信息来生成所需的输出。程序创建的输出文件为：`sounding_<file_type>_<date>.cgm`。
+
+### plot_level.exe
+
+脚本`util/station.ncl`为每个分析层创建站点图。这些图既包含已通过所有QC测试的观测结果，也包含未通过QC测试的观测结果。未通过QC测试的观测结果根据失败的测试类型以不同的颜色绘制。该脚本从netCDF文件`qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc`和`qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc`生成站点图。
+
+默认情况下，脚本将绘制目录中**所有**`qc_obs_used`文件中的数据。这可以通过使用命令行设置进行自定义。例如：
+
+`ncl ./util/station.ncl 'qcOBS="raw"'`
+
+从`qc_obs_raw`文件中绘制数据
+
+`ncl util/station.ncl YYYY=2010 MM=6`
+
+从2010年6月的`qc_obs_used`文件中绘制数据
+
+可用的命令行选项包括：
+
+命令    | 说明
+--------|----
+qcOBS   | 要使用的数据集，选项包括`raw`或`used`，默认为`used`
+YYYY    | 要用于绘图的年份，整数格式，默认包括所有可用的年份
+MM      | 要用于绘图的月份，整数格式，默认包括所有可用的月份
+DD      | 要用于绘图的日，整数格式，默认包括所有可用的日
+HH      | 要用于绘图的小时，整数格式，默认包括所有可用的小时
+outTYPE | 输出类型，默认为绘制到屏幕上（即`x11`），其他可用的选项包括`pdf`或`ps`。本脚本创建以下输出文件：`qc_obs_<qcOBS>.station.<date>.<outTYPE>`，例如`qc_obs_used.station.2010-03-06_09.pdf `
+
+较早的`plot_level.exe`程序为每个分析层创建站点图。这些图中既包含已通过所有QC测试的观测结果，也包含未通过QC测试的观测结果。未通过QC测试的观测结果根据失败的测试类型以不同的颜色绘制。该程序使用`namelist.oa`文件中的`&record1`和`&record2`中的信息来根据`plotobs_out.dn.YYYY-MM-DD_HH:mm:ss.tttt`文件中的观测结果生成图件。程序创建的输出文件为：`levels_<date>.cgm`。
 
 <a id=Obs_Format></a>
 
 ## 观测格式
 
-To make the best use of the OBSGRID program, it is important for users to understand the wrf_obs/little_r Observations Format.
-Observations are conceptually organized in terms of reports. A report consists of a single observation or set of observations associated with a single latitude/longitude coordinate.
-Examples
-•	a surface station report including observations of temperature, pressure, humidity, and winds.
-•	an upper-air station's sounding report with temperature, humidity, and wind observations at many height or pressure levels.
-•	an aircraft report of temperature at a specific lat/lon/height.
-•	a satellite-derived wind observation at a specific lat/lon/height.
-Each report in the wrf_obs/little_r Observations Format consists of at least four records:
-•	A report header record 
-•	one or more data records 
-•	an end data record 
-•	an end report record .
-The report header record is a 600-character-long record (much of which is unused and needs only dummy values) that contains certain information about the station and the report as a whole (location, station id, station type, station elevation, etc.). The report header record is described fully in the following table. Shaded items in the table are unused:
-Report header format
-Variable	Fortran I/O Format	Description
-latitude	F20.5	station latitude (north positive)
-longitude	F20.5	station longitude (east positive)
-id	A40	ID of station
-name	A40	Name of station
-platform	A40	Description of the measurement device
-source	A40	GTS, NCAR/ADP, BOGUS, etc.
-elevation	F20.5	station elevation (m)
-num_vld_fld	I10	Number of valid fields in the report
-num_error	I10	Number of errors encountered during the decoding of this observation
-num_warning	I10	Number of warnings encountered during decoding of this observation.
-seq_num	I10	Sequence number of this observation
-num_dups	I10	Number of duplicates found for this observation
-is_sound	L10	T/F Above-surface or surface (i.e., all non-surface observations should use T, even above-surface single-level obs)
-bogus	L10	T/F bogus report or normal one
-discard	L10	T/F Duplicate and discarded (or merged) report.
-sut	I10	Seconds since 0000 UTC 1 January 1970
-julian	I10	Day of the year
-date_char	A20	YYYYMMDDHHmmss
-slp, qc	F13.5, I7	Sea-level pressure (Pa) and a QC flag
-ref_pres, qc	F13.5, I7	Reference pressure level (for thickness) (Pa) and a QC flag
-ground_t, qc	F13.5, I7	Ground Temperature (T) and QC flag
-sst, qc	F13.5, I7	Sea-Surface Temperature (K) and QC
-psfc, qc	F13.5, I7	Surface pressure (Pa) and QC
-precip, qc	F13.5, I7	Precipitation Accumulation and QC
-t_max, qc	F13.5, I7	Daily maximum T (K) and QC
-t_min, qc	F13.5, I7	Daily minimum T (K) and QC
-t_min_night, qc	F13.5, I7	Overnight minimum T (K) and QC
-p_tend03, qc	F13.5, I7	3-hour pressure change (Pa) and QC
-p_tend24, qc	F13.5, I7	24-hour pressure change (Pa) and QC
-cloud_cvr, qc	F13.5, I7	Total cloud cover (oktas) and QC
-ceiling, qc	F13.5, I7	Height (m) of cloud base and QC
+为了充分利用OBSGRID程序，用户必须了解`wrf_obs/little_r`观测格式，这一点很重要。
+
+观测在概念上是根据报告进行组织的。报告由与单个纬度/经度坐标关联的单个观测值或一组观测值组成。
+
+例子
+
+- 地面站报告，包括对温度、压力、湿度和风的观测。
+
+- 高空站的探空报告，其中包含许多高度或压力层上的温度、湿度和风的观测。
+
+- 飞机的报告，包括特定纬度/经度/高度的温度。
+
+- 卫星观测，包括特定纬度/经度/高度的风观测。
+ 
+`wrf_obs/little_r`观测格式的每个报告至少包含四个部分：
+
+- 报告标题
+
+- 一个或多个数据
+
+- 数据结束符号
+
+- 报告结束符号
+
+报告标题是一个600个字符长的记录（其中许多未使用，仅需要虚拟值），其中包含有关站点和整个报告的某些信息（位置、站点ID、站点类型、站点海拔等）。下表中完整描述了报告标题记录。表中粗体的项目未使用：
+
+**报告标题格式**
+
+**变量**        | **Fortran I/O 格式** | **描述**
+----------------|----------------------|---------
+latitude        | F20.5     | station latitude (north positive)
+longitude       | F20.5     | station longitude (east positive)
+id              | A40       | ID of station
+name            | A40       | Name of station
+platform        | A40       | Description of the measurement device
+source          | A40       | GTS, NCAR/ADP, BOGUS, etc.
+elevation       | F20.5     | station elevation (m)
+num_vld_fld     | I10       | Number of valid fields in the report
+**num_error     | I10       | Number of errors encountered during the decoding of this observation**
+**num_warning   | I10       | Number of warnings encountered during decoding of this observation**
+seq_num         | I10       | Sequence number of this observation
+**num_dups      | I10       | Number of duplicates found for this observation**
+is_sound        | L10       | T/F Above-surface or surface (i.e., all non-surface observations should use T, even above-surface single-level obs)
+bogus           | L10       | T/F bogus report or normal one
+discard         | L10       | T/F Duplicate and discarded (or merged) report.
+**sut           | I10       | Seconds since 0000 UTC 1 January 1970**
+**julian        | I10       | Day of the year**
+date_char       | A20       | YYYYMMDDHHmmss
+slp, qc         | F13.5, I7 | Sea-level pressure (Pa) and a QC flag
+**ref_pres, qc    | F13.5, I7 | Reference pressure level (for thickness) (Pa) and a QC flag**
+**ground_t, qc    | F13.5, I7 | Ground Temperature (T) and QC flag**
+**sst, qc         | F13.5, I7 | Sea-Surface Temperature (K) and QC**
+**psfc, qc        | F13.5, I7 | Surface pressure (Pa) and QC**
+**precip, qc      | F13.5, I7 | Precipitation Accumulation and QC**
+**t_max, qc       | F13.5, I7 | Daily maximum T (K) and QC**
+**t_min, qc       | F13.5, I7 | Daily minimum T (K) and QC**
+**t_min_night, qc | F13.5, I7 | Overnight minimum T (K) and QC**
+**p_tend03, qc    | F13.5, I7 | 3-hour pressure change (Pa) and QC**
+**p_tend24, qc    | F13.5, I7 | 24-hour pressure change (Pa) and QC**
+**cloud_cvr, qc   | F13.5, I7 | Total cloud cover (oktas) and QC**
+**ceiling, qc     | F13.5, I7 | Height (m) of cloud base and QC**
+
 Following the report header record are the data records. These data records contain the observations of pressure, height, temperature, dewpoint, wind speed, and wind direction. There are a number of other fields in the data record that are not used on input. Each data record contains data for a single level of the report. For report types that have multiple levels (e.g., upper-air station sounding reports), each pressure or height level has its own data record. For report types with a single level (such as surface station reports or a satellite wind observation), the report will have a single data record. The data record contents and format are summarized in the following table
 Format of data records
 Variable	Fortran I/O Format	Description
