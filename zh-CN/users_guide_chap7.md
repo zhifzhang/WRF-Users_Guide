@@ -545,15 +545,15 @@ namelist `record1`中的数据定义了要处理的分析时间：
 
 **Namelist变量** | **取值** | **描述**
 -----------------|----------|---------
-start_year  | 2000  | 4-digit year of the starting time to process
-start_month | 01    | 2-digit month of the starting time to process
-start_day   | 24    | 2-digit day of the starting time to process
-start_hour  | 12    | 2-digit hour of the starting time to process
-end_year    | 2000  | 4-digit year of the ending time to process
-end_month   | 01    | 2-digit month of the ending time to process
-end_day     | 25    | 2-digit day of the ending time to process
-end_hour    | 12    | 2-digit hour of the ending time to process
-interval    | 21600 | Time interval (s) between consecutive times to process
+start_year       | 2000     | 要处理的开始日期的4位数年
+start_month      | 01       | 要处理的开始日期的2位数月
+start_day        | 24       | 要处理的开始日期的2位数日
+start_hour       | 12       | 要处理的开始日期的2位数小时
+end_year         | 2000     | 要处理的结束日期的4位数年
+end_month        | 01       | 要处理的结束日期的2位数月
+end_day          | 25       | 要处理的结束日期的2位数日
+end_hour         | 12       | 要处理的结束日期的2位数小时
+interval         | 21600    | 连续处理时段之间的时间间隔（单位：s）
 
 ### Namelist record2
 
@@ -561,12 +561,12 @@ interval    | 21600 | Time interval (s) between consecutive times to process
 
 **Namelist变量** | **取值** | **描述**
 -----------------|----------|---------
-grid_id                   | 1         | ID of domain to process 
-obs_filename              | CHARACTER | Root file name (may include directory information) of the observational files. All input files must have the format obs_filename:<YYYY-MM-DD_HH>. One file required for each time period.If a wrfsfdda is being created, then similar input data files are required for each surface fdda time.
-remove_data_above_qc_flag | 200000    | Data with qc flags higher than this will not be output to the OBS_DOMAINdxx files. Default is to output all data. Use 65536 to remove data that failed the buddy and error max tests. To also exclude data outside analysis times that could not be QC-ed use 32768 (recommended). This does not affect the data used in the OA process.
-remove_unverified_data    | .FALSE.   | By setting this parameter to .TRUE. (recommended) any observations that could not be QC'd due to having a pressure insufficiently close to an analysis level will be removed from the OBS_DOMAINdxx files.  Obs QC'd by adjusting them to a nearby analysis level or by comparing them to an analysis level within a user-specified tolerance will be included in the OBS_DOMAINdxx files.  See use_p_tolerance_one_lev in &record4.
-trim_domain               | .FALSE.   | Set to .TRUE. if this domain must be cut down on output
-trim_value                | 5         | Value by which the domain will be cut down in each direction 
+grid_id                   | 1         | 要处理的区域ID 
+obs_filename              | CHARACTER | 观测文件的根文件名（可能包括目录信息）。所有输入文件的格式必须为`obs_filename:<YYYY-MM-DD_HH>`。每个时间段需要一个文件。如果同时要创建wrfsfdda，则每个地面fdda时间需要类似的输入数据文件。
+remove_data_above_qc_flag | 200000    | QC标志高于此值的数据将不会输出到`OBS_DOMAINdxx`文件。默认值是输出所有数据。使用`65536`删除未通过buddy和error max测试的数据。若要排除分析时间以外不能进行质量控制的数据，则使用`32768`（推荐）。这不会影响OA过程中使用的数据。
+remove_unverified_data    | .FALSE.   | 通过将此参数设置为`.TRUE.`(建议值），由于压力不足以接近分析层而无法进行质量控制的任何观测将从`OBS_DOMAINdxx`文件中删除。Obs质量控制（通过将其调整到附近的分析层或将其与用户指定公差范围内的分析层进行比较）将包含在`OBS_DOMAINdxx`文件中。请参阅`&record4`中的`use_p_tolerance_one_lev`选项
+trim_domain               | .FALSE.   | 设置为.TRUE.时，则此区域在输出时减小一定的范围
+trim_value                | 5         | 区域各个方向上减小的网格点数
 
 准备处理的`met_em*`文件必须在OBSGRID/目录中可用。
  
@@ -588,8 +588,8 @@ trim_value                | 5         | Value by which the domain will be cut do
 
 **Namelist变量** | **取值** | **描述**
 -----------------|----------|---------
-max_number_of_obs       | 10000  | Anticipated maximum number of reports per time period
-fatal_if_exceed_max_obs | .TRUE. | T/F flag allows the user to decide the severity of not having enough space to store all of the available observation
+max_number_of_obs       | 10000  | 每个时间段的预期最大报告数
+fatal_if_exceed_max_obs | .TRUE. | T/F标志允许用户决定没有足够空间来存储所有可用观测时的处理方式
 
 ### Namelist record4
 
@@ -627,108 +627,146 @@ max_p_extend_w             | 1300    | Pressure difference (Pa) through which a 
 
 露点质量控制：
 
-Note that the dewpoint error max check and buddy check are using the same moisture field as the relative humidity checks.  The dewpoint checks are to allow for an additional level of quality control on the moisture fields and may be helpful for dry observations where RH differences may be small but dewpoint differences are much larger.  The maximum dewpoint thresholds are scaled based on the observed dewpoint to increase the threshold for dry conditions where larger dewpoint variations are expected.  If the user does not wish to use dewpoint error checks, simply set the thresholds to very large values.
+请注意，露点错误最大值检查和伙伴检查与相对湿度检查使用相同的湿度场。露点检查允许对湿度场进行额外的质量控制，并可能有助于干燥观测，其中相对湿度差异可能很小，但露点差异要大得多。最大露点阈值根据观测到的露点进行缩放，以增加预期露点变化较大的干燥条件下的阈值。如果用户不希望使用露点错误检查，只需将阈值设置为非常大的值。
 
-Quality control of single-level above-surface observations:
+地面以上单层观测的质量控制：
 
-Option 1:  use_p_tolerance_one_lev = .FALSE.:
-For single-level above-surface observations marked as 'FM-88 SATOB' or 'FM-97 AIREP', the observations are adjusted to the nearest pressure level.  If the observation's pressure is within max_p_extend_t Pa of the nearest first-guess level, the temperature of the observation is adjusted to the first-guess level using a standard lapse rate, otherwise the temperature is marked as missing.  If the observation’s pressure is within max_p_extend_w Pa of the nearest first-guess level, the winds are used without adjustment.  The dewpoint is marked as missing regardless of the pressure of the observation. The pressure of the observation is changed to be the pressure of the pressure level against which it is being quality controlled.
-If a single-level above-surface observation is marked as anything other than ‘FM-88 SATOB’ or ‘FM-97 AIREP’, it appears that it will not be quality controlled unless its pressure happens to exactly match one of the pressure levels in the first guess field.  Note that max_p_tolerance_one_lev_qc is ignored if use_p_tolerance_one_lev = .FALSE.
-Option 2: use_p_tolerance_one_lev = .TRUE.:
-For all single-level above-surface observations, the observations will be quality controlled as long as the closest first-guess field is within max_p_tolerance_one_lev_qc Pa of the observation.  In order to allow all single-level above-surface observations to be close enough to a first-guess pressure level that quality control directly comparing the closest pressure level to the observation is valid, the user may need to interpolate the first guess to additional pressure levels prior to ingestion into OBSGRID.  OBSGRID will print out the pressure ranges for which error max quality control is not available (i.e., the pressures for which single-level above-surface observations will not be quality controlled).  See max_p_tolerance_one_lev_oa in namelist record9 for the equivalent pressure tolerance for creating objective analyses.  Note that max_p_extend_t and max_p_extend_w are ignored if use_p_tolerance_one_lev = .TRUE.
+选项 1：`use_p_tolerance_one_lev = .FALSE.`
 
-Namelist record5
-The data in &record5 control the enormous amount of printout that may be produced by the OBSGRID program. These values are all logical flags, where TRUE will generate output and FALSE will turn off output.
-print_obs_files ; print_found_obs ; print_header ; print_analysis ;print_qc_vert ; print_qc_dry ; print_error_max ; print_buddy ;print_oa
+对于标记为`FM-88 SATOB`或`FM-97 AIREP`的地面以上单层观测值，会将观测值调整至最近的压力层。如果观测的压力在最接近的第一猜测层的`max_p_extend_t Pa`内，则使用标准递减率将观测的温度调整到第一猜测层，否则温度被标记为缺失。如果观测的气压在最接近的第一猜测层的`max_p_extend_w Pa`内，则直接使用风而不进行调整。无论观测压力如何，露点都被标记为缺失。观测压力改为质量控制所针对的压力层压力。
 
-Namelist record7
-The data in &record7 concern the use of the first-guess fields and surface FDDA analysis options. Always use the first guess. 
-Namelist Variable	Value	Description
-use_first_guess	.TRUE.	Always use first guess (use_first_guess=.TRUE.)
-f4d	.TRUE.	Turns on (.TRUE.) or off (.FALSE.) the creation of surface analysis files.
-intf4d	10800	Time interval in seconds between surface analysis times
-lagtem	.FALSE.	Use the previous time-period's final surface analysis for this time-period's first guess (lagtem=.TRUE.); or 
-Use a temporal interpolation between upper-air times as the first guess for this surface analysis (lagtem = .FALSE.)
+如果地面以上单层观测被标记为`FM-88 SATOB`或`FM-97 AIREP`以外的任何东西，则除非其压力恰好与第一猜测场中的一个压力层匹配，否则它不会受到质量控制。请注意，如果`use_p_tolerance_one_lev = .FALSE.`，则忽略`max_p_tolerance_one_lev_qc`。
 
-Namelist record8 
-The data in &record8 concern the smoothing of the data after the objective analysis. Note, only the differences fields (observation minus first-guess) of the analyzed are smoothed, not the full fields.
-Namelist Variable	Value	Description
-smooth_type	1	1 = five point stencil of 1-2-1 smoothing; 2 = smoother-desmoother
-smooth_sfc_wind	0	Number of smoothing passes for surface winds
-smooth_sfc_temp	0	Number of smoothing passes for surface temperature
-smooth_sfc_rh	0	Number of smoothing passes for surface relative humidity
-smooth_sfc_slp	0	Number of smoothing passes for sea-level pressure
-smooth_upper_wind	0	Number of smoothing passes for upper-air winds
-smooth_upper_temp	0	Number of smoothing passes for upper-air temperature
-smooth_upper_rh	0	Number of smoothing passes for upper-air relative humidity
+选项 2：`use_p_tolerance_one_lev = .TRUE.`
 
-Namelist record9 
-The data in &record9 concern the objective analysis options. There is no user control to select the various Cressman extensions for the radius of influence (circular, elliptical or banana). If the Cressman option is selected, ellipse or banana extensions will be applied as the wind conditions warrant.
-Namelist Variable	Value	Description
-oa_type	“Cressman”	“MQD” for multiquadric; “Cressman” for the Cressman-type scheme, "None" for no analysis, this string is case sensitive
-oa_3D_type	“Cressman”	Set upper-air scheme to “Cressman”, regardless of the scheme used at the surface
-oa_3D_option	0	How to switch between “MQD” and “Cressman” if not enough observations are available to perform “MQD”
-mqd_minimum_num_obs	30	Minimum number of observations for MQD
-mqd_maximum_num_obs	1000	Maximum number of observations for MQD
-radius_influence	5,4,3,2	Radius of influence in grid units for Cressman scheme
-radius_influence_sfc_mult	1.0	Multiply above-surface radius of influence by this value to get surface radius of influence
-oa_min_switch	.TRUE.	T = switch to Cressman if too few observations for MQD; F = no analysis if too few observations
-oa_max_switch	.TRUE.	T = switch to Cressman if too many observations for MQD; F = no analysis if too many observation
-scale_cressman_rh_decreases	.FALSE.	T = decrease magnitude of drying in Cressman analysis; F = magnitude of drying in Cressman analysis unmodified
-oa_psfc	.FALSE.	T = perform surface pressure objective analysis; F = surface pressure only adjusted by sea level pressure analysis
-max_p_tolerance_one_lev_oa	700	Pressure tolerance within which single-level above-surface observations can be used in the objective analysis (Pa)
-When oa_type is set to Cressman, then the Cressman scheme will be performed on all data.
-When oa_type is set to None, then no objective analysis will be performed on any data.
-When oa_type is set to MQD, there are a wide variety of options available that control when the code will revert back to the Cressman scheme. 
-•	oa_max_switch ; mqd_maximum_num_obs
-The code will revert back to Cressman if the switch is set to true and the maximum number of observations is exceeded.
-This is to reduce the time the code runs and not for physical reasons.
-Recommended to leave switch set to true and just set the maximum number large.
+对于所有地面以上单层观测，只要最接近的第一猜测场在观测的`max_p_tolerance_one_lev_qc Pa`范围内，观测都将受到质量控制。为了使所有地面以上单层观测值足够接近第一猜测的压力层，以便质量控制直接将最近的压力层与观测值进行比较是有效的，用户可能需要在摄取到OBSGRID之前将第一猜测插入额外的压力层。OBSGRID将打印出错误最大质量控制不可用的压力范围（即地面以上单层观测不受质量控制的压力）。有关创建客观分析的等效压力公差，请参见namelist `record9`中的`max_p_tolerance_one_lev_oa`。请注意，如果`use_p_tolerance_one_lev = .TRUE.`，则忽略`max_p_extend_t`和`max_p_extend_w`。
 
-•	oa_min_switch ; mqd_minimum_num_obs
-The code will revert back to Cressman if the switch is set to true and there are too few  observations. How and when the code reverts back to Cressman under these conditions are controlled by the oa_3D_option parameter.
-Recommended to leave switch set to true and start with the default minimum settings.
+### Namelist record5
 
-•	oa_3D_type=”Cressman”
-All upper-air levels will use the Cressman scheme, regardless of other settings.
- 
-The surface will use MQD as long as there are enough observations to do so (mqd_maximum_num_obs ; mqd_minimum_num_obs), otherwise it will revert to the Cressman scheme. 
-Note that if some time periods have enough observations and others do not, the code will only revert to Cressman for the times without sufficient observations. 
+`&record5`中的数据用来控制OBSGRID程序可能产生的大量打印输出。这些值都是逻辑标志，其中`TRUE`将生成输出，`FALSE`将关闭输出。
 
-•	oa_3D_option
-There are three options (0,1,2). For all these options the surface will use MQD as long as there are enough observations to do so (mqd_maximum_num_obs ; mqd_minimum_num_obs), otherwise it will revert to the Cressman scheme. 
-Note that if some time periods have enough observations and others do not, the code will only revert to Cressman for the times without sufficient observations.
+`print_obs_files ; print_found_obs ; print_header ; print_analysis ;print_qc_vert ; print_qc_dry ; print_error_max ; print_buddy ;print_oa`
 
-The upper-air will react as follows:
-0 (default): MQD is performed in the upper-air as long as there are enough observations to do so (mqd_maximum_num_obs ; mqd_minimum_num_obs). As soon as this is no longer the case, the code will STOP, with suggestions as to which parameters to set to run the code correctly. 
+### Namelist record7
 
-1: The code will first check to see if, for a given time, all levels and variables in the upper-air have sufficient observations for the MQD scheme. If not, the code will revert to Cressman for that time period. Note that if some time periods have enough observations and others do not, the code will only revert to Cressman for the times without sufficient observations.
+`&record7`中的数据涉及第一猜测场和地面FDDA分析选项的使用。总是用第一猜测。
 
-2: The code will check if sufficient observations are available per time, level, and variable for the MQD scheme. If not, the code will revert to the Cressman scheme for that particular time, level and variable. Note this can result in uncontrolled switching between MQD and Cressman.  Therefore this option is not recommended. 
-radius_influence
-There are three ways to set the radius of influence (RIN) for the Cressman scheme:
-•	Manually: Set the RIN and number of scans directly. E.g., 5,4,3,2, will result in 4 scans. The first will use 5 grid points for the RIN and the last, 2 points.
-•	Automatically 1: Set RIN to 0 and the code will calculate the RIN based on the domain size and an estimated observation density of 325 km. By default there will be 4 scans.
-•	Automatically 2: Set RIN to a negative number and the code will calculate the RIN based on the domain size and an estimated observation density of 325 km. The number of scans is controlled by the value of the set number. E.g, -5 will result in 5 scans. 
+**Namelist变量** | **取值** | **描述**
+-----------------|----------|---------
+use_first_guess  | .TRUE.   | 总是用第一猜测，即设置`use_first_guess=.TRUE.`
+f4d              | .TRUE.   | 打开（`.TRUE.`）或关闭（`.FALSE.`）地面分析文件的创建
+intf4d           | 10800    | 地面分析时间之间的时间间隔（以秒为单位）
+lagtem           | .FALSE.  | 使用上一个时间段的最终地面分析作为这个时间段的第一猜测（`lagtem=.TRUE.`）；或者使用高空时间之间的时间插值作为此地面分析的第一猜测（`lagtem=.FALSE.`）
 
-radius_influence_sfc_mult 
-The RIN calculated as described above is multiplied by this value to determine the RIN for surface observations.  This allows the finer scale structures observed at the surface to be retained.  If this multiplication results in a RIN greater than 100 model grid points, then the RIN on the first scan is scaled to be 100 model grid points and all subsequent scans are scale by that same ratio.  This is to prevent features from being washed out on fine-scale domains.  In order to minimize “spots” on the solution, any scan with a RIN less than 4.5 model grid points is skipped. If this is set to 1.0 then the RIN for surface observations will match the RIN for above-surface observations.
+### Namelist record8
 
-scale_cressman_rh_decreases 
-This option is meant to mitigate overdrying that can occur when the need for drying diagnosed via an observation at one point is spread to another point where the first guess is already drier than the first guess at the location of the observation  If this option is set to true then drying applied to a point where the first guess is drier than the first guess at the observation location is scaled by the ratio first guess relative humidity at the point the drying is being applied to divided by the first guess relative humidity at the location of the observation. 
- 
-Note that this scaling is applied on each Cressman scan.  See Reen et al. 2016 (http://dx.doi.org/10.1175/JAMC-D-14-0301.1) for further details.
- 
-oa_psfc 
-An objective analysis of surface pressure may allow Obsgrid surface analyses of other fields to be more effectively utilized in WRF if the first-guess surface pressure field is sufficiently coarse compared to the WRF domains (e.g., Reen 2015; http://www.arl.army.mil/arlreports/2015/ARL-TR-7447.pdf).  This is because the surface pressure analysis may provide a better estimate of the pressure of the surface analyses and thus WRF is less likely to erroneously reject the surface analyses as being too distant from the actual surface.  If there are an insufficient number of observations or if the first-guess surface pressure is not much coarser than WRF, this capability is less likely to add value.
- 
-max_p_tolerance_one_lev_oa
-If use_p_tolerance_one_lev = .TRUE. in record4, then max_p_tolerance_one_lev_oa is the pressure tolerance (Pa) allowed between single-level above-surface observations and the pressure level they are being used in an objective analysis. If use_p_tolerance_one_lev = .FALSE. in record4, then max_p_tolerance_one_lev_oa is not used by OBSGRID.
+`&record8`中的数据用于客观分析之后数据的平滑。请注意，仅对分析结果的差异场（观测值减去第一猜测值）进行平滑处理，而不是对整个场进行平滑处理。
 
-Namelist plot_sounding
-Only used for the utility plot_sounding.exe
-Namelist Variable	Value	Description
-file_type	“raw”	File to read to produce the plots. Options are “raw” or “used”
-read_metoa	.TRUE.	If set to .TRUE., the model domain information in the metoa_em files will be used to add location information on the plot.
+**Namelist变量**  | **取值** | **描述**
+------------------|----------|---------
+smooth_type       | 1 | 1 = five point stencil of 1-2-1 smoothing; 2 = smoother-desmoother
+smooth_sfc_wind   | 0 | 地面风的平滑次数
+smooth_sfc_temp   | 0 | 地面温度的平滑次数
+smooth_sfc_rh     | 0 | 地面相对湿度的平滑次数
+smooth_sfc_slp    | 0 | 海平面压力的平滑次数
+smooth_upper_wind | 0 | 高空风的平滑次数
+smooth_upper_temp | 0 | 高空温度的平滑次数
+smooth_upper_rh   | 0 | 高空相对湿度的平滑次数
 
+### Namelist record9 
 
+`&record9`中的数据涉及客观分析选项。注意这里没有可以为影响半径（圆形、椭圆形或香蕉形）选择各种Cressman扩展的选项。如果选择了Cressman选项，则将根据风的情况应用椭圆或香蕉扩展。
+
+**Namelist变量** | **取值** | **描述**
+-----------------|----------|---------
+oa_type                     | “Cressman” | “MQD”即multiquadric，“Cressman”即Cressman类型方案，"None"即不进行分析，此字符串区分大小写
+oa_3D_type                  | “Cressman” | 将高空数据设置为“Cressman”方案，而不考虑在地面使用的方案
+oa_3D_option                | 0       | 如果没有足够的观测值来执行“MQD”时，如何在“MQD”和“Cressman”之间切换
+mqd_minimum_num_obs         | 30      | 用于MQD的最小观测数
+mqd_maximum_num_obs         | 1000    | 用于MQD的最大观测数
+radius_influence            | 5,4,3,2 | Cressman方案的影响半径（以网格点位单位）
+radius_influence_sfc_mult   | 1.0     | 将地面以上影响半径乘以本数值，即可得到地面影响半径
+oa_min_switch               | .TRUE.  | T=如果用于MQD的观测数太少，则切换到Cressman；F=如果观测数太少，则不进行分析
+oa_max_switch               | .TRUE.  | T=如果用于MQD的观测数太多，则切换到Cressman；F=如果观测数太多，则不进行分析
+scale_cressman_rh_decreases | .FALSE. | T=减少Cressman分析中的干燥度；F=不修改Cressman分析中的干燥度
+oa_psfc                     | .FALSE. | T=进行地面压力客观分析；F=仅通过海平面压力分析调整地面压力
+max_p_tolerance_one_lev_oa  | 700     | 可用于客观分析的地面以上单层观测的压力限值（Pa）
+
+当`oa_type`设置为`Cressman`时，将对所有数据执行Cressman方案。
+
+当`oa_type`设置为`None`时，将不对任何数据执行客观分析。
+
+当`oa_type`设置为`MQD`时，可以使用多种选项来控制何时将代码恢复为Cressman方案。
+
+- `oa_max_switch ; mqd_maximum_num_obs`
+
+如果将开关设置为true并且超过了最大观测数，则代码将恢复为Cressman。
+
+这是为了减少代码运行的时间，而不是出于物理原因。
+
+建议将开关设置为true，而将最大数设置为大的值。
+
+- `oa_min_switch ; mqd_minimum_num_obs`
+
+如果将开关设置为true并且观测值太少，则代码将恢复为Cressman。在这种情况下，代码如何以及何时恢复为Cressman，由`oa_3D_option`参数控制。
+
+建议将开关设置为true并以默认的最小设置开始。
+
+- `oa_3D_type=”Cressman”`
+
+无论其他设置如何，所有高空层数据都将使用Cressman方案。
+
+只要有足够的观测值（`mqd_maximum_num_obs; mqd_minimum_num_obs`），地面将使用`MQD`，否则它将恢复为Cressman方案。
+
+请注意，如果某些时间段有足够的观测值，而另一些时间段没有足够的观测值，则只在没有足够的观测值的时间段时，代码会恢复为Cressman方案。
+
+- `oa_3D_option`
+
+有三个选项（0,1,2）。对于所有这些选项，只要有足够的观测值（`mqd_maximum_num_obs; mqd_minimum_num_obs`），地面将使用`MQD`，否则它将恢复为Cressman方案。
+
+请注意，如果某些时间段有足够的观测值，而另一些时间段没有足够的观测值，则只在没有足够的观测值的时间段时，代码会恢复为Cressman方案。
+
+高空数据处理如下：
+
+0（默认值）：只要有足够的观测值（`mqd_maximum_num_obs; mqd_minimum_num_obs`），就在高空数据执行`MQD`。一旦不再是这种情况，代码将停止，并提供有关设置哪些参数以正确运行代码的建议。
+
+1：代码将首先检查在给定的时间内，高空的所有层和变量是否对MQD方案具有足够的观测值。如果没有，该时间段内的代码将恢复为Cressman。请注意，如果某些时间段有足够的观测值，而另一些时间段没有足够的观测值，则只在没有足够的观测值的时间段时，代码会恢复为Cressman方案。
+
+2：该代码将检查MQD方案的每个时间、层和变量是否有足够的观测值。如果没有，代码将在该特定时间、层和变量下恢复为Cressman方案。注意，这可能导致MQD和Cressman之间的不受控制的切换。因此不建议使用此选项。
+
+- `radius_influence`
+
+Cressman方案有三种影响半径（RIN）的设置选项：
+
+	- 手动：直接设置RIN和扫描次数。例如5、4、3、2将导致4次扫描。第一次将使用5个网格点作为RIN，最后一次使用2个网格点。
+	
+	- 自动1：将RIN设置为0，代码将根据区域的大小和325km的估计观测密度来计算RIN。默认情况下，将进行4次扫描。
+	
+	- 自动2：将RIN设置为负数，代码将根据区域的大小和325km的估计观测密度来计算RIN。扫描次数由设定的值控制。例如，设置为-5时将导致5次扫描。
+
+- `radius_influence_sfc_mult`
+
+将如上所述计算的RIN乘以本选项设置的值即可确定用于地面观测的RIN。这允许保留在地面观测的更精细的尺度结构。如果此乘数结果RIN大于100个模型网格点，则将第一次扫描的RIN缩放为100个模型网格点，并且所有后续扫描都以相同的比例缩放。这是为了防止特征在精细域上被消除。为了最小化解决方案上的`spots`，将跳过任何RIN小于4.5个模型网格点的扫描。如果将本选项设置为1.0，则用于地面观测的RIN将与用于地面以上观测的RIN一致。
+
+- `scale_cressman_rh_decreases`
+
+此选项的目的是减轻当通过观测在某个点诊断出的干燥需求散布到与观测点所在位置的第一猜测相比，比第一个猜测更干燥的另一点时可能发生的过度干燥。如果本项设置为true，则将干燥应用于施加到观测位置的第一猜测比第一猜测更干燥的点，然后按以下比例缩放该比例：应用干燥的点处的第一个猜测相对湿度除以位于该位置的第一个猜测相对湿度（这一段完全没看懂原文啥意思，翻译可能也不对）。
+
+请注意，此缩放比例适用于每次Cressman扫描。详见Reen et al. 2016 (http://dx.doi.org/10.1175/JAMC-D-14-0301.1 )了解更多详细信息。
+
+- `oa_psfc`
+
+如果第一猜测的地面压力场​​与WRF域相比足够粗糙，则对地面压力的客观分析可以使其他区域的Obsgrid表面分析在WRF中得到更有效的利用（例如Reen 2015; http://www.arl.army.mil/arlreports/2015/ARL-TR-7447.pdf ）。这是因为地面压力分析可以更好地估计地面分析的压力，因此WRF不太可能因为与实际地面的距离太远而错误地拒绝了地面分析。如果没有足够的观测值，或者如果第一猜测的地面压力没有比WRF粗糙，则此功能很难增加价值。
+
+- `max_p_tolerance_one_lev_oa`
+
+如果在`record4`中设置`use_p_tolerance_one_lev = .TRUE.`，那么`max_p_tolerance_one_lev_oa`是地面以上单层观测值与客观分析中使用的压力层之间允许的压力公差（Pa）。如果在record4中设置`use_p_tolerance_one_lev = .FALSE.`，则OBSGRID不使用`max_p_tolerance_one_lev_oa`。
+
+### Namelist plot_sounding
+
+仅用于plot_sounding.exe实用工具
+
+**Namelist变量** | **取值** | **描述**
+-----------------|----------|---------
+file_type        | “raw”    | 用于生成图件的文件类型，选项是“raw”或者“used” 
+read_metoa       | .TRUE.   | 如果设置为.TRUE.，则读取`metoa_em`文件中的模型区域信息，用于在绘图上添加位置信息
