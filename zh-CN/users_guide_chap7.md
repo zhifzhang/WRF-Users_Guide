@@ -507,28 +507,28 @@ num_vld_fld     | I7     | Number of valid fields in the report
 
 ### QCFlags（质量控制标记）
 
-在观测文件中，大多数气象数据字段还具有用于附加整数质量控制标记的空间。质量控制标记取值的形式为2n，其中n为正整数值。这允许添加各种质量控制标志，也允许将总和分解为各个组成部分。以下是当前应用于观测的质量控制标志：
+在观测文件中，大多数气象数据字段还具有用于附加整数质量控制标记的空间。质量控制标记取值的形式为2^n，其中n为正整数值。这允许添加各种质量控制标志，也允许将总和分解为各个组成部分。以下是当前应用于观测的质量控制标志：
 
 ```
-pressure interpolated from first-guess height      = 2 **  1 =      2 
-pressure int. from std. atmos. and 1st-guess height= 2 **  3 =      8
-temperature and dew point both = 0                 = 2 **  4 =     16
-wind speed and direction both = 0                  = 2 **  5 =     32
-wind speed negative                                = 2 **  6 =     64
-wind direction < 0 or > 360                        = 2 **  7 =    128
-level vertically interpolated                      = 2 **  8 =    256
-value vertically extrapolated from single level    = 2 **  9 =    512
-sign of temperature reversed                       = 2 ** 10 =   1024
-superadiabatic level detected                      = 2 ** 11 =   2048
-vertical spike in wind speed or direction          = 2 ** 12 =   4096
-convective adjustment applied to temperature field = 2 ** 13 =   8192 
-no neighboring observations for buddy check        = 2 ** 14 =  16384
+pressure interpolated from first-guess height      = 2 **  1 =      2   从第一猜测高度插入的压力
+pressure int. from std. atmos. and 1st-guess height= 2 **  3 =      8   压力整数来自于标准大气和第一猜测高度
+temperature and dew point both = 0                 = 2 **  4 =     16   温度和露点均等于0
+wind speed and direction both = 0                  = 2 **  5 =     32   风速和风向都等于0
+wind speed negative                                = 2 **  6 =     64   风速为负值
+wind direction < 0 or > 360                        = 2 **  7 =    128   风向数据小于0或大于360
+level vertically interpolated                      = 2 **  8 =    256   层垂直内插
+value vertically extrapolated from single level    = 2 **  9 =    512   从单个层垂直外推的值
+sign of temperature reversed                       = 2 ** 10 =   1024   温度反转的标记
+superadiabatic level detected                      = 2 ** 11 =   2048   检测到超绝热层
+vertical spike in wind speed or direction          = 2 ** 12 =   4096   风速或风向的垂直峰值
+convective adjustment applied to temperature field = 2 ** 13 =   8192   应用于温度场的对流调节
+no neighboring observations for buddy check        = 2 ** 14 =  16384   buddy check没有相邻观测点
 ---------------------------------------------------------------------- 
-data outside normal analysis time and not QC-ed    = 2 ** 15 =  32768
+data outside normal analysis time and not QC-ed    = 2 ** 15 =  32768   数据超出了正常分析时间且未进行质量控制
 ----------------------------------------------------------------------
-fails error maximum test                           = 2 ** 16 =  65536
-fails buddy test                                   = 2 ** 17 = 131072 
-observation outside of domain detected by QC       = 2 ** 18 = 262144
+fails error maximum test                           = 2 ** 16 =  65536   未通过error maximum测试
+fails buddy test                                   = 2 ** 17 = 131072   未通过buddy测试
+observation outside of domain detected by QC       = 2 ** 18 = 262144   质量控制检测到的区域之外的观测值
 ```
 
 <a id=Namelist></a>
