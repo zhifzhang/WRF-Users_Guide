@@ -597,33 +597,33 @@ fatal_if_exceed_max_obs | .TRUE. | T/F标志允许用户决定没有足够空间
 
 **Namelist变量** | **取值** | **描述**
 -----------------|----------|---------
-qc_psfc                    | .FALSE. | Execute error max and buddy check tests for surface pressure observations (temporarily converted to sea level pressure to run QC)
-Error Max Test:            |         | For this test there is a threshold for each variable. These values are scaled for time of day, surface characteristics and vertical level.
-qc_test_error_max          | .TRUE.  | Check the difference between the first-guess and the observation
-max_error_t                | 10      | Maximum allowable temperature difference (K)
-max_error_uv               | 13      | Maximum allowable horizontal wind component difference (m/s)
-max_error_z                | 8       | Not used
-max_error_rh               | 50      | Maximum allowable relative humidity difference (%)
-max_error_p                | 600     | Maximum allowable sea-level pressure difference (Pa
-max_error_dewpoint         | 20      | Maximum allowable dewpoint difference (K)
-Buddy Check Test:          |         | For this test there is a threshold for each variable. These values are similar to standard deviations.
-qc_test_buddy              | .TRUE.  | Check the difference between a single observation and neighboring observations
-max_buddy_t                | 8       | Maximum allowable temperature difference (K)
-max_buddy_uv               | 8       | Maximum allowable horizontal wind component difference (m/s)
-max_buddy_z                | 8       | Not used
-max_buddy_rh               | 40      | Maximum allowable relative humidity difference (%)
-max_buddy_p                | 800     | Maximum allowable sea-level pressure difference (Pa)
-max_buddy_dewpoint         | 20      | Maximum allowable dewpoint difference (K)
-buddy_weight               | 1.0     | Value by which the buddy thresholds are scaled
-Spike removal              |         | 
-qc_test_vert_consistency   | .FALSE. | Check for vertical spikes in temperature, dew point, wind speed and wind direction
-Removal of super-adiabatic lapse rates |   | 
-qc_test_convective_adj     | .FALSE. | Remove any super-adiabatic lapse rate in a sounding by conservation of dry static energy
-For satellite and aircraft observations, data are often horizontally spaced with only a single vertical level. The following entries determine how such data are dealt with and are described in more detail below the table. |   | 
-use_p_tolerance_one_lev    | .FALSE. | Should single-level above-surface observations be directly QC'd against nearby levels (.TRUE.) or extended to nearby levels (.FALSE.)
-max_p_tolerance_one_lev_qc | 700     | Pressure tolerance within which QC can be applied directly (Pa)
-max_p_extend_t             | 1300    | Pressure difference (Pa) through which a single temperature report may be extended
-max_p_extend_w             | 1300    | Pressure difference (Pa) through which a single wind report may be extended
+qc_psfc                    | .FALSE. | 对地面压力观测值（临时转换为海平面压力以运行质量控制）执行error max和buddy检查测试
+Error Max Test（最大错误测试）：|    | 本测试中每个变量都有一个阈值。这些阈值按时间（day）、地面特征和垂直层进行缩放
+qc_test_error_max          | .TRUE.  | 检查第一猜测和观测结果之间的差异
+max_error_t                | 10      | 最大允许温差（K）
+max_error_uv               | 13      | 最大允许水平风分量差（m/s）
+max_error_z                | 8       | 未使用
+max_error_rh               | 50      | 最大允许相对湿度差（%）
+max_error_p                | 600     | 最大允许海平面压力差（Pa）
+max_error_dewpoint         | 20      | 最大允许露点温差（K）
+Buddy Check Test（伙伴测试）：|      | 本测试中每个变量都有一个阈值。这些阈值类似于标准偏差。
+qc_test_buddy              | .TRUE.  | 检查单个观测值与相邻观测值之间的差异
+max_buddy_t                | 8       | 最大允许温差（K）
+max_buddy_uv               | 8       | 最大允许水平风分量差（m/s）
+max_buddy_z                | 8       | 未使用
+max_buddy_rh               | 40      | 最大允许相对湿度差（%）
+max_buddy_p                | 800     | 最大允许海平面压力差（Pa）
+max_buddy_dewpoint         | 20      | 最大允许露点温差（K）
+buddy_weight               | 1.0     | 缩放buddy阈值的比例
+Spike removal（去除峰值）：|         | 
+qc_test_vert_consistency   | .FALSE. | 检查温度、露点、风速和风向的垂直峰值
+去除超绝热的消失速率       |         | 
+qc_test_convective_adj     | .FALSE. | 通过保留干燥的静态能量，去除sounding中任何超绝热的消失速率
+对于卫星和飞机观测数据，在水平方向上通常只有一个垂直层。以下条目将确定如何处理此类数据，并在下表下方更详细地描述。|   |
+use_p_tolerance_one_lev    | .FALSE. | 地面以上单层观测是直接对比附近的层（.TRUE.）进行质量控制，还是扩展到附近的层（.FALSE.）进行质量控制
+max_p_tolerance_one_lev_qc | 700     | 可以直接应用质量控制的压力容差（Pa）
+max_p_extend_t             | 1300    | 可以从单个温度报告扩展的压力差（Pa）
+max_p_extend_w             | 1300    | 可以从单个风向报告扩展的压力差（Pa）
 
 露点质量控制：
 
