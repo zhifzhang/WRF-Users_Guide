@@ -383,7 +383,7 @@ outTYPE | 输出类型，默认为绘制到屏幕上（即`x11`），其他可�
 
 较早的`plot_soundings.exe`程序也可以绘制探空数据。该程序从`qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt`和`qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt`数据文件生成探空图件。仅处理位于需要的分析层中的数据。该程序使用`namelist.oa`文件中的`&record1`、`&record2`和`&plot_sounding`中的信息来生成所需的输出。程序创建的输出文件为：`sounding_<file_type>_<date>.cgm`。
 
-### plot_level.exe
+### station.ncl / plot_level.exe
 
 脚本`util/station.ncl`为每个分析层创建站点图。这些图既包含已通过所有QC测试的观测结果，也包含未通过QC测试的观测结果。未通过QC测试的观测结果根据失败的测试类型以不同的颜色绘制。该脚本从netCDF文件`qc_obs_raw.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc`和`qc_obs_used.dn.YYYY-MM-DD_HH:mm:ss.tttt.nc`生成站点图。
 
@@ -736,7 +736,7 @@ max_p_tolerance_one_lev_oa  | 700     | 可用于客观分析的地面以上单�
 
 - `radius_influence`
 
-Cressman方案有三种影响半径（RIN）的设置选项：
+	Cressman方案有三种影响半径（RIN）的设置选项：
 
 	- 手动：直接设置RIN和扫描次数。例如5、4、3、2将导致4次扫描。第一次将使用5个网格点作为RIN，最后一次使用2个网格点。
 	

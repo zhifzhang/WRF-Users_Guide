@@ -1556,9 +1556,11 @@ WRF提供了多种物理选项，可以以任何方式进行组合。这些选�
 
 1.21 **Morrison double-moment scheme with CESM aerosol（`mp_physics = 40`）**：必须与MSKF积云方案一起使用。
 
-1.22 **P3 (Morrison and Milbrandt)（`mp_physics = 50,51,52`）**：可预测的粒子特性方案。它有一个代表冰、雪和霰的组合的冰类别，并且还包含有边缘冰质量和边缘冰体积的预测数组。双时刻雨和冰方案（50）。P3-nc方案（51）：与P3相同，但增加了过饱和依赖活化和双时刻云水。P3-2ice方案（52）：与P3-nc相同，但有两个冰数组。
+1.22 **P3 (Morrison and Milbrandt)（`mp_physics = 50,51,52,53`）**：可预测的粒子特性方案。它有一个代表冰、雪和霰的组合的冰类别，并且还包含有边缘冰质量和边缘冰体积的预测数组。双时刻雨和冰方案（50）。P3-nc方案（51）：与50相同，但增加了过饱和依赖活化和双时刻云水。P3-2ice方案（52）：与P3-nc相同，但有两个冰数组。P3-3 moment（53）：与P3-nc（51）相同，但带有3-moment冰。
 
 1.23 **Jensen ISHMAEL（`mp_physics = 55`）**：该方案可预测冰晶生长中的颗粒形状和习惯。V4.1中的新功能。
+
+1.24 **National Taiwan University (NTU)（`mp_physics = 56`）**：液相的两相moment和冰相的三相moment，以及冰晶形状和密度变化的考虑因素（Tsai和Chen，2020，JAS）。
  
 #### 2.1 长波辐射方案（ra_lw_physics）
 
@@ -1603,9 +1605,11 @@ CO2的体积混合比值为379e-6，N2O为319e-9，CH4为1774e-9。有关随时�
 
 相关选项：
 
-- 坡度和阴影效果。`slope_rad = 1`根据地形坡度修改地表太阳辐射通量。`topo_shading = 1`允许相邻网格单元的阴影化。仅用于网格尺寸小于几公里的高分辨率运行。
+- `slope_rad = 1`：坡度和阴影效果。本选项根据地形坡度修改地表太阳辐射通量。`topo_shading = 1`允许相邻网格单元的阴影化。仅用于网格尺寸小于几公里的高分辨率运行。
 
 - `swrad_scat`：用于`ra_sw_physics = 1`的散射转动参数。默认值是1，相当于1.e-5m2/kg。当该值大于1时，会增加散射。
+
+- `ra_sw_eclipse = 1`：日蚀对短波辐射的影响，适用于RRTMG（4）、Goddard（5）、old Goddard（2）和Duhhia（1）短波辐射选项。1950年至2050年的日食数据在`run/eclipse_besselian_elements.dat`中提供。
 
 - `swint_opt = 1`：基于短波呼叫间太阳天顶角更新的短波辐射插值。
   
@@ -1718,11 +1722,11 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
  
 #### 3.3 城市表面（sf_urban_physics –替换旧的开关ucmcall）
 
-城市物理选项可与Noah LSM和NoahMP一起使用。 从V4.3开始，对代码进行了更新，以包括使用本地气候区的功能，该功能适用​​于所有三个城市应用（其他信息，请参见[此文档](https://www2.mmm.ucar.edu/wrf/users/docs/readme_bep_bem_v4.3_modifications.pdf )）。
+城市物理选项可与Noah LSM和NoahMP一起使用。 从V4.3开始，对代码进行了更新，以包括使用本地气候区的功能，该功能适用​​于所有三个城市应用（其他信息，请参见[此文档](https://ral.ucar.edu/sites/default/files/public/product-tool/urban-canopy-model/WRF_urban_update_Readme_file_WRF4.3.pdf )）。
 
 3.3.1 **Urban canopy model（`sf_urban_physics = 1`）**：3类UCM选项，具有针对屋顶、墙壁和街道的表面效果。包含绿色屋顶选项。
 
-3.3.2 **BEP，Building Environment Parameterization（`sf_urban_physics = 2`）**：多层城市雨棚模型，允许高于最低模型层的建筑物。仅适用于Noah LSM和Boulac和MYJ PBL选项。
+3.3.2 **BEP，Building Environment Parameterization（`sf_urban_physics = 2`）**：多层城市雨棚模型，允许高于最低模型层的建筑物。适用于Noah和NoahMP LSM，Boulac，MYJ PBL和YSU选项。
 
 3.3.3 **BEM，Building Energy Model（`sf_urban_physics = 3`）**：增加了BEP，通过供暖和制冷系统实现建筑能耗预算。与BEP的适用选项相同，即仅适用于Noah LSM和Boulac和MYJ PBL选项。
  
@@ -1773,6 +1777,8 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 4.13 **LES PBL**：提供了大涡模拟（large-eddy-simulation，LES）边界层。采用本选项时，需设置`bl_pbl_physic = 0`，`isfflx = 1`并选择`sf_sfclay_physics`和`sf_surface_physics`。本选项使用扩散进行垂直混合，并且必须使用`diff_opt = 2`和`km_opt = 2或3`，请参见下文。使用`isfflx = 0或2`选择运行LESPBL的其他理想方式。
 
 4.14 **SMS-3DTKE**：这是3D TKE子网格混合方案，可自适应大涡模拟（LES）和中尺度极限之间的网格大小。可以通过设置`bl_pbl_physic = 0`，`km_opt = 5`，`diff_opt = 2`来激活它，并且只能与`sf_sfclay_physics = 1，5，91`一起使用。4.2版的新功能。
+
+4.15 **TKE-TKE dissipation rate (epsilon) scheme，EEPS（`bl_pbl_physics = 16`）**：该方案可预测TKE以及TKE耗散率。它还可以同时考虑TKE和耗散率。它与地面物理选项1、91、2和5一起使用。
 
 #### 5 积云参数化（cu_physics）
 
@@ -1850,7 +1856,9 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
     
     - `rdlai2d`：设置为.true.时，使用来自geogrid的每月LAI数据，并且如果`sst_update`为1，则该字段也将转到wrflowinp文件。
 
-7.4 `gwd_opt`：重力波拖动选项。建议用于所有网格尺寸。该方案包括两个子网格的地形效果：重力波阻力和低水平流阻。方案的输入风将旋转到地球坐标，然后将输出调整回投影域。这使该方案可以用于WRF支持的所有地图投影。为了正确应用此选项，必须使用来自geogrid的适当输入字段。有关详细信息，请参见本指南[第3章中的“为重力波拖曳方案选择静态数据”部分](users_guide_chap3.md#Selecting_Static_Data )。
+7.4 `gwd_opt=1`：重力波拖动选项。建议用于所有网格尺寸。该方案包括两个子网格的地形效果：重力波阻力和低水平流阻。方案的输入风将旋转到地球坐标，然后将输出调整回投影域。这使该方案可以用于WRF支持的所有地图投影。为了正确应用此选项，必须使用来自geogrid的适当输入字段。有关详细信息，请参见本指南[第3章中的“为重力波拖曳方案选择静态数据”部分](users_guide_chap3.md#Selecting_Static_Data )。
+
+`gwd_opt = 3`：高于+两个子网格规模的地形阻力：一个是Tsiringakis等人的小型GWD（QJRMS，2017），代表重力波在稳定边界层内和之上的传播和破裂；另一种是Beljaars等人的湍流地形形式阻力（QJRMS，2004）。两者都适用于1km的网格大小。从`gwd_opt = 1`开始的大规模GWD和低级别流量阻塞已针对水平网格分辨率进行了更适当的调整。可以通过设置名称列表选项`gwd_diags = 1`来输出该方案的更多诊断字段。WPS需要新的GWD输入字段。
 
 7.5 `windfarm_opt`：风力涡轮机阻力参数化方案。它表示特定涡轮机在风场和TKE场上的子网格效应。从文件中读取风电场的物理特性，并建议使用制造商的规范。`run/wind-turbine-1.tbl`中提供了该文件的示例。涡轮机的位置从文件`windturbines.txt`中读取。有关更多详细信息，请参见WRF/目录中的`README.windturbine`。它仅适用于2.5 level MYNN PBL选项（`bl_pbl_physics = 5`）。
 
@@ -1866,7 +1874,7 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 
         - `irr_ph = 1`：激活字段是（i，j，IRRIGATION）的函数
 
-        - `irr_ph = 1`：使用fortran RANDOM函数创建激活字段
+        - `irr_ph = 2`：使用fortran RANDOM函数创建激活字段
 
 考虑到WRF中可能存在多个嵌套，对于每个模拟，灌溉方案应仅在一个域上运行。这样可以确保不重复使用水，并且与计算的`irr_daily_amount`保持一致。有关代码更改的更多信息，请参见https://github.com/wrf-model/WRF/commit/9bd5b61d9a 。
 
@@ -1947,6 +1955,8 @@ WRF中的扩散分为两个参数：扩散选项和K选项。扩散选项选择�
 	6.3 单调传输（选项2）和正定平流（选项1）可应用于湿度（`moist_adv_opt`）、标量（`scalar_adv_opt`）、化学变量（`chem_adv_opt`）和TKE（`tke_adv_opt`）。在以前的版本中，选项1替换了`pd_moist = .true.`等选项。
 
 	6.4 WENO（加权实际无振荡）（选项3适用于五阶WENO；选项4适用于带正定限制器的五阶WENO）：适用于湿度（`moist_adv_opt`）、标量（`scalar_adv_opt`）、化学变量（`chem_adv_opt`）和TKE（`tke_adv_opt`）。对于动量，`momentum_adv_opt = 3`。
+	
+	6.5 隐式显式垂直对流（Implicit explicit vertical advection，IEVA，`zadvect_opt = 1`）：对于具有大纵横比（`dx/dz>> 1`）且允许显式对流的网格，较大的时间步长受积分过程中发生的最强上升气流的限制。这导致时间步长通常减小20-30％，或者需要使用w滤波，例如限制潜热趋势。垂直速度大的区域相对于区域通常也非常小。IEVA方案通过将垂直传输分为使用WRF中存在的常规垂直方案的显式段和使用隐式传输（无条件稳定）的隐式段，从而允许更长的时间步长。组合方案允许比以前使用的时间步长更大的时间步长，并减少了w滤波（Wicker和Skamarock，2020年，MWR）。
 
 	**有关使用单调和正定平流选项的一些注意事项：**
 	
@@ -2096,7 +2106,9 @@ mp_physics|Scheme|Cores|Mass Variables|Number Variables
 50|P3|ARW|Qc Qr Qi|Nr Ni Ri+ Bi++
 51|P3-nc|ARW|Qc Qr Qi|Nc Nr Ni Ri Bi
 52|P3-2ice|ARW|Qc Qr Qi,Qi2|Nc Nr Ni Ri Bi, Ni2, Ri2, Bi2
+53|P3-3mc|ARW|Qc Qr Qi|Nc Nr Ni Ri Bi Zi
 55|Jensen ISHMAEL|ARW|Qv Qc Qr Qi Qi2 Qi3|
+56|NTU|ARW|Qc Qr Qi Qs Qg Qh|Nc Nr Ni Ns Ng Nh
 
 ```
 * Advects only total condensates
@@ -2483,10 +2495,12 @@ mp_physics (max_dom)|-|微观物理设置，所有域都应使用相同的值
 -|30|HUJI (Hebrew University of Jerusalem, Israel) spectral bin microphysics, fast version
 -|32|HUJI spectral bin microphysics, full version
 -|40|Morrison double-moment scheme with CESM aerosol; must be used  with MSKF cumulus scheme.
--|50|P3 1-category; a single ice category that represents a combination of ice, snow and graupel, and carries prognostic arrays for rimed ice mass and rimed ice volume. Double moment rain and ice.
--|51|P3 1-category plus double moment cloud water
--|52|P3-nc; As P3 but adds supersaturation dependent activation and double-moment cloud water.
+-|50|P3 1-ice category, 1-moment cloud water
+-|51|P3 1-ice category, plus double moment cloud water
+-|52|P3 2-ice categories, plus double-moment cloud water
+(new since V4.3)|53|P3 1-ice category, 3-moment ice, plus double moment cloud water
 (new since V4.1)|55|Jensen ISHMAEL
+(new since V4.3)|56|NTU multi-moment scheme
 -|95|Ferrier (old Eta), operational NAM (WRF NMM)
 do_radar_ref|1|允许使用mp-scheme-特定的参数来计算雷达反射率，适用于`mp_physics = 2,4,6,7,8,10,14,16`
 mp_zero_out|-|对于非零的`mp_physics`选项，将湿度变量保持在≥0（阈值）以上。使湿度变量保持正值的另一种（更好的）方法是使用`moist_adv_opt`选项。
@@ -2542,6 +2556,7 @@ swint_opt|1|Turn on interpolation of shortwave radiation based on the updated so
 -|2|Activates FARMS to allow simulation of the broadband solar radiation model every time step.
 ra_call_offset|-1|Turn on radiation offset, to call radiation just before output time, instead of after output time
 co2tf|1|CO2 transmission function flag for GFDL radiation only, which allows generation of CO2 function internally
+ra_sw_eclipse|0|Eclipse effect on shortwave radiation. 0: off, 1: on. Works with RRTMG, Goddard, old Goddard, and Dudhia schemes
 -|-|**注：CAM的以下5个变量是自动设置的**
 cam_abs_freq_s|21600|default CAM clear sky longwave absorption calculation frequency (recommended minimum value to speed scheme up)
 levsiz|59|number of ozone data levels for  CAM radiation
@@ -2604,8 +2619,9 @@ sf_surface_physics (max_dom)|-|land-surface option (set this before running real
 sf_urban_physics (max_dom)|-|activate urban canopy model (in Noah LSM only). The same value should be used for all domains.
 -|0|off
 -|1|Single-layer, UCM
--|2|Multi-layer, Building Environment Parameterization (BEP) scheme (works only with the MYJ and BouLac PBL)
--|3|Multi-layer, Building Environment Model (BEM) scheme (works only with MYJ and BouLac PBL)
+-|2|Multi-layer, Building Environment Parameterization (BEP) scheme (works only with the MYJ, BouLac and YSU PBL)
+-|3|Multi-layer, Building Environment Model (BEM) scheme (works only with MYJ, BouLac and YSU PBL)
+use_wudapt_lcz|0|Option to use WUDAPT LCZ urban landuse categories. 0: use traditional 31-33 urban categories; 1: use WUDAPT LCZ 31-41 categories.
 ua_phys|.true.|activate UA Noah LSM changes to use a different snow-cover physics. Aimed toward improving treatment of snow as it relates to the vegetation canopy.
 num_soil_layers|-|number of soil layers in land surface model (set before running real.exe)
 -|5|（默认值） thermal diffusion scheme for temp only
@@ -2627,6 +2643,7 @@ bl_pbl_physics (max_dom)|-|boundary layer option. The same value should be used 
 -|10|TEMF scheme (ARW only); must use  sf_sfclay_physics=10
 -|11|Shin-Hong 'scale-aware' PBL scheme
 -|12|GBM TKE-type scheme (ARW only); must use  sf_sfclay_physics=1
+-|16|EEPS: TKE+TKE dissipation rate (epsilon) scheme; works with sf_sfclay_physics = 1,91,2,5
 -|99|MRF scheme (to be removed in the future)
 mfshconv (max_dom)|1|turns on day-time EDMF for QNSE (0=off)
 bldt (max_dom)|0|minutes between boundary-layer physics calls (0=call every time step – recommended)
@@ -2666,7 +2683,7 @@ grav_settling (max_dom)|-|gravitational settling of fog/cloud droplets
 -|0|（默认值） no settling of cloud droplets
 -|1|settling from Dyunkerke 1991 (in atmosphere at at surface)
 -|2|Fogdes (vegetation and wind speed dependent; Katata et al. 2008) at surface, and Dyunkerke in the atmosphere
-ysu_topdown_pblmix|1|turns on top-down radiation-driven mixing (default is 0=no)
+ysu_topdown_pblmix|1|turns on top-down radiation-driven mixing; 0: off, 1: on (default)
 cu_physics (max_dom)|-|cumulus parameterization option. The same value should be used for all domains that have cu_physics turned on.
 -|0|no cumulus parameterization
 -|1|Kain-Fritsch (new Eta) scheme
@@ -2737,6 +2754,7 @@ icloud|-|cloud effect to the optical depth in radiation (only works with ra_sw_p
 -|0|without cloud effect
 -|2|with cloud effect; must use cloud fraction option 2, 0/1 based on threshold
 -|3|with cloud effect; must use cloud fraction option 3, a Sundqvist method (Sundqvist et al. 1989)
+insert_init_cloud|.false.|Option to estimate initial model cloud using option icloud=3, cold start only.
 swrad_scat|1|scattering tuning parameter; default 1 is 1.e-5 m-2 kg-1 (only for ra_sw_physics=1).  Increase for more scattering.
 surface_input_source|-|where landuse and soil category data come from
 -|1|WPS/geogrid, but with dominant categories recomputed in real
@@ -2987,6 +3005,8 @@ opt_crop|-|Options for crop model
 -|0|（默认值） no crop model, will run default dynamic vegetation
 -|1|Liu, et al., 2016
 -|2|Gecros (Genotype-by-Environment interaction on CROp grown Simulator); Yin and van Laar, 2005
+opt_irr|0|Irrigation option: 0: No irrigation; 1: on; 2: irrigation trigger based on crop season planting and harvesting; 3: irrigation trigger based on LAI threshold
+opt_irrm|0|Irrigation methods: 0: based on geo_em fraction; 1: sprinkler; 2: micro/drip irrigation; 3: surface flooding
 
 **变量名称**|**输入选项**|**描述**
 -------------|------------|--------
@@ -3116,7 +3136,7 @@ obs_scl_neg_qv_innov|1|Setting to 1 prevents nudging toward negative Qv
 **&dynamics**|-|**扩散、阻尼、平流选项**
 hybrid_opt |2|（默认值） Klemp cubic form with etac
 -|0|Original WRF coordinate (through V3)
-Etac |0.2|znw(k) < etac, eta surfaces are isobaric (0.2 is a good default)
+etac|0.2|znw(k) < etac, eta surfaces are isobaric (0.2 is a good default)
 rk_ord|-|time-integration scheme option
 -|2|Runge-Kutta 2nd order
 -|3|(3 is recommended setting) Runge-Kutta 3rd order
@@ -3150,6 +3170,8 @@ c_k (max_dom|0.15|TKE coefficient
 zdamp (max_dom)|5000|damping depth (m) from model top
 dampcoef (max_dom)|0.|damping coefficient (see damp_opt)
 w_damping|-|Turns on vertical velocity damping flag (for operational use)
+w_crit_cfl|1.2|Default vertical courant number where vertical damping begins
+zadvect_implicit|0|Switch for implicit / explicit vertical advection (IEVA) scheme. 0: off (default), 1: on.
 base_pres|100000|base state surface pressure (Pa); real only. not recommended to change default value.
 base_temp|290.|base state temperature (K); real only
 base_lapse|50.|real-data ONLY, lapse rate (K), not recommended to change default value
@@ -3194,6 +3216,7 @@ tke_adv_opt (max_dom)|-|advection options for TKE
 -|2|monotonic
 -|3|5th-order WENO
 -|4|5th-order WENO with positive definite
+phi_adv_z|1|vertical advection option for geopotentialvertical advection option for geopotential; 1: original (default); 2: avoid double staggering of omega
 -|-|**以下10个选项是有选择地停用特定标量变量类的2阶和6阶水平过滤器的开关**
 moist_mix2_off (max_dom)|.true.|Setting to .true. deactivates 2nd-order horizontal mixing for moisture.
 chem_mix2_off (max_dom|.true.|Setting to .true. deactivates 2nd-order horizontal mixing for chem species.
@@ -3227,7 +3250,7 @@ coupled_filtering|.true.|mu coupled scalar arrays are run through the polar filt
 pos_def|.true.|remove negative values of scalar arrays by setting minimum value to zero
 swap_pole_with_next_j|.true.|replaces the entire j=1 (jds-1) with the values from j=2 (jds-2)
 actual_distance_average|.true.|average the field at each i location in the j-loop with a number of grid points based on a map-factor ratio
-gwd_opt (max_dom)|1|gravity wave drag option; can be used for all grid sizes with appropriate input fields from geogrid
+gwd_opt (max_dom)|1|gravity wave drag option; can be used for all grid sizes with appropriate input fields from geogrid. 0: option off; 1: gravity wave drag and blocking; 3: gravity wave drag, blocking, small-scale gravity drag and turbulent orographic form drag
 do_avgflx_em (max_dom)|1|outputs time-averaged mass-coupled advective velocities
 do_avgflx_cugd (max_dom)|1|outputs time-averaged convective mass-fluxes from the Grell-Devenyi ensemble scheme; only takes effect if do_avgflx_em =1, and cu_physics=93
 sfs_opt (max_dom)|-|nonlinear backscatter and anisotrophy (NBA)
