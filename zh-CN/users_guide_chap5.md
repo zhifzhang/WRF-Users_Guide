@@ -1738,9 +1738,9 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 
 4.1 **Yonsei University scheme（`bl_pbl_physics = 1`）**：在不稳定的混合层中具有显式夹杂层和抛物线K轮廓的非局部K方案。
 
-    - `topo_wind`：= 1：地表风的地形校正，以表示来自子网格地形的额外阻力以及山顶处的​​流量增加（Jimenez and Dudhia, JAMC 2012）。仅适用于YSU PBL。= 2：更简单的与地形变化有关的校正。
+- `topo_wind`：= 1：地表风的地形校正，以表示来自子网格地形的额外阻力以及山顶处的​​流量增加（Jimenez and Dudhia, JAMC 2012）。仅适用于YSU PBL。= 2：更简单的与地形变化有关的校正。
     
-    - `ysu_topdown_pblmix`：= 1：由辐射冷却驱动的自上而下混合的选项。
+- `ysu_topdown_pblmix`：= 1：由辐射冷却驱动的自上而下混合的选项。
 
 4.2 **Mellor-Yamada-Janjic scheme（`bl_pbl_physics = 2`）**：Eta操作方案。一维局部湍流预混湍动能方案。
 
@@ -1748,15 +1748,15 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 
 4.4 **Mellor-Yamada Nakanishi and Niino Level 2.5 PBL（`bl_pbl_physics = 5`）**。预测子网格TKE项。
 
-    - `icloud_bl`：= 1，将子网格规模的云从MYNN耦合到辐射的选项；
+- `icloud_bl`：= 1，将子网格规模的云从MYNN耦合到辐射的选项；
     
-    - `bl_mynn_cloudpdf`：= 1，Kuwano等人（2010）; = 2，Chaboureau和Bechtold（2002，JAS，带有mods，默认值）; 
+- `bl_mynn_cloudpdf`：= 1，Kuwano等人（2010）; = 2，Chaboureau和Bechtold（2002，JAS，带有mods，默认值）; 
     
-    - `bl_mynn_cloudmix`：= 1，混合云水和冰（当`scalar_pblmix = 1`时，qnc和qni混合）；
+- `bl_mynn_cloudmix`：= 1，混合云水和冰（当`scalar_pblmix = 1`时，qnc和qni混合）；
     
-    - `bl_mynn_edmf`：= 1，激活MYNN中的质量通量；
+- `bl_mynn_edmf`：= 1，激活MYNN中的质量通量；
     
-    - `bl_mynn_mixlength`：= 1，来自RAP/HRRR；2，来自混合。
+- `bl_mynn_mixlength`：= 1，来自RAP/HRRR；2，来自混合。
 
 4.5 **Mellor-Yamada Nakanishi and Niino Level 3 PBL（`bl_pbl_physics = 6`）**：预测TKE和其他第二时刻。
 
@@ -1784,9 +1784,9 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 
 5.1 **Kain-Fritsch scheme（`cu_physics = 1`）**：深质量流和浅层对流子网格方案，该方案使用质量流量法并具有下降气流和CAPE去除时间尺度。
 
-    -  `kfeta_trigger`：= 1 ，缺省触发器; = 2，湿度对流调制触发函数（基于Ma和Tan，2009，大气研究）。当大规模强迫作用较弱时，可能会改善亚热带地区的结果。
+-  `kfeta_trigger`：= 1 ，缺省触发器; = 2，湿度对流调制触发函数（基于Ma和Tan，2009，大气研究）。当大规模强迫作用较弱时，可能会改善亚热带地区的结果。
     
-    - `cu_rad_feedback`：=true，允许与辐射子网格云量相互作用。（Alapaty等人，2012年，Geophysical Research Letters）
+- `cu_rad_feedback`：=true，允许与辐射子网格云量相互作用。（Alapaty等人，2012年，Geophysical Research Letters）
 
 5.2 **Betts-Miller-Janjic scheme（`cu_physics = 2`）**：操作Eta方案。色谱柱湿润度调节方案朝着混合均匀的轮廓方向放松。
 
@@ -1832,29 +1832,29 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 
 7.1 用于热带风暴和飓风应用的选项：
 
-        - `sf_ocean_physics = 1`（在以前的版本中名为`omlcall`）：简单的海洋混合层模型：遵循Pollard，Rhines和Thompson（1972）的一维海洋混合层模型。其他两个namelist选项可用于指定初始混合层深度（尽管可能会摄取实际的混合层深度数据）（`oml_hml0`）和低于混合层的温度降低速率（`oml_gamma`）。此选项可用于所有`sf_surface_physics`选项。
+- `sf_ocean_physics = 1`（在以前的版本中名为`omlcall`）：简单的海洋混合层模型：遵循Pollard，Rhines和Thompson（1972）的一维海洋混合层模型。其他两个namelist选项可用于指定初始混合层深度（尽管可能会摄取实际的混合层深度数据）（`oml_hml0`）和低于混合层的温度降低速率（`oml_gamma`）。此选项可用于所有`sf_surface_physics`选项。
         
-        - `sf_ocean_physics = 2`：基于Price等人（1994）的3D Price-Weller-Pinkel（PWP）海洋模型。该模型预测水平对流、压力梯度力以及混合层过程。通过namelist变量`ocean_z`，`ocean_t`和`ocean_s`的简单初始化可用。
+- `sf_ocean_physics = 2`：基于Price等人（1994）的3D Price-Weller-Pinkel（PWP）海洋模型。该模型预测水平对流、压力梯度力以及混合层过程。通过namelist变量`ocean_z`，`ocean_t`和`ocean_s`的简单初始化可用。
         
-        - `isftcflx`：修改表面体阻力（Donelan）和焓系数，使其与热带风暴和飓风的最新研究结果更加一致。此选项还包括热通量中的耗散加热项。这是仅适用于`sf_sfclay_physics = 1`，有用于计算焓系数的两个选项：`isftcflx = 1`：常数z0q，用于热和水分; `isftcflx = 2`：Garratt公式，热量和水分的形式略有不同。
+- `isftcflx`：修改表面体阻力（Donelan）和焓系数，使其与热带风暴和飓风的最新研究结果更加一致。此选项还包括热通量中的耗散加热项。这是仅适用于`sf_sfclay_physics = 1`，有用于计算焓系数的两个选项：`isftcflx = 1`：常数z0q，用于热和水分; `isftcflx = 2`：Garratt公式，热量和水分的形式略有不同。
 
 7.2 长时间模拟的其他选项：
 
-    - `tmn_update`：更新深层土壤温度（1）。
+- `tmn_update`：更新深层土壤温度（1）。
     
-    - `sst_skin`：根据Zeng和Beljaars（2005）计算的表面SST（1）。
+- `sst_skin`：根据Zeng和Beljaars（2005）计算的表面SST（1）。
     
-    - `bucket_mm`：水当量降水累积的桶重置值（以mm为单位的值，-1 = 无效）。
+- `bucket_mm`：水当量降水累积的桶重置值（以mm为单位的值，-1 = 无效）。
     
-    - bucket_J ：能量累积的存储桶重置值（以焦耳为单位的值，-1 = 无效）。仅适用于CAM和RRTMG辐射（`ra_lw_physics = 3、4、14、24`以及`ra_sw_physics = 3、4、14、24`）选项。
+- bucket_J ：能量累积的存储桶重置值（以焦耳为单位的值，-1 = 无效）。仅适用于CAM和RRTMG辐射（`ra_lw_physics = 3、4、14、24`以及`ra_sw_physics = 3、4、14、24`）选项。
     
-    - 使用没有leap年的气候数据驱动WRF模型，有一个编译选项可以做到。编辑`configure.wrf`并添加`-DNO_LEAP_CALENDAR`给宏`ARCH_LOCAL`。
+- 使用没有leap年的气候数据驱动WRF模型，有一个编译选项可以做到。编辑`configure.wrf`并添加`-DNO_LEAP_CALENDAR`给宏`ARCH_LOCAL`。
 
 7.3 土地模型输入选项：
 
-    - `usemonalb`：设置为.true.时，使用来自geogrid的每月反照率字段，而不是表值。
+- `usemonalb`：设置为.true.时，使用来自geogrid的每月反照率字段，而不是表值。
     
-    - `rdlai2d`：设置为.true.时，使用来自geogrid的每月LAI数据，并且如果`sst_update`为1，则该字段也将转到wrflowinp文件。
+- `rdlai2d`：设置为.true.时，使用来自geogrid的每月LAI数据，并且如果`sst_update`为1，则该字段也将转到wrflowinp文件。
 
 7.4 `gwd_opt=1`：重力波拖动选项。建议用于所有网格尺寸。该方案包括两个子网格的地形效果：重力波阻力和低水平流阻。方案的输入风将旋转到地球坐标，然后将输出调整回投影域。这使该方案可以用于WRF支持的所有地图投影。为了正确应用此选项，必须使用来自geogrid的适当输入字段。有关详细信息，请参见本指南[第3章中的“为重力波拖曳方案选择静态数据”部分](users_guide_chap3.md#Selecting_Static_Data )。
 
@@ -1864,17 +1864,17 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 
 7.6 地表灌溉参数化：V4.2中增加了三种灌溉方案，可在模型中表示地表灌溉过程，并明确控制水量和灌溉时间（有关更多信息，请参阅https://doi.org/10.5194/gmd-2019-233）。该方案（&physics namelist）代表不同的技术，具体取决于应用过程中的水蒸发损失。蒸发过程考虑以下因素造成的损失：
 
-    - `sf_surf_irr_scheme = 1`：表面蒸散（仅适用于Noah-LSM）
+- `sf_surf_irr_scheme = 1`：表面蒸散（仅适用于Noah-LSM）
 
-    - `sf_surf_irr_scheme = 2`：树叶/冠层截留和表面蒸散
+- `sf_surf_irr_scheme = 2`：树叶/冠层截留和表面蒸散
 
-    - `sf_surf_irr_scheme = 3`：微观物理过程，叶片/冠层截留和表面蒸散
+- `sf_surf_irr_scheme = 3`：微观物理过程，叶片/冠层截留和表面蒸散
 
 每天使用的灌溉水量定义为`irr_daily_amount`（毫米/天）。该应用在一天中的时间段从`irr_start_hours` UTC时间开始，并持续`irr_num_hours`。一年中的灌溉时间范围由`irr_start_julianday`和`irr_end_julianday`内的儒略日定义。要考虑大于每天的灌溉间隔，可以将`irr_freq`设置为大于1的值。因此，在`irr_freq`期间内的活动日中应用的水量为（`irr_daily_amount` × `irr_freq`）。`irr_ph`调节灌溉的空间激活（当`irr_freq > 1`），尤其是确定是否在同一天为所有域激活了灌溉（`irr_ph = 0`）。对于`irr_ph`不等于0给出了两个选项：
 
-        - `irr_ph = 1`：激活字段是（i，j，IRRIGATION）的函数
+- `irr_ph = 1`：激活字段是（i，j，IRRIGATION）的函数
 
-        - `irr_ph = 2`：使用fortran RANDOM函数创建激活字段
+- `irr_ph = 2`：使用fortran RANDOM函数创建激活字段
 
 考虑到WRF中可能存在多个嵌套，对于每个模拟，灌溉方案应仅在一个域上运行。这样可以确保不重复使用水，并且与计算的`irr_daily_amount`保持一致。有关代码更改的更多信息，请参见https://github.com/wrf-model/WRF/commit/9bd5b61d9a 。
 
