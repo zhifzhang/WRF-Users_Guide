@@ -49,6 +49,8 @@
 	3.20 [混合垂直坐标](#HVC)
 	
 	3.21 [使用多个横向条件文件](#Multiple_Lateral_Condition)
+	
+	3.22 [使用MAD-WRF](#Mad_WRF)
 
 4. [各种应用的namelist示例](#Examples_namelists)
 
@@ -1338,6 +1340,40 @@ wrfbdy_d01_2000-01-24_18:00:00
 wrfbdy_d01_2000-01-25_00:00:00       
 wrfbdy_d01_2000-01-25_06:00:00
 ```
+<a id=Mad_WRF></a>
+
+### 使用MAD-WRF
+
+MAD-WRF模式是为改进云分析和太阳辐照度的短期预报而设计的。
+
+运行MAD-WRF有两个选项：
+
+1. madwrf_opt = 1：在不考虑任何微物理过程的情况下，利用模型动力学对初始水汽凝结体进行平流和扩散。用户应在namelist.input的physics模块中设置mp_physics = 96和use_mp_re = 0。
+
+2. madwrf_opt = 2：有一组水汽凝结体示踪剂随模型动力学平流和扩散。在初始时间，示踪剂等于标准水汽凝结体。在模拟过程中，标准水汽凝结体向示踪剂微调。namelist变量madwrf_dt_nudge设置水汽凝结体微调的时间周期（单位：分钟）。Namelist变量madwrf_dt_relax设置水汽凝结体微调的松弛时间（单位：秒）。
+
+MAD-WRF有一个增强云初始化的选项。要打开（关闭）云初始化，请设置namelist变量madwrf_cldinit=1（0）。
+
+默认情况下，模型根据分析的相对湿度增强云分析。用户可以通过WPS中间格式向metgrid提供额外的变量来增强云初始化：
+
+1. Cloud mask (CLDMASK variable): 
+	Remove clouds if clear (cldmask = 0)
+
+2. Cloud mask (CLDMASK variable) + brightness temperature (BRTEMP variable) sensitive to hydrometeor content (e.g. GOES-R channel 13): 
+	Remove clouds if clear (cldmask = 0) 
+	Reduce / extend cloud top heights to match observations
+	Add clouds over clear sky regions (cldmask = 1)
+
+3. Cloud top height (CLDTOPZ variable) with 0 values over clear sky regions:
+	Remove clouds if clear (cldmask = 0)
+	Reduce / extend cloud top heights to match observations
+	Add clouds over clear sky regions (cldmask = 1)
+
+4. Either 2 or 3 + the cloud base height (CLDBASEZ variable):
+	Remove clouds if clear (cldmask = 0)
+	Reduce / extend cloud top / base heights to match observations
+
+*这些变量中缺少的值应设置为-999.9。
 
 <a id=Examples_namelists></a>
 
