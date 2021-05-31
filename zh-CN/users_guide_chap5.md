@@ -1357,20 +1357,29 @@ MAD-WRF有一个增强云初始化的选项。要打开（关闭）云初始化�
 默认情况下，模型根据分析的相对湿度增强云分析。用户可以通过WPS中间格式向metgrid提供额外的变量来增强云初始化：
 
 1. Cloud mask (CLDMASK variable): 
+
 	Remove clouds if clear (cldmask = 0)
 
 2. Cloud mask (CLDMASK variable) + brightness temperature (BRTEMP variable) sensitive to hydrometeor content (e.g. GOES-R channel 13): 
+
 	Remove clouds if clear (cldmask = 0) 
+	
 	Reduce / extend cloud top heights to match observations
+	
 	Add clouds over clear sky regions (cldmask = 1)
 
 3. Cloud top height (CLDTOPZ variable) with 0 values over clear sky regions:
+
 	Remove clouds if clear (cldmask = 0)
+	
 	Reduce / extend cloud top heights to match observations
+	
 	Add clouds over clear sky regions (cldmask = 1)
 
 4. Either 2 or 3 + the cloud base height (CLDBASEZ variable):
+
 	Remove clouds if clear (cldmask = 0)
+	
 	Reduce / extend cloud top / base heights to match observations
 
 *这些变量中缺少的值应设置为-999.9。
