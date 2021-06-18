@@ -1605,7 +1605,7 @@ WRF提供了多种物理选项，可以以任何方式进行组合。这些选�
 
 1.23 **Jensen ISHMAEL（`mp_physics = 55`）**：该方案可预测冰晶生长中的颗粒形状和习惯。V4.1中的新功能。
 
-1.24 **National Taiwan University (NTU)（`mp_physics = 56`）**：液相的两相moment和冰相的三相moment，以及冰晶形状和密度变化的考虑因素（Tsai和Chen，2020，JAS）。
+1.24 **National Taiwan University (NTU)（`mp_physics = 56`）**：液相的两相moment和冰相的三相moment，以及冰晶形状和密度变化的考虑因素。解决了过饱和，以便明确计算凝聚核(CN)活化；跟踪CN在液滴中的质量以解释气溶胶回收。（Tsai和Chen，2020，JAS）。
  
 #### 2.1 长波辐射方案（ra_lw_physics）
 
@@ -1823,7 +1823,7 @@ Smirnova et al（2016，Mon.Wea.Rev.，S16）;
 
 4.14 **SMS-3DTKE**：这是3D TKE子网格混合方案，可自适应大涡模拟（LES）和中尺度极限之间的网格大小。可以通过设置`bl_pbl_physic = 0`，`km_opt = 5`，`diff_opt = 2`来激活它，并且只能与`sf_sfclay_physics = 1，5，91`一起使用。4.2版的新功能。
 
-4.15 **TKE-TKE dissipation rate (epsilon) scheme，EEPS（`bl_pbl_physics = 16`）**：该方案可预测TKE以及TKE耗散率。它还可以同时考虑TKE和耗散率。它与地面物理选项1、91、2和5一起使用。
+4.15 **TKE(E)-TKE dissipation rate (epsilon) scheme，EEPS（`bl_pbl_physics = 16`）**：该方案可预测TKE以及TKE耗散率。它还可以同时考虑TKE和耗散率。它与地面物理选项1、91和5一起使用。
 
 #### 5 积云参数化（cu_physics）
 
@@ -2120,6 +2120,7 @@ mp_physics|Scheme|Reference|Added
 40|Morrison+CESM aerosol|EPA|2018
 50/51/52|P3|[Morrison and Milbrandt (2015, JAS)](https://doi.org/10.1175/JAS-D-14-0065.1 )|2017
 55|Jensen ISHMAEL|[Jensen et al. (2017, JAS)](https://doi.org/10.1175/JAS-D-16-0350.1 )|2019
+56|NTU|Tsai and Chen (2020, JAS)|2021
 
 mp_physics|Scheme|Cores|Mass Variables|Number Variables
 ----------|------|-----|--------------|----------------
@@ -2153,7 +2154,7 @@ mp_physics|Scheme|Cores|Mass Variables|Number Variables
 52|P3-2ice|ARW|Qc Qr Qi,Qi2|Nc Nr Ni Ri Bi, Ni2, Ri2, Bi2
 53|P3-3mc|ARW|Qc Qr Qi|Nc Nr Ni Ri Bi Zi
 55|Jensen ISHMAEL|ARW|Qv Qc Qr Qi Qi2 Qi3|
-56|NTU|ARW|Qc Qr Qi Qs Qg Qh|Nc Nr Ni Ns Ng Nh
+56|NTU|ARW|Qc Qr Qi Qs Qg Qh Qdcn Qtcn Qccn Qrcn|Nc Nr Ni Ns Ng Nh Nin Ai As Ag Ah Vi Vs Vg Fi Fs
 
 ```
 * Advects only total condensates
@@ -2547,6 +2548,7 @@ mp_physics (max_dom)|-|微观物理设置，所有域都应使用相同的值
 (new since V4.1)|55|Jensen ISHMAEL
 (new since V4.3)|56|NTU multi-moment scheme
 -|95|Ferrier (old Eta), operational NAM (WRF NMM)
+ccnty|2|NTU微物理学的气溶胶选项(56)；1: 海洋气溶胶背景类型；2:（默认值）大陆清洁气溶胶类型；3:大陆平均气溶胶类型；4:大陆城市气溶胶类型
 do_radar_ref|1|允许使用mp-scheme-特定的参数来计算雷达反射率，适用于`mp_physics = 2,4,6,7,8,10,14,16`
 mp_zero_out|-|对于非零的`mp_physics`选项，将湿度变量保持在≥0（阈值）以上。使湿度变量保持正值的另一种（更好的）方法是使用`moist_adv_opt`选项。
 -|0|（默认值）不采取行动; 无需调整任何湿度场
@@ -2688,7 +2690,7 @@ bl_pbl_physics (max_dom)|-|boundary layer option. The same value should be used 
 -|10|TEMF scheme (ARW only); must use  sf_sfclay_physics=10
 -|11|Shin-Hong 'scale-aware' PBL scheme
 -|12|GBM TKE-type scheme (ARW only); must use  sf_sfclay_physics=1
--|16|EEPS: TKE+TKE dissipation rate (epsilon) scheme; works with sf_sfclay_physics = 1,91,2,5
+-|16|EEPS: TKE+TKE dissipation rate (epsilon) scheme; works with sf_sfclay_physics = 1,91,5
 -|99|MRF scheme (to be removed in the future)
 mfshconv (max_dom)|1|turns on day-time EDMF for QNSE (0=off)
 bldt (max_dom)|0|minutes between boundary-layer physics calls (0=call every time step – recommended)
